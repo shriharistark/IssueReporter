@@ -1,0 +1,169 @@
+<html>
+<head>
+    <link rel = "stylesheet" href = "stylenewissue.css">
+    <link rel = "stylesheet" href = "styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<title>Issue tracker</title>
+
+<body>
+
+<div id = "banner">
+</div>
+<div id = "nav">
+    <img src = "logo.jpg" widtd=40px height=40px>
+    <a class = "nav-box" href ="issues.html">Issues</a>
+    <a class = "nav-box">Profiling</a>
+    <a class = "nav-box">Ledger</a>
+    <a class = "nav-box" href = "newissue.html">New Issue</a>
+</div>
+
+<div id = "create-issue">
+    <form id = "issue-new">
+
+        <br>
+        <div class = "issue-new-text">Tags</div>
+        <input id = "issue-tags"  type="text" name="tags" required>
+        <br>
+
+        <div class = "issue-new-text">Subject</div>
+        <input id = "issue-subject" type="textarea" name="subject">
+        <br>
+        <div id ="issue-description-insert">
+            <div class = "issue-new-text">Description</div>
+            <div class="issue-new-text-insert">
+                Insert <select>
+                <option value="Image">Image</option>
+                <option value="video">Video</option>
+                <option value="link">Link</option>
+                <option value="others">Others</option>
+            </select>
+            </div>
+        </div>
+        <textarea id = "issue-description" name="description"></textarea>
+        <br>
+        <div id ="assign">
+            <div class = "issue-new-text">Assignee</div>
+            <select id = "issue-assignee" name="assignee">
+                <option value="Hari">Hari</option>
+                <option value="Karhti">Karhtik</option>
+                <option value="Maneesh">Manessh</option>
+                <option value="Vivek">Vivek</option>
+            </select>
+            <div class = "issue-new-text">Assign to</div>
+            <select id = "issue-assigned-to" name="assigned-to">
+                <option value="Hari">Hari</option>
+                <option value="Karhti">Karhtik</option>
+                <option value="Maneesh">Manessh</option>
+                <option value="Vivek">Vivek</option>
+            </select>
+        </div>
+        <button id ="issue-done">Done</button>
+    </form>
+</div>
+
+
+<script>
+    document.getElementById("issue-done").onclick = function (ev) {
+
+        //var issueDetails = document.getElementById("getStudentDetails").getElementsByTagName("input");
+        ev.preventDefault();
+        //alert("hey");
+        createIssue();
+
+        function createIssue(){
+
+            let tags = $("#issue-new #issue-tags").val();
+            let subject = $("#issue-subject").val();
+            let description = $("#issue-description").val();
+            let assignee = $("#issue-assignee").val();
+            let assignedTo = $("#issue-assigned-to").val();
+
+            let tagsList = tags.split(",");
+
+
+            for(let i = 0 ; i < tagsList.length ; i++){
+                tagsList[i] = tagsList[i].trim();
+            }
+
+            console.log(tags+","+subject+","+description+","+assignedTo+","+assignee);
+
+            let issue = {};
+
+            issue.tags = tagsList;
+            issue.subject = subject;
+            issue.description = description;
+            issue.assignee = assignee;
+            issue.assignedTo = assignedTo;
+            issue.toString = function(){
+                return this.tags+this.subject+this.description+this.assignee+this.assignedTo;
+            }
+
+            console.log(issue.toString());
+
+            let init = {
+                method : "POST",
+                body : JSON.stringify(issue),
+                headers : {
+                    'Accept' : 'application/json,text/plain,*/*',
+                    'Content-type' : 'application/json'
+                }
+            };
+
+            let url = "/issue/create";
+
+            fetch(url,init).then(function (value) {
+                return value.json();
+            },function (reason) {
+                console.log(reason);
+                return "{'result':'failed'}";
+            }).then(function (val) {
+
+            let issueTicketResponse = val;
+            console.log(issueTicketResponse);
+            if(issueTicketResponse.ok) {
+                console.log(issueTicketResponse);
+                alert("ticket created | ticketCode: "+issueTicketResponse.code);
+            }
+
+            else{
+                alert("ticket creation failed | reason: "+issueTicketResponse.status);
+            }
+        });
+
+        }
+
+
+        // var url = "/issue/create"+"?tags="+tagsList
+        //     +"&subject="+subject
+        //     +"&description="+description
+        //     +"&assignee="+assignee
+        //     +"&assignedTo="+assignedTo;
+
+        //console.log(url);
+
+
+        //alert("eee");
+
+        // return fetch(url,init).then(function (value) {
+        //         return value.json();
+        //     },function (reason) {
+        //         console.log(reason);
+        //         return "{'result':'failed'}";
+        //     }
+        // ).then(function (val) {
+
+        //     var issueTicketResponse = val;
+        //     console.log(issueTicketResponse);
+        //     if(issueTicketResponse.ok) {
+        //         alert("ticket created | ticketCode: "+issueTicketResponse.code);
+        //     }
+
+        //     else{
+        //         alert("ticket creation failed | reason: "+issueTicketResponse.status);
+        //     }
+        // });
+    }
+</script></body>
+</html>

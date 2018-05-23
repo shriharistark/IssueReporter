@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello spring</title>
+</head>
+<body>
+<p id ="p">
+    <form id = "getStudentDetails">
+        <input type = "text" name = "id" placeholder="id">
+        <input type = "text" name = "name" placeholder="name">
+        <input type = "text" name = "number" placeholder="number">
+        <input type = "text" name = "friends" placeholder="friends">
+    </form>
+    <button id = "st">Let us see</button>
+
+</p>
+
+<form id = "displayStudentDetails">
+    <input type = "text" name = "name" placeholder="name">
+    <input type = "text" name = "number" placeholder="age">
+    <input type = "text" name = "friends" placeholder="friends">
+</form>
+
+<script>
+    document.getElementById("st").onclick = function (ev) {
+        var init = {
+            method : "GET"
+        };
+
+        var studentDetails = document.getElementById("getStudentDetails").getElementsByTagName("input");
+
+        var url = "/student/"+studentDetails[0].value +"?name="+studentDetails[1].value
+                    +"&age="+studentDetails[2].value
+                    +"&friends="+studentDetails[3].value;
+
+        return fetch(url,init).then(function (value) {
+                return value.json();
+            },function (reason) {
+                console.log(reason);
+                return "{'result':'failed'}";
+            }
+        ).then(function (val) {
+
+            var student = val;
+            console.log(student);
+            if(!student.result) {
+                var formEle = document.getElementById("displayStudentDetails").getElementsByTagName("input");
+
+                formEle[0].value = student.name;
+                formEle[1].value = student.age;
+                formEle[2].value = student.friends;
+            }
+        });
+    }
+</script>
+</body>
+</html>

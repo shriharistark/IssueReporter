@@ -1,0 +1,198 @@
+#banner {
+    width: 100%;
+    height: 15%;
+    background-color: #adadad;
+    border: solid 1px #979797;
+}
+
+#nav{
+    display: flex;
+    flex-direction: row;
+    background-color: #979797;
+    height: 10%;
+}
+
+#nav img{
+    padding-left: 10px;
+    padding-right: 10px;
+    align-self: center;
+}
+
+.nav-box-active {
+    width: 15%;
+    height: 100%;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 10px;
+    text-decoration: none;
+}
+
+.nav-box {
+    width: 15%;
+    height: 100%;
+    background-color: #606060;
+    padding-left: 20px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+#filters{
+    min-height: 10%;
+}
+/*
+#issues {
+	display: flex;
+	flex-direction: column;
+}*/
+
+
+/*
+.issue-container {
+  width: 100%;
+  height: 10%;
+  background-color: #f4f4f4;
+  border: solid 1px #ffffff;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.issue-id{
+	font-family: Helvetica;
+	padding-left: 2%;
+}
+
+.issue-content {
+  font-family: Helvetica;
+  padding-left: 5%;
+
+}
+
+.issue-status {
+  font-family: Helvetica;
+  color: rgba(57, 149, 0, 0.93);
+  	padding-left: 10%;
+
+}
+
+.issue-date {
+  font-family: Helvetica;
+  color: rgba(3, 3, 3, 0.93);
+  	padding-left: 10%;
+
+}
+
+.issue-description {
+  font-family: Helvetica;
+  color: rgba(3, 3, 3, 0.93);
+  	padding-left: 10%;
+
+}
+
+.issue-assignee {
+  font-family: Helvetica;
+  color: rgba(3, 3, 3, 0.93);
+  	padding-left: 10%;
+
+}
+
+.issue-assign-to {
+  font-family: Helvetica;
+  color: rgba(3, 3, 3, 0.93);
+  	padding-left: 5%;
+
+}*/
+
+
+.issue-container-main{
+    display: flex;
+    width : 100%;
+    flex-direction: row;
+}
+.issue-container, .issue-container-head{
+    display: flex;
+    justify-content: flex-start;
+    background-color: whitesmoke;
+    height: 10%;
+    padding-bottom: 1px;
+    align-items: center;
+    font-family: helvetica;
+    padding-left: 10px;
+    min-width: 600px;
+    max-width: 100%;
+    margin-bottom: 2px;
+
+}
+
+.issue-id, .issue-id-head{
+    text-overflow: ellipsis;
+    max-width: 10%;
+    overflow-wrap: break-word;
+    flex-basis: 10%;
+}
+
+.issue-content, .issue-content-head{
+    order : -3;
+    text-overflow: ellipsis;
+    max-width: 15%;
+    overflow-wrap: break-word;
+    flex-basis: 20%;
+    min-width: 150px;
+}
+
+.issue-description, .issue-description-head{
+    order: -1;
+    text-overflow: ellipsis;
+    max-width: 25%;
+    overflow-wrap: break-word;
+    flex-basis: 25%;
+}
+
+.issue-status, .issue-status-head{
+    order : -2;
+    text-overflow: ellipsis;
+    max-width: 10%;
+    overflow-wrap: break-word;
+    flex-basis: 5%;
+    padding-left: 2%;
+    min-width:8%;
+}
+
+.issue-date, .issue-date-head{
+    order: -4;
+    text-overflow: ellipsis;
+    max-width: 10%;
+    overflow-wrap: break-word;
+    flex-basis: 10%;
+}
+
+.issue-assignee, .issue-assignee-head{
+    text-overflow: ellipsis;
+    max-width: 10%;
+    overflow-wrap: break-word;
+    flex-basis: 10%;
+}
+
+.issue-assigned-to, .issue-asigned-to-head{
+    text-overflow: ellipsis;
+    max-width: 10%;
+    overflow-wrap: break-word;
+    flex-basis: 10%;
+}
+
+/*common*/
+.issue-id, .issue-content, .issue-description, .issue-status, .issue-date, .issue-assignee, .issue-assigned-to{
+    font-family: helvetica;
+    font-weight: 200;
+    font-size: 90%;
+}
+
+.issue-id-head, .issue-content-head, .issue-description-head, .issue-status-head, .issue-date-head, .issue-assignee-head, .issue-assigned-to-head{
+    font-family: helvetica;
+    font-weight: 400;
+}
