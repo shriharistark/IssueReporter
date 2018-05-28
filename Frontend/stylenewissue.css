@@ -1,0 +1,133 @@
+#issue-new{
+    margin-left: 5%;
+    margin-top: 5%;
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.issue-new-text{
+    font-family: helvetica neue;
+    color: grey;
+    font-size: 70%;
+    font-weight: 200;
+    padding-bottom: 2px;
+}
+
+#issue-tags{
+    max-width: 50%;
+    border-style:solid;
+    border : none;
+    border-width: 0.5px;
+    border-radius: 2px;
+    height : 8%;
+}
+
+#issue-tags:focus {
+    outline: none;
+    border-color: #4a4a4a;
+    box-shadow: 0 0 1px #4a4a4a;
+}
+
+#issue-subject{
+    max-width: 50%;
+    border-style:solid;
+    border : none;
+    border-width: 0.5px;
+    border-radius: 2px;
+    height : 8%;
+}
+
+#issue-subject:focus {
+    outline: none;
+    border-color: #4a4a4a;
+    box-shadow: 0 0 1px #4a4a4a;
+}
+
+#issue-description{
+    max-width: 50%;
+    border-style:solid;
+    border : none;
+    max-height : 30%;
+    min-height: 20%;
+    resize: none;
+}
+
+#issue-description:focus {
+    outline: none;
+    border-color: #4a4a4a;
+    box-shadow: 0 0 1px #4a4a4a;
+}
+
+#assign{
+    display: flex;
+    justify-content: flex-start;
+    max-width: 50%;
+}
+
+#issue-assignee{
+    margin-left: 10px;
+    margin-right: 10px;
+    min-width: 25%;
+    max-width: 35%;
+    border-style:solid;
+    border : none;
+    border-width: 0.5px;
+    border-radius: 2px;
+    max-height : 12%;
+    min-height: 10%;
+}
+
+#issue-assignee:focus {
+    outline: none;
+    border-color: #4a4a4a;
+    box-shadow: 0 0 1px #4a4a4a;
+}
+
+#issue-assigned-to{
+    margin-left: 10px;
+    padding-left: 10px;
+    min-width: 25%;
+    max-width: 35%;
+    border-style:solid;
+    border : none;
+    border-width: 0.5px;
+    border-radius: 2px;
+    max-height : 12%;
+    min-height: 10%;
+}
+
+#issue-assigned-to:focus {
+    outline: none;
+    border-color: #4a4a4a;
+    box-shadow: 0 0 1px #4a4a4a;
+}
+
+#issue-done{
+    color: white;
+    background-color: #4a4a4a;
+    margin-top: 2%;
+    margin-left: 25%;
+    max-width: 20%;
+    border-style:solid;
+    border : none;
+    border-width: 0.5px;
+    border-radius: 2px;
+    min-height: 10%;
+}
+
+#issue-done:hover, #issue-done:focus {
+    outline: none;
+    background-color: #6d6d6d;
+}
+
+#issue-description-insert{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.issue-new-text-insert{
+    margin-left: 40%;
+}

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bugdog</title>
+    <link rel="stylesheet" href="IssueStyles.css">
+    <!--<link rel="stylesheet" href="stylenewissue.css">-->
+</head>
+<body>
+
+<div id="header">
+Header
+</div>
+<div id = "body-after-header">
+
+    <!--sidebar elements -->
+    <div id = "sidebar">
+        <button id = "create-post" class="create-post-btn" onclick="createIssueButton()">CREATE POST</button>
+        <button id="search-post" class="create-post-btn">SEARCH POST</button>
+
+    </div>
+
+    <!-- issue container -->
+    <div class="issue-main-container">
+        <!--<div class = "issue">-->
+            <!--<div class = "downvote-button">-->
+                <!--<div>-->
+                    <!--<img src="img/status-open-symbol.png">-->
+                <!--</div>-->
+                <!--<div class ="button-downvote">-->
+                    <!--<button class="btn">-->
+                        <!--<div class="arrow-down"></div>-->
+                        <!--<div class="downvote-numbers">5</div>-->
+                    <!--</button>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="issue-body">-->
+                <!--<div class = "title">-->
+                    <!--Reminders not delivered-->
+                <!--</div>-->
+                <!--<div class="assignee">-->
+                    <!--#333 by Maneesh-->
+                <!--</div>-->
+                <!--<div class="description">-->
+                    <!--reminders not delivered at wrong intervals but when booked from ios it works fine.-->
+                <!--</div>-->
+                <!--<div class="assignedTo">-->
+                    <!--Bling/none-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="comments">-->
+                <!--<img src="img/comment-symbol.png">-->
+                <!--<div class="number-of-comments">4</div>-->
+            <!--</div>-->
+        </div>
+    </div>
+
+<div id = "create-issue-popup" hidden>
+
+    <div class="create-issue-popup-title">
+        <div>CREATE ISSUE</div>
+        <div class ="create-issue-popup-close" onclick="hideIssueButton()">x</div>
+    </div>
+
+    <form id = "create-issue-popup-form">
+        <!-- tags -->
+        <div class="create-issue-popup-tags">
+            <div class="textInput">
+                <div class="inset">
+                Tags
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="Add cripsy tags" value="">
+                </div>
+            </div>
+        </div>
+        <!-- subject -->
+        <div class = "create-issue-popup-subject">
+            <div class="textInput">
+                <div class="inset">
+                    Subject
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="Be concise and sweet" value="">
+                </div>
+            </div>
+        </div>
+        <!-- description -->
+        <div class="create-issue-popup-description">
+            <div class="textInput">
+                <div class="inset">
+                    Description
+                </div>
+                <div class="inputContainer">
+                    <textarea placeholder="Add details here" value=""></textarea>
+                </div>
+            </div>
+        </div>
+        <!-- assignee -->
+        <div class="create-issue-popup-assignee">
+            <div class="textInput">
+                <div class="inset">
+                    Assignee
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="choose assignee" value="none">
+                </div>
+            </div>
+        </div>
+        <!-- assignedTo -->
+        <div class="create-issue-popup-assigned-to">
+            <div class="textInput">
+                <div class="inset">
+                    Assign to
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="assign to who?" value="none">
+                </div>
+            </div>
+        </div>
+
+        <div class="create-issue-popup-done">
+            <button class="create-post-btn">Done</button>
+        </div>
+    </form>
+</div>
+<script>
+
+    //status, downvotes, subject, id, assignee, description, assignedTo, comments
+
+    /* Ignore : test for functions
+    * addIssue("closed","11","Calendar is loading Slow","125","Karthick","smartly pick the team to be assigned based on the tags Assigned to should be like bling/none by default.","Claws/Velu","4");
+      addIssue("open","123","Appointments disappearing all of a sudden","009","Prince","Jingle bells jingle bells jingle all the way. Twinkle twinkle little star how I wonder what I want, Up above the world so hight like a diamond in the sky","Avengers/Thulsi","390");
+    * */
+
+    document.getElementById("create-post").addEventListener("click",function (ev) {
+        var createPostDiv = document.createElement("div");
+        createPostDiv.classList.add("create-post-popup-div");
+
+    });
+
+    function addIssue(status, downvotes, subject, id, assignee, description, assignedTo, noofcomments){
+        var issue = document.createElement("div");
+        issue.classList.add("issue");
+        issue.innerHTML="            <div class = \"downvote-button\">\n" +
+            "                <div>\n" +
+            "                    <img src=\"img/status-"+status+"-symbol.png\">\n" +
+            "                </div>\n" +
+            "                <div class =\"button-downvote\">\n" +
+            "                    <button class=\"btn\">\n" +
+            "                        <div class=\"arrow-down\"></div>\n" +
+            "                        <div class=\"downvote-numbers\">"+downvotes+"</div>\n" +
+            "                    </button>\n" +
+            "                </div>\n" +
+            "            </div>\n" +
+            "            <div class=\"issue-body\">\n" +
+            "                <div class = \"title\">\n" +
+            "                    "+subject+"\n" +
+            "                </div>\n" +
+            "                <div class=\"assignee\">\n" +
+            "                    #"+id+" by "+ assignee +
+            "                </div>\n" +
+            "                <div class=\"description\">\n" +
+            "                    "+description +
+            "                </div>\n" +
+            "                <div class=\"assignedTo\">\n" +
+            "                    " +assignedTo+
+            "                </div>\n" +
+            "            </div>\n" +
+            "            <div class=\"comments\">\n" +
+            "                <img src=\"img/comment-symbol.png\">\n" +
+            "                <div class=\"number-of-comments\">"+noofcomments+"</div>\n" +
+            "            </div>";
+        document.getElementsByClassName("issue-main-container")[0].appendChild(issue);
+    }
+
+    function createIssueButton(){
+
+        var elem = document.getElementById("create-issue-popup");
+        // elem.innerHTML = "";
+        elem.removeAttribute("hidden");
+
+        // var elem = document.getElementById("create-issue-popup");
+        // elem.hidden = false;
+        // elem.innerHTML = "<form id = \"create-issue-form\">\n" +
+        //     "        <!-- tags -->\n" +
+        //     "        <input class=\"create-issue-popup-tags\" type=\"text\" name=\"tags\" placeholder=\"tags\">\n" +
+        //     "        <!-- subject -->\n" +
+        //     "        <input class=\"subject\" type=\"text\" name=\"subject\" placeholder=\"subject\">\n" +
+        //     "        <!-- description -->\n" +
+        //     "        <input class=\"create-issue-popup-description\" type=\"text\" name=\"description\" placeholder=\"description\">\n" +
+        //     "        <!-- assignee -->\n" +
+        //     "        <input class=\"create-issue-popup-assignee\" type=\"\" name=\"assignee\" placeholder=\"none\">\n" +
+        //     "        <!-- assignedTo -->\n" +
+        //     "        <input class=\"create-issue-popup-assigned-to\" type=\"\" name=\"assignedTo\" placeholder=\"none\">\n" +
+        //     "    </form>";
+
+        //reduce background opacity
+        var bodyelems = document.getElementsByTagName("body")[0];
+        console.log(bodyelems);
+        for(var i = 0 ; i < bodyelems.children.length ; i++){
+            console.log(bodyelems.children[i].tagName);
+            if(bodyelems.children[i].tagName == "DIV" && bodyelems.children[i].getAttribute("id") != "create-issue-popup"){
+                bodyelems.children[i].style.opacity = 0.2;
+            }
+        }
+
+    }
+
+    function hideIssueButton(){
+        var elem = document.getElementById("create-issue-popup");
+        // elem.innerHTML = "";
+        elem.setAttribute("hidden","");
+
+        //restore background opacity
+        var bodyelems = document.getElementsByTagName("body")[0];
+        for(var i = 0 ; i < bodyelems.children.length ; i++){
+            console.log(bodyelems.children[i].tagName);
+            if(bodyelems.children[i].tagName == "DIV" && bodyelems.children[i].getAttribute("id") != "create-issue-popup"){
+                bodyelems.children[i].style.opacity = 1;
+            }
+        }
+    }
+</script>
+</body>
+</html>
