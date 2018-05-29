@@ -17,7 +17,7 @@ import com.googlecode.objectify.cmd.Query;
 
 public class IssueDAOService implements IssueDAO{
 	
-	Objectify objectifyInstance;
+	static Objectify objectifyInstance;
 	Query<IssueModel> result;
 	
 	public IssueDAOService() {

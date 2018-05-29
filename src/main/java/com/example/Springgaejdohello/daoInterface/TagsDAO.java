@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface TagsDAO {
 
-    List<String> getByPartialText(String partialTag);
-    void setTag(String newtag);
+    List<String> getTagsByPartialText(String partialTag);
+    String createTag(String newtag);
 }
