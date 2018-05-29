@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bugdog</title>
+    <link rel="stylesheet" href="IssueStyles.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--<link rel="stylesheet" href="stylenewissue.css">-->
+</head>
+<body>
+
+<div id="header">
+    Header
+</div>
+<div id = "body-after-header">
+
+    <!--sidebar elements -->
+    <div id = "sidebar">
+        <button id = "create-post" class="create-post-btn" onclick="createIssueButton()">CREATE POST</button>
+        <button id="search-post" class="create-post-btn">SEARCH POST</button>
+
+    </div>
+
+    <!-- issue container -->
+    <div class="issue-main-container">
+
+    </div>
+</div>
+
+<div id = "create-issue-popup" hidden>
+
+    <div class="create-issue-popup-title">
+        <div>CREATE ISSUE</div>
+        <div class ="create-issue-popup-close" onclick="hideIssueButton()">x</div>
+    </div>
+
+    <form id = "create-issue-popup-form">
+        <!-- tags -->
+        <div class="create-issue-popup-tags">
+            <div class="textInput">
+                <div class="inset">
+                    Tags
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="Add cripsy tags" value="">
+                </div>
+            </div>
+        </div>
+        <!-- subject -->
+        <div class = "create-issue-popup-subject">
+            <div class="textInput">
+                <div class="inset">
+                    Subject
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="Be concise and sweet" value="">
+                </div>
+            </div>
+        </div>
+        <!-- description -->
+        <div class="create-issue-popup-description">
+            <div class="textInput">
+                <div class="inset">
+                    Description
+                </div>
+                <div class="inputContainer">
+                    <textarea placeholder="Add details here" value=""></textarea>
+                </div>
+            </div>
+        </div>
+        <!-- assignee -->
+        <div class="create-issue-popup-assignee">
+            <div class="textInput">
+                <div class="inset">
+                    Assignee
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="choose assignee" value="none">
+                </div>
+            </div>
+        </div>
+        <!-- assignedTo -->
+        <div class="create-issue-popup-assigned-to">
+            <div class="textInput">
+                <div class="inset">
+                    Assign to
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="assign to whom?" value="none">
+                </div>
+            </div>
+        </div>
+
+        <div class="create-issue-popup-done">
+            <button class="create-post-btn">Done</button>
+        </div>
+    </form>
+</div>
+<script>
+
+</script>
+</body>
+</html>

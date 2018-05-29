@@ -82,7 +82,8 @@
     float: left;
     padding: 1% 0% 1% 1%;
     cursor: pointer;
-    width:9%;
+    min-width: 8%;
+    max-width: 13%;
 }
 
 .issue .downvote-button:hover{

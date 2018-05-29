@@ -98,7 +98,7 @@ public class IssueController {
 	public @ResponseBody String readAll(@RequestParam(value = "cursor", defaultValue = "") String cursorStr){
 		
 		//hard coded
-		int limit = 10;
+		int limit = 5;
 		
 		IssueDAOService issuedao = new IssueDAOService();
 		QueryResultIterator<IssueModel> resultSet = issuedao.getAllIssues(cursorStr,limit);
