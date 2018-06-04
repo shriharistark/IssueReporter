@@ -10,4 +10,5 @@ public interface TagsDAO {
 
     List<String> getTagsByPartialText(String partialTag);
     String createTag(String newtag);
+    List<String> getAllTags();
 }

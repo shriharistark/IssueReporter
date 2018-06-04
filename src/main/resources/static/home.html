@@ -6,9 +6,17 @@
     <link rel="stylesheet" href="IssueStyles.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
     <!--<link rel="stylesheet" href="stylenewissue.css">-->
 </head>
 <body>
+
+<div id = "loading-icon" hidden>
+    <img src="img/infinity.gif">
+</div>
 
 <div id="header">
     Header
@@ -72,9 +80,17 @@
                     Tags
                 </div>
                 <div class="inputContainer">
-                    <input type="text" placeholder="Add cripsy tags" value="">
+                    <div class = "ui-widget">
+                        <input id = "autoC" type="text" placeholder="Add cripsy tags" value="">
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <!-- dropdown -->
+        <div class = "create-issue-popup-listing">
+            <ul>
+            </ul>
         </div>
         <!-- subject -->
         <div class = "create-issue-popup-subject">
@@ -125,6 +141,10 @@
             <button class="create-post-btn">Done</button>
         </div>
     </form>
+</div>
+
+<div id="floater">
+    <img src="img/downfloatbutton.png">
 </div>
 <script>
 
@@ -180,33 +200,40 @@
 
         var elem = document.getElementById("create-issue-popup");
         // elem.innerHTML = "";
+        //let form = $("#create-issue-popup-form");
+        $('#create-issue-popup-form').on('keyup keypress', function(e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode === 13) {
+                e.preventDefault();
+                return false;
+            }
+
+            else if(keyCode === 27){
+                hideIssueButton();
+            }
+        });
         elem.removeAttribute("hidden");
 
-        // var elem = document.getElementById("create-issue-popup");
-        // elem.hidden = false;
-        // elem.innerHTML = "<form id = \"create-issue-form\">\n" +
-        //     "        <!-- tags -->\n" +
-        //     "        <input class=\"create-issue-popup-tags\" type=\"text\" name=\"tags\" placeholder=\"tags\">\n" +
-        //     "        <!-- subject -->\n" +
-        //     "        <input class=\"subject\" type=\"text\" name=\"subject\" placeholder=\"subject\">\n" +
-        //     "        <!-- description -->\n" +
-        //     "        <input class=\"create-issue-popup-description\" type=\"text\" name=\"description\" placeholder=\"description\">\n" +
-        //     "        <!-- assignee -->\n" +
-        //     "        <input class=\"create-issue-popup-assignee\" type=\"\" name=\"assignee\" placeholder=\"none\">\n" +
-        //     "        <!-- assignedTo -->\n" +
-        //     "        <input class=\"create-issue-popup-assigned-to\" type=\"\" name=\"assignedTo\" placeholder=\"none\">\n" +
-        //     "    </form>";
+        //dims the bg while form creation
+        dimBackgroundExcept("create-issue-popup");
 
-        //reduce background opacity
-        var bodyelems = document.getElementsByTagName("body")[0];
+    }
+
+    function dimBackgroundExcept(id){
+
+        let bodyelems = document.getElementsByTagName("body")[0];
         console.log(bodyelems);
-        for(var i = 0 ; i < bodyelems.children.length ; i++){
-            console.log(bodyelems.children[i].tagName);
-            if(bodyelems.children[i].tagName == "DIV" && bodyelems.children[i].getAttribute("id") != "create-issue-popup"){
-                bodyelems.children[i].style.opacity = 0.2;
-            }
-        }
 
+        Array.from(bodyelems.children).forEach(el => {
+            el.style.opacity = el.tagName.toLowerCase() == "div" && el.getAttribute("id") != id ? 0.2 : 1;
+        });
+
+        // for(let i = 0 ; i < bodyelems.children.length ; i++){
+        //     console.log(bodyelems.children[i].tagName);
+        //     if(bodyelems.children[i].tagName == "DIV" && bodyelems.children[i].getAttribute("id") != id){
+        //         bodyelems.children[i].style.opacity = 0.2;
+        //     }
+        // }
     }
 
     function hideIssueButton(){
@@ -215,13 +242,28 @@
         elem.setAttribute("hidden","");
 
         //restore background opacity
-        var bodyelems = document.getElementsByTagName("body")[0];
-        for(var i = 0 ; i < bodyelems.children.length ; i++){
-            console.log(bodyelems.children[i].tagName);
-            if(bodyelems.children[i].tagName == "DIV" && bodyelems.children[i].getAttribute("id") != "create-issue-popup"){
-                bodyelems.children[i].style.opacity = 1;
+        // var bodyelems = document.getElementsByTagName("body")[0];
+        // for(var i = 0 ; i < bodyelems.children.length ; i++){
+        //     console.log(bodyelems.children[i].tagName);
+        //     if(bodyelems.children[i].tagName == "DIV" && bodyelems.children[i].getAttribute("id") != "create-issue-popup"){
+        //         bodyelems.children[i].style.opacity = 1;
+        //     }
+        // }
+
+        reverseDimBackgroundExcept("create-issue-popup");
+    }
+
+    function reverseDimBackgroundExcept(id){
+        var elem = document.getElementById(id);
+        // elem.innerHTML = "";
+
+        //restore background opacity
+        let bodyelems = document.getElementsByTagName("body")[0];
+        Array.from(bodyelems.children).forEach(el => {
+            if(el.tagName.toLowerCase() == "div" && el.getAttribute("id") != id){
+                el.style.opacity = 1;
             }
-        }
+        });
     }
 
     $(".create-issue-popup-done .create-post-btn").click(function(ev){
@@ -299,6 +341,359 @@
         console.log(eletext);
         eletext.html(+(eletext.html())+1);
     });
+
+
+    let tags = ( function() {
+        var availableTags = [
+            "ActionScript",
+            "AppleScript",
+            "Asp",
+            "BASIC",
+            "C",
+            "C++",
+            "Clojure",
+            "COBOL",
+            "ColdFusion",
+            "Erlang",
+            "Fortran",
+            "Groovy",
+            "Haskell",
+            "Java",
+            "JavaScript",
+            "Lisp",
+            "Perl",
+            "PHP",
+            "Python",
+            "Ruby",
+            "Scala",
+            "Scheme"
+        ];
+        // $("#autoC").autocomplete({
+        //     source: availableTags
+        // });
+
+        addTags : function addTags(element){
+            availableTags.push(element);
+        }
+
+        return {
+            addTags : addTags,
+            tags:availableTags
+        }
+    });
+
+    //select elements via up/down/enter
+    $(".create-issue-popup-tags input").on("keyup",{index : 0, prev:""},function(ev){
+
+        console.log("value change "+ev.keyCode);
+        console.log($(this).val());
+
+        let currentVal = $(this).val();
+        let ulElement = $(".create-issue-popup-listing ul");
+        $(ulElement).children().remove();
+        autoCompleteHelper(tags().tags,currentVal).forEach((el) => {
+            let liElement = document.createElement("li");
+            liElement.innerHTML = el;
+            ulElement.append(liElement);
+        });
+
+
+        function autoCompleteHelper(array, element){
+            let resarr = [];
+            array.forEach((ele) => {
+
+                function generateSubstrings(text){
+                    let subarr = [];
+                    for(let n = 1 ; n <= text.length ; n++){
+                        subarr.push(text.substring(0,n));
+                    }
+                    return subarr;
+                }
+
+                if(generateSubstrings(ele).includes(element)){
+                    resarr.push(ele);
+                }
+            })
+
+            return resarr;
+        }
+
+
+        switch (ev.keyCode){
+
+            case 38:
+                var listel = $(".create-issue-popup-listing li");
+                console.log("up arrow pressed on "+$(ev.target).html());
+                if(ev.data.index >= 0){
+                    ev.data.index--;
+                    listel.eq(ev.data.index).addClass("create-issue-popup-listing-active");
+                    listel.eq((ev.data.index)+1).removeClass("create-issue-popup-listing-active");
+                }
+                else{
+                    ev.data.index = 0;
+                }
+                break;
+
+            case 40:
+                console.log("down arrow pressed on "+$(ev.target).html());
+                var listel = $(".create-issue-popup-listing li");
+                if(ev.data.index < listel.length){
+                    ev.data.index++;
+                    listel.eq(ev.data.index).addClass("create-issue-popup-listing-active");
+                    listel.eq((ev.data.index)-1).removeClass("create-issue-popup-listing-active");
+                }
+
+                else{
+                    ev.data.index = listel.length-1;
+                }
+                break;
+
+            case 13:
+                console.log("enter pressed : ");
+                var listel = $(".create-issue-popup-listing li");
+                $("#autoC").val(listel.eq(ev.data.index).html());
+                $(ulElement).children().remove();
+                break;
+        }
+    });
+
+    //autocompleter on keydown
+    // $(".create-issue-popup-tags input").keydown(function(ev){
+    //     console.log("value change "+ev.keyCode);
+    //     console.log($(this).val());
+    //
+    //     let currentVal = $(this).val();
+    //     let ulElement = $(".create-issue-popup-listing ul");
+    //     $(ulElement).children().remove();
+    //     autoCompleteHelper(tags().tags,currentVal).forEach((el) => {
+    //         let liElement = document.createElement("li");
+    //         liElement.innerHTML = el;
+    //         ulElement.append(liElement);
+    //     });
+    //
+    //
+    // //     let lieles = $(ulElement).children();
+    // //     $(lieles).forEach(e => {
+    // //         $(e).hover(function(evt){
+    // //             $(e).attr("background","#3c8bc2");
+    // //         })
+    // //     })
+    // // });
+    //
+    //     $(".create-issue-popup-listing li").hover(function(){
+    //         $(this).css("background-color" , "wheat");
+    //         $(".create-issue-popup-listing li").click(function(ev){
+    //             let selectedValue = $(ev.currentTarget).html();
+    //             console.log(selectedValue);
+    //             $(".create-issue-popup-tags input").val(selectedValue);
+    //             $(ulElement).children().remove();
+    //         });
+    //     },function(){
+    //         $(this).css("background-color","#dcdcdc");
+    //         $(this).css("cursor","pointer");
+    //     });
+    //
+    // function autoCompleteHelper(array, element){
+    //     let resarr = [];
+    //     array.forEach((ele) => {
+    //
+    //         function generateSubstrings(text){
+    //             let subarr = [];
+    //             for(let n = 1 ; n <= text.length ; n++){
+    //                 subarr.push(text.substring(0,n));
+    //             }
+    //             return subarr;
+    //         }
+    //
+    //         if(generateSubstrings(ele).includes(element)){
+    //             resarr.push(ele);
+    //         }
+    //     })
+    //
+    //     return resarr;
+    // }
+    // });
+
+    //populate home page
+
+
+    function readIssues(limit,cursor){
+
+        let url = "/issue/readall?cursor="+cursor+"&limit="+limit;
+        let init = {
+            method : "GET",
+            headers : {
+                'Accept' : 'application/json,text/plain,*/*'
+            }
+        };
+
+        loading = true;
+        $(window).trigger("loading");
+
+        let nextcurs = "o";
+
+        return fetch(url,init).then(function(val){
+
+            function x() {
+                var promise = new Promise(function(resolve, reject) {
+                    window.setTimeout(function() {
+                        resolve('done!');
+                    },250);
+                });
+                return promise;
+            }
+
+            return x().then(function() {
+                if(cursor !== undefined){
+                    console.log(val); // --> 'done!'
+                    return val.json();
+                }
+
+                else{
+                    throw "Fatal : cursor undefined";
+                }
+            });
+
+            // if(cursor !== undefined) {
+            //     return val.json();
+            // }
+            //
+            // else {
+            //     throw "Fatal : undefined cursor";
+            // }
+
+        }, function (reason) {
+            console.log("fetch failed due to "+reason);
+            return "{'result':'failed'}"
+        }).then((valuejson) => {
+
+            if(valuejson.result === 'failed' || !valuejson.next){
+                throw "end of line reached";
+            }
+
+            console.log("next cursor: "+valuejson.next);
+            nextcurs = valuejson.next;
+            return valuejson;
+        }).then(function(value){
+
+            //console.log(value);
+            if(value.ok && nextcurs !== "") {
+                let issues = value.issues;
+                if(issues.length > 0) {
+                    issues.forEach(issue => {
+                        let issueCode = issue.code.toString().slice(-3);
+                        let subject = issue.subject;
+                        let assignee = issue.assignee;
+                        let assignedto = issue.assignedto;
+                        let tags = issue.tags; //for debugging
+
+                        let status = (function(){
+                            if(issue.status != "open" && issue.status != "closed"){
+                                return "open";
+                            }
+
+                            else{
+                                return issue.status;
+                            }
+                        })();
+
+                        let description = issue.description;
+
+                        addIssue(status, 10, subject, issueCode, assignee, description, assignedto, 5);
+                    });
+
+
+                }
+            }
+            //loading = false;
+            return value.next;
+        }).catch(function(reason){
+            //loading = false;
+            console.log("end of results "+reason);
+            loading = false;
+        }).finally(()=>{
+            loading = false;
+            $(window).trigger("loading");
+        });
+
+    }
+
+    var loading = false;
+
+    function displayLoading(){
+        $("#loading-icon").show();
+        dimBackgroundExcept("loading-icon");
+    }
+
+    function hideLoading(){
+        $("#loading-icon").hide();
+        reverseDimBackgroundExcept("loading-icon");
+    }
+
+    function readOnscroll(){
+
+        // function displayLoading(){
+        //     $("#loading-icon").show();
+        //     dimBackgroundExcept("loading-icon");
+        // }
+        //
+        // function hideLoading(){
+        //     $("#loading-icon").hide();
+        //     reverseDimBackgroundExcept("loading-icon");
+        // }
+
+        var cursor = {next:""};
+
+        $(window).on('scroll',function(evt) {
+            if ($(window).scrollTop() == $(document).height() - $(window).height() ) {
+
+                //end of page
+                //const nextCu = readIssues(5,cursor.next);
+
+                console.log("scrolled!");
+
+                function displayNextCursor(){
+
+                    let x = readIssues(5,cursor.next).then((y) =>{
+                        if(y) {
+                            console.log("I got this: " + y);
+                            cursor.next = y;
+                            return y;
+                        }
+                        // else{
+                        //     if(y !== undefined) {
+                        //         displayLoading();
+                        //     }
+                        // }
+                    });
+
+                    return x;
+                }
+
+                if(!loading){
+                    hideLoading();
+                    displayNextCursor();
+                }
+
+                else{
+                    console.log("loading ..")
+                    displayLoading();
+                }
+
+            }
+        });
+    };
+
+    $(window).on("loading",function (event) {
+        if(loading) {
+            displayLoading();
+        }
+        else {
+            hideLoading();
+        }
+    });
+    readOnscroll();
+
 </script>
 </body>
 </html>

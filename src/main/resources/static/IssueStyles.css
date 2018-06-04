@@ -1,4 +1,12 @@
 
+#loading-icon{
+    position: absolute;
+    width: 50%;
+    /*height: 70%;*/
+    z-index: 15;
+    top: 30%;
+    left: 30%;
+}
 .issue-main-container{
     /*background: url("img/tic-tac-toe.png") repeat;*/
     min-width: 70%;
@@ -345,6 +353,37 @@
 #create-issue-popup .create-issue-popup-done button{
     margin: 1% 30% 1% 30%;
     background: green;
+}
+
+.create-issue-popup-listing{
+    position: relative;
+}
+
+.create-issue-popup-listing ul{
+    position: absolute;
+    font-family: Helvetica;
+    font-size: 12px;
+    font-weight: lighter;
+    background: #dcdcdc;
+    list-style-type: none;
+    margin: -5% 0 0 0;
+    padding: 0;
+    z-index: 99;
+    width: 100%;
+}
+
+.create-issue-popup-listing-active{
+    background: wheat;
+}
+
+#floater{
+    position: absolute;
+    float: right;
+    margin: 90% 10% 10% 90%;
+}
+
+#floater img{
+    width: 100%;
 }
 
 /*#create-issue-popup-form .create-issue-popup-tags input{*/

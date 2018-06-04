@@ -40,7 +40,7 @@ public class IssueController {
 
 	@RequestMapping("/")
 	public String home() {
-		return "issues.html";
+		return "home.html";
 	}
 	
 	/*
@@ -95,13 +95,12 @@ public class IssueController {
     }
 	
 	@RequestMapping(value = "/issue/readall", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String readAll(@RequestParam(value = "cursor", defaultValue = "") String cursorStr){
-		
-		//hard coded
-		int limit = 5;
-		
+	public @ResponseBody String readAll(@RequestParam(value = "cursor", defaultValue = "") String cursorStr,
+										@RequestParam(value = "limit", defaultValue = "5") String limit){
+
+
 		IssueDAOService issuedao = new IssueDAOService();
-		QueryResultIterator<IssueModel> resultSet = issuedao.getAllIssues(cursorStr,limit);
+		QueryResultIterator<IssueModel> resultSet = issuedao.getAllIssues(cursorStr,Integer.parseInt(limit));
 		String cursorNext = "";
 		boolean continu = false;
 		List<IssueModel> issues = new ArrayList<IssueModel>();

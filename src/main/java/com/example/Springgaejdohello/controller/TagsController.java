@@ -17,6 +17,7 @@ import java.util.Map;
 @RequestMapping("/tags")
 public class TagsController {
 
+
     @RequestMapping("/create")
     public @ResponseBody String createTag(@RequestParam("tag") String tag){
 
@@ -52,5 +53,33 @@ public class TagsController {
         }
 
         return jsonResponse;
+    }
+
+    @RequestMapping("/getalltags")
+    public @ResponseBody String getAllTags(){
+
+        TagsDAOService tagservice = new TagsDAOService();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String,Object> response = new HashMap<>();
+        String jsonResponse = "";
+
+        try{
+            List<String> allTags = tagservice.getAllTags();
+            response.put("ok",true);
+            response.put("tags",allTags.toString());
+        }catch (Exception e){
+            response.put("ok",false);
+            response.put("tags",null);
+            e.printStackTrace();
+        }
+
+        try {
+            jsonResponse = mapper.writeValueAsString(response);
+        }catch (JsonProcessingException e){
+            e.printStackTrace();
+        }
+
+        return jsonResponse.length() > 0 ? jsonResponse : "Json processing error";
     }
 }
