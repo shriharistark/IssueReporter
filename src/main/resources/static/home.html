@@ -32,36 +32,11 @@
 
     <!-- issue container -->
     <div class="issue-main-container">
-        <!--<div class = "issue">-->
-        <!--<div class = "downvote-button">-->
-        <!--<div>-->
-        <!--<img src="img/status-open-symbol.png">-->
-        <!--</div>-->
-        <!--<div class ="button-downvote">-->
-        <!--<button class="btn">-->
-        <!--<div class="arrow-down"></div>-->
-        <!--<div class="downvote-numbers">5</div>-->
-        <!--</button>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--<div class="issue-body">-->
-        <!--<div class = "title">-->
-        <!--Reminders not delivered-->
-        <!--</div>-->
-        <!--<div class="assignee">-->
-        <!--#333 by Maneesh-->
-        <!--</div>-->
-        <!--<div class="description">-->
-        <!--reminders not delivered at wrong intervals but when booked from ios it works fine.-->
-        <!--</div>-->
-        <!--<div class="assignedTo">-->
-        <!--Bling/none-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--<div class="comments">-->
-        <!--<img src="img/comment-symbol.png">-->
-        <!--<div class="number-of-comments">4</div>-->
-        <!--</div>-->
+
+    </div>
+
+    <div class="issue-details-frame">
+        <iframe src="/"></iframe>
     </div>
 </div>
 
@@ -143,9 +118,6 @@
     </form>
 </div>
 
-<div id="floater">
-    <img src="img/downfloatbutton.png">
-</div>
 <script>
 
     //status, downvotes, subject, id, assignee, description, assignedTo, comments
@@ -180,9 +152,9 @@
             "                    "+subject+"\n" +
             "                </div>\n" +
             "                <div class=\"assignee\">\n" +
-            "                    #"+id+" by "+ assignee +
+            "                    #"+id.toString().slice(-3)+" by "+ assignee +
             "                </div>\n" +
-            "                <div class=\"description\">\n" +
+            "                <div class=\"description\" data-issue-id="+id.toString()+">\n" +
             "                    "+description +
             "                </div>\n" +
             "                <div class=\"assignedTo\">\n" +
@@ -212,6 +184,13 @@
                 hideIssueButton();
             }
         });
+
+        //disables scroll while loading to prevent loading more with redundant scrolling
+        $( 'body').css({
+            overflow: 'hidden',
+            height: '50%'
+        });
+
         elem.removeAttribute("hidden");
 
         //dims the bg while form creation
@@ -239,6 +218,12 @@
     function hideIssueButton(){
         var elem = document.getElementById("create-issue-popup");
         // elem.innerHTML = "";
+
+        //re-enable the locked scrolling
+        $('body').css({
+            overflow: 'auto',
+            height: 'auto'
+        });
         elem.setAttribute("hidden","");
 
         //restore background opacity
@@ -528,17 +513,17 @@
         };
 
         loading = true;
-        $(window).trigger("loading");
 
         let nextcurs = "o";
 
         return fetch(url,init).then(function(val){
+            $(window).trigger("loading");
 
             function x() {
                 var promise = new Promise(function(resolve, reject) {
                     window.setTimeout(function() {
                         resolve('done!');
-                    },250);
+                    },500);
                 });
                 return promise;
             }
@@ -581,7 +566,7 @@
                 let issues = value.issues;
                 if(issues.length > 0) {
                     issues.forEach(issue => {
-                        let issueCode = issue.code.toString().slice(-3);
+                        let issueCode = issue.code;
                         let subject = issue.subject;
                         let assignee = issue.assignee;
                         let assignedto = issue.assignedto;
@@ -621,6 +606,7 @@
     var loading = false;
 
     function displayLoading(){
+        $("#loading-icon").css({'top': "0px" , 'left': $("#sidebar").outerWidth() + ($(".issue-main-container").outerWidth())/2+"px"});
         $("#loading-icon").show();
         dimBackgroundExcept("loading-icon");
     }
@@ -652,9 +638,9 @@
 
                 console.log("scrolled!");
 
-                function displayNextCursor(){
+                (function displayNextCursor(){
 
-                    let x = readIssues(5,cursor.next).then((y) =>{
+                    let x = readIssues(6,cursor.next).then((y) =>{
                         if(y) {
                             console.log("I got this: " + y);
                             cursor.next = y;
@@ -668,31 +654,46 @@
                     });
 
                     return x;
-                }
+                })();
 
-                if(!loading){
-                    hideLoading();
-                    displayNextCursor();
-                }
-
-                else{
-                    console.log("loading ..")
-                    displayLoading();
-                }
+                // if(!loading){
+                //     hideLoading();
+                //     displayNextCursor();
+                // }
+                //
+                // else{
+                //     console.log("loading ..")
+                //     displayLoading();
+                // }
 
             }
         });
     };
 
     $(window).on("loading",function (event) {
+
+        console.log("loading triggered...");
         if(loading) {
+
+            //disables scroll while loading to prevent loading more with redundant scrolling
+            $( 'body').css({
+                overflow: 'hidden',
+                height: '50%'
+            });
             displayLoading();
         }
         else {
+
+            //enables the scroll back
+            $('body').css({
+                overflow: 'auto',
+                height: 'auto'
+            });
             hideLoading();
         }
     });
     readOnscroll();
+    $(window).trigger("scroll");
 
 </script>
 </body>

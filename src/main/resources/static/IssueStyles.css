@@ -1,15 +1,18 @@
 
+body{
+    position: relative;
+}
 #loading-icon{
-    position: absolute;
-    width: 50%;
+    position: sticky;
+    width: 10%;
     /*height: 70%;*/
-    z-index: 15;
-    top: 30%;
-    left: 30%;
+    z-index: 20;
+    top: 6em;
+    /*left: 50%;*/
 }
 .issue-main-container{
     /*background: url("img/tic-tac-toe.png") repeat;*/
-    min-width: 70%;
+    /*min-width: 70%;*/
     /*height: 600px;*/
     /*background-repeat: repeat;*/
 }
@@ -90,7 +93,7 @@
     float: left;
     padding: 1% 0% 1% 1%;
     cursor: pointer;
-    width:9%;
+    /*width:9%;*/
 }
 
 .issue .downvote-button:hover{
@@ -100,8 +103,8 @@
 .issue .issue-body{
     overflow: hidden;
     padding: 1.5% 2% 2% 1%;
-    max-width:75%;
-    min-width: 75%;
+    max-width:50%;
+    min-width: 50%;
 }
 
 .issue .downvotebutton .downvote-numbers{
@@ -211,6 +214,7 @@
 #body-after-header{
     display: flex;
     flex-direction: row;
+    min-width: 90%;
 }
 
 #create-issue-popup{
@@ -218,7 +222,7 @@
     width: 50%;
     /*height: 70%;*/
     z-index: 15;
-    top: 30%;
+    top: 16em; /*2 em from header */
     left: 30%;
     margin: -100px 0 0 -150px;
     background: white;
@@ -463,3 +467,7 @@
 /*!* height: 150%; *!*/
 /*padding: 1% 1% 1% 2%;*/
 /*}*/
+.issue-details-frame{
+
+    width: 15%;
+}
