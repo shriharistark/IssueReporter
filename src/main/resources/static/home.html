@@ -36,7 +36,7 @@
     </div>
 
     <div class="issue-details-frame">
-        <iframe src="/"></iframe>
+        <iframe src="/" frameBorder="0"></iframe>
     </div>
 </div>
 
@@ -173,19 +173,23 @@
         var elem = document.getElementById("create-issue-popup");
         // elem.innerHTML = "";
         //let form = $("#create-issue-popup-form");
-        $('#create-issue-popup-form').on('keyup keypress', function(e) {
+        $(window).on('keyup keypress', function(e) {
             var keyCode = e.keyCode || e.which;
+
+            //prevent submit on enter key
             if (keyCode === 13) {
+                console.log(keyCode);
                 e.preventDefault();
                 return false;
             }
 
+            //pressing esc closes the popup
             else if(keyCode === 27){
                 hideIssueButton();
             }
         });
 
-        //disables scroll while loading to prevent loading more with redundant scrolling
+        //disables scroll while loading to prevent loading more data with redundant scrolling
         $( 'body').css({
             overflow: 'hidden',
             height: '50%'
@@ -693,6 +697,10 @@
         }
     });
     // $(window).trigger("scroll");
+
+    // $(".issue-details-frame iframe").css({
+    //     height : $(window).height()-$("#header").height()-30 + 'px'
+    // });
 
     (function(){
         readOnscroll();

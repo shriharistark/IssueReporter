@@ -12,4 +12,5 @@ public interface IssueDAO {
 	List<IssueModel> getIssuesByStatus();
 	List<IssueModel> getIssuesByAssignedTo();
 	List<IssueModel> getIssuesByFilters(List<String> filters);
+	List<IssueModel> getIssuesById(String id);
 }

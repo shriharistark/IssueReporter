@@ -56,6 +56,14 @@ public class IssueController {
         
         return "worked!";
 	}*/
+
+
+	//read issue by id
+	@RequestMapping(value = "/issue/readbyid", method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody String getIssueById(@RequestParam("id")String id){
+
+		return null;
+	}
 	
 	//create issue
 	@RequestMapping(value = "/issue/create", method = RequestMethod.POST, consumes = "application/json")

@@ -1,5 +1,6 @@
 package com.example.Springgaejdohello.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +19,6 @@ public class IssueModel {
     @Index String status;
     @Index String description;
 
-
     public IssueModel(){
 
     }
@@ -31,6 +31,7 @@ public class IssueModel {
         this.tags = tags;
         this.status = status;
         this.description = description;
+
     }
 
     public Long getCode() {
@@ -88,5 +89,6 @@ public class IssueModel {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
 }

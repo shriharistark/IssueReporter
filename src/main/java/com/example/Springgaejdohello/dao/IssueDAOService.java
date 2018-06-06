@@ -78,7 +78,13 @@ public class IssueDAOService implements IssueDAO{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
+	@Override
+	public List<IssueModel> getIssuesById(String id) {
+		ObjectifyWorker.getofy().load();
+		return null;
+	}
+
 	//createIssue
 	//readIssueBydate
 	//readIssueBystatus
