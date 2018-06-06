@@ -692,8 +692,14 @@
             hideLoading();
         }
     });
-    readOnscroll();
-    $(window).trigger("scroll");
+    // $(window).trigger("scroll");
+
+    (function(){
+        readOnscroll();
+        $(window).trigger("scroll");
+    })();
+    //readOnscroll();
+    // $(window).trigger("scroll");
 
 </script>
 </body>
