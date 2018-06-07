@@ -80,9 +80,10 @@ public class IssueDAOService implements IssueDAO{
 	}
 
 	@Override
-	public List<IssueModel> getIssuesById(String id) {
-		ObjectifyWorker.getofy().load();
-		return null;
+	public IssueModel getIssueById(String id) {
+		IssueModel issuemodel = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
+
+		return issuemodel;
 	}
 
 	//createIssue

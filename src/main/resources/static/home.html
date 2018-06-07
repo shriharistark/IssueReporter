@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <title>Bugdog</title>
     <link rel="stylesheet" href="IssueStyles.css">
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
 
     <!--<link rel="stylesheet" href="stylenewissue.css">-->
 </head>
@@ -55,9 +51,7 @@
                     Tags
                 </div>
                 <div class="inputContainer">
-                    <div class = "ui-widget">
-                        <input id = "autoC" type="text" placeholder="Add cripsy tags" value="">
-                    </div>
+                    <input id = "autoC" type="text" placeholder="Add cripsy tags" value="">
                 </div>
             </div>
         </div>
@@ -118,6 +112,83 @@
     </form>
 </div>
 
+
+<!-- view-detail-issue -->
+<div id = "view-issue-popup" hidden>
+
+    <div class="create-issue-popup-title">
+        <div>CREATE ISSUE</div>
+        <div class ="create-issue-popup-close" onclick="hideIssueButton()">x</div>
+    </div>
+     <!-- tags -->
+        <div class="create-issue-popup-tags">
+            <div class="textInput">
+                <div class="inset">
+                    Tags
+                </div>
+                <div class="inputContainer">
+                    <div class = "ui-widget">
+                        <input type="text" placeholder="Add cripsy tags" value="">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- dropdown -->
+        <div class = "create-issue-popup-listing">
+            <ul>
+            </ul>
+        </div>
+        <!-- subject -->
+        <div class = "create-issue-popup-subject">
+            <div class="textInput">
+                <div class="inset">
+                    Subject
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="Be concise and sweet" value="">
+                </div>
+            </div>
+        </div>
+        <!-- description -->
+        <div class="create-issue-popup-description">
+            <div class="textInput">
+                <div class="inset">
+                    Description
+                </div>
+                <div class="inputContainer">
+                    <textarea placeholder="Add details here" value=""></textarea>
+                </div>
+            </div>
+        </div>
+        <!-- assignee -->
+        <div class="create-issue-popup-assignee">
+            <div class="textInput">
+                <div class="inset">
+                    Assignee
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="choose assignee" value="none">
+                </div>
+            </div>
+        </div>
+        <!-- assignedTo -->
+        <div class="create-issue-popup-assigned-to">
+            <div class="textInput">
+                <div class="inset">
+                    Assign to
+                </div>
+                <div class="inputContainer">
+                    <input type="text" placeholder="assign to whom?" value="none">
+                </div>
+            </div>
+        </div>
+
+        <div class="create-issue-popup-done">
+            <button class="create-post-btn">Close</button>
+        </div>
+</div>
+
 <script>
 
     //status, downvotes, subject, id, assignee, description, assignedTo, comments
@@ -168,6 +239,7 @@
         document.getElementsByClassName("issue-main-container")[0].appendChild(issue);
     }
 
+
     function createIssueButton(){
 
         var elem = document.getElementById("create-issue-popup");
@@ -210,19 +282,10 @@
         Array.from(bodyelems.children).forEach(el => {
             el.style.opacity = el.tagName.toLowerCase() == "div" && el.getAttribute("id") != id ? 0.2 : 1;
         });
-
-        // for(let i = 0 ; i < bodyelems.children.length ; i++){
-        //     console.log(bodyelems.children[i].tagName);
-        //     if(bodyelems.children[i].tagName == "DIV" && bodyelems.children[i].getAttribute("id") != id){
-        //         bodyelems.children[i].style.opacity = 0.2;
-        //     }
-        // }
     }
 
     function hideIssueButton(){
         var elem = document.getElementById("create-issue-popup");
-        // elem.innerHTML = "";
-
         //re-enable the locked scrolling
         $('body').css({
             overflow: 'auto',
@@ -230,22 +293,12 @@
         });
         elem.setAttribute("hidden","");
 
-        //restore background opacity
-        // var bodyelems = document.getElementsByTagName("body")[0];
-        // for(var i = 0 ; i < bodyelems.children.length ; i++){
-        //     console.log(bodyelems.children[i].tagName);
-        //     if(bodyelems.children[i].tagName == "DIV" && bodyelems.children[i].getAttribute("id") != "create-issue-popup"){
-        //         bodyelems.children[i].style.opacity = 1;
-        //     }
-        // }
 
         reverseDimBackgroundExcept("create-issue-popup");
     }
 
     function reverseDimBackgroundExcept(id){
         var elem = document.getElementById(id);
-        // elem.innerHTML = "";
-
         //restore background opacity
         let bodyelems = document.getElementsByTagName("body")[0];
         Array.from(bodyelems.children).forEach(el => {
@@ -357,9 +410,6 @@
             "Scala",
             "Scheme"
         ];
-        // $("#autoC").autocomplete({
-        //     source: availableTags
-        // });
 
         addTags : function addTags(element){
             availableTags.push(element);
@@ -543,14 +593,6 @@
                 }
             });
 
-            // if(cursor !== undefined) {
-            //     return val.json();
-            // }
-            //
-            // else {
-            //     throw "Fatal : undefined cursor";
-            // }
-
         }, function (reason) {
             console.log("fetch failed due to "+reason);
             return "{'result':'failed'}"
@@ -708,6 +750,80 @@
     })();
     //readOnscroll();
     // $(window).trigger("scroll");
+
+    $(".issue .description").click(function(evt){
+        let issueID = $(this).data("issue-id");
+        viewDetail(issueID);
+    });
+
+    function viewDetail(issueId){
+
+        let url = "/issue/readbyid?id="+issueId;
+        let init = {
+            method : 'GET'
+        }
+
+        fetch(url,init).then(function (value) {
+            return value.json();
+        },function (reason) {
+            console.log(reason);
+            return "{'result':'failed'}";
+        }).then(function (val) {
+
+            let commentResponse = val;
+            console.log(commentResponse);
+            if(commentResponse.ok) {
+                console.log(commentResponse);
+                alert("comment added | ticketCode: "+commentResponse.id);
+                hideIssueButton();
+            }
+
+            else{
+                alert("ticket creation failed | reason: "+commentResponse.ok);
+            }
+        });
+
+    }
+
+    function addComment(issueID, parentID, message){
+
+        let comment = {};
+        comment.issueid = issueID;
+        comment.parentid = parentID;
+        comment.message = message;
+
+        let init = {
+            method : "POST",
+            body : JSON.stringify(comment),
+            headers : {
+                'Accept' : 'application/json,text/plain,*/*',
+                'Content-type' : 'application/json'
+            }
+        };
+
+        let url = "/comments/add";
+
+        fetch(url,init).then(function (value) {
+            return value.json();
+        },function (reason) {
+            console.log(reason);
+            return "{'result':'failed'}";
+        }).then(function (val) {
+
+            let commentResponse = val;
+            console.log(commentResponse);
+            if(commentResponse.ok) {
+                console.log(commentResponse);
+                alert("comment added | ticketCode: "+commentResponse.id);
+                hideIssueButton();
+            }
+
+            else{
+                alert("ticket creation failed | reason: "+commentResponse.ok);
+            }
+        });
+
+    }
 
 </script>
 </body>

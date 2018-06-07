@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.googlecode.objectify.Key;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,9 +61,27 @@ public class IssueController {
 
 	//read issue by id
 	@RequestMapping(value = "/issue/readbyid", method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String getIssueById(@RequestParam("id")String id){
+	public @ResponseBody String getIssueById(@RequestParam("id")String id) throws JsonProcessingException {
 
-		return null;
+		IssueDAOService issueDAOService = new IssueDAOService();
+
+		IssueModel issue = issueDAOService.getIssueById(id);
+		Map<String,Object> response = new HashMap<>();
+
+		if(issue != null){
+			response.put("ok",true);
+			response.put("issue",issue);
+		}
+
+		else{
+			response.put("ok",false);
+		}
+
+		String jsonresponse = "jsonparse exception";
+		ObjectMapper mapper = new ObjectMapper();
+		jsonresponse = mapper.writeValueAsString(response);
+
+		return jsonresponse;
 	}
 	
 	//create issue
@@ -82,10 +101,10 @@ public class IssueController {
 
         
         try {
-            ObjectifyWorker.getofy().save().entity(newTicket).now();
+            Key<IssueModel> issuekey = ObjectifyWorker.getofy().save().entity(newTicket).now();
             response.put("ok",true);
             response.put("status","entity save success");
-            response.put("code",newTicket.getCode());
+            response.put("code",issuekey.toWebSafeString());
         }catch(Exception e) {
         		
         }
