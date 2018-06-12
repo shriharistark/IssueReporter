@@ -1,3 +1,111 @@
 .issue-view-main-container{
 
+    min-width: 40%;
+    max-width: 55%;
+}
+.issue-view-main-container > div{
+    padding: 5% 0%;
+}
+
+
+.issue{
+    padding: 2% 0 !important;
+}
+
+.small-titles{
+    font-weight: 700;
+    font-family: Helvetica;
+    text-transform: uppercase;
+    font-size: 10px
+}
+
+.issue-view-comment-box{
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    font-family: "helvetica neue";
+    letter-spacing: 0.31px;
+}
+
+.issue-view-comment-new{
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+}
+
+.issue-view-comment-new input{
+    flex: 1;
+    width: 80%;
+    /* line-height: 21px; */
+    /* border: 0; */
+    margin: 1% 2%;
+    padding: 0.5% 3%;
+    resize: none;
+    outline: none;
+    color: #333;
+    background: white;
+    font-size: 13px;
+    line-height: 22px;
+    transform-style: preserve-3d;
+    -webkit-font-smoothing: antialiased;
+    opacity: 1;
+    border: 1px none aliceblue;
+    border-radius: 3px;
+}
+
+.issue-view-comment-new textarea{
+    flex: 1;
+    width: 60%;
+    /* line-height: 21px; */
+    /* border: 0; */
+    margin: 1% 2%;
+    padding: 0.5% 3%;
+    /*resize: none;*/
+    outline: none;
+    color: #333;
+    background: white;
+    font-size: 13px;
+    line-height: 22px;
+    transform-style: preserve-3d;
+    -webkit-font-smoothing: antialiased;
+    opacity: 1;
+    border: 1px none aliceblue;
+    border-radius: 3px;
+}
+
+.submit-btn{
+    width:20%;
+    cursor: pointer;
+    /*-webkit-border-radius: 11;*/
+    /*-moz-border-radius: 11;*/
+    border-radius: 8px;
+    font-family: Helvetica;
+    font-weight: normal;
+    color: #fbfbfb;
+    font-size: 8px;
+    letter-spacing: 0.8px;
+    background: #6360f8;
+    padding: 12px 0;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background: #8a84f5;
+    text-decoration: none;
+}
+
+.issue-view-comments-section{
+    display: flex;
+    flex-direction: column;
+}
+
+.issue-view-comment-date-reply-container{
+    display: flex;
+    flex-direction: row;
+    color: #6d6d6d;
+}
+
+.comment-child{
+    padding-left: 20px;
 }

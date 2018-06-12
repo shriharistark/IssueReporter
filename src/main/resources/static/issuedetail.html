@@ -3,10 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>IssueDetailed</title>
-    <link rel="stylesheet" href="IssuedetailedStyles.css">
+    <link rel="stylesheet" href="viewissuestyles.css">
+    <link rel="stylesheet" href="IssueStyles.css">
 </head>
 <body>
+<!--- this is nohting ignore
 
+https://www.amazon.in/Marvel-Dancing-Bobble-Action-Figure/dp/B00N1EJXUU?tag=googinhydr18418-21&source=ps-sl-shoppingads-lpcontext&tag=googinkenshoo-21&ascsubtag=790d5d32-12b0-4290-9519-4c563659aeb6
+https://planetofgeeks.com/collections/apparells/products/thor-is-worthy-tee
+https://osomwear.in/products/today-toothless-feels-how-to-train-a-dragon-t-shirt-toothless-india-mens-womens-designs?variant=3721631170600
+https://www.thesouledstore.com/product/thor-hammer-badge
+https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
+
+//baby groot/toothless is the final choice
+-->
 <div id = "loading-icon" hidden>
     <img src="img/infinity.gif">
 </div>
@@ -44,7 +54,7 @@
                         Appointments getting double booked
                     </div>
                     <div class="assignee">
-                        #257 by Maneesh
+                        #257423423431
                     </div>
                     <div class="description" data-issue-id="1528455017257">
                         Jun 12, 2018
@@ -56,25 +66,31 @@
         </div>
 
         <div class="issue-view-comment-box">
-            <div class="issue-view-comment-name">Karthick</div>
-            <div class="issue-view-comment-description">Karthick</div>
+            <div class="issue-view-comment-name small-titles">Karthick</div>
+            <div class="issue-view-comment-description">
+                As the number of overweight children in the\r\n
+                United States continues to climb, fitness is a\r\n
+                consideration that weighs heavily on the minds\r\nof parents,
+                caregivers and teachers. The risk of\r\nhealth issues
+                accompanying obesity
+            </div>
 
             <!-- comment box -->
             <div class="issue-view-comment-new">
                 <input type="text" placeholder="your name goes here..">
                 <textarea placeholder="your comment goes here"></textarea>
-                <button>Submit</button>
+                <button class="submit-btn">Submit</button>
             </div>
 
         </div>
 
-        <div>Activity</div>
+        <div class="small-titles">Activity</div>
 
         <div class = "issue-view-comments-section">
 
             <!-- comments -->
-            <div class="issue-view-comment-box">
-                <div class="issue-view-comment-name">Hari</div>
+            <div class="issue-view-comment-box comment-parent">
+                <div class="issue-view-comment-name small-titles">Hari</div>
                 <div class="issue-view-comment-description">This issue is non-replicable. I beleive we need to give this more
                     priority as it affects crtiical portions of the application.
                 </div>
@@ -87,8 +103,15 @@
                         Reply
                     </div>
                 </div>
+            </div>
 
-                <div class="issue-view-comment-date-reply-container" class ="comment-child">
+            <div class="issue-view-comment-box comment-child">
+                <div class="issue-view-comment-name small-titles">Hari</div>
+                <div class="issue-view-comment-description">This issue is non-replicable. I beleive we need to give this more
+                    priority as it affects crtiical portions of the application.
+                </div>
+
+                <div class="issue-view-comment-date-reply-container" class ="comment-parent">
                     <div class="issue-view-comment-date-">
                         Jun 12, 2018
                     </div>
@@ -96,13 +119,25 @@
                         Reply
                     </div>
                 </div>
+            </div>
+
+
+
+                <!--<div class="issue-view-comment-date-reply-container" class ="comment-child">-->
+                    <!--<div class="issue-view-comment-date-">-->
+                        <!--Jun 12, 2018-->
+                    <!--</div>-->
+                    <!--<div class="issue-view-comment-reply">-->
+                        <!--Reply-->
+                    <!--</div>-->
+                <!--</div>-->
                 <!-- comment box
                     invoke this on clicking reply button -->
-                <div class="issue-view-comment-new">
-                    <input type="text" placeholder="your name goes here..">
-                    <textarea placeholder="your comment goes here"></textarea>
-                    <button>Submit</button>
-                </div>
+            <div class="issue-view-comment-new">
+                <input type="text" placeholder="your name goes here..">
+                <textarea placeholder="your reply goes here"></textarea>
+                <button class="submit-btn">Submit</button>
+            </div>
 
             </div>
 
