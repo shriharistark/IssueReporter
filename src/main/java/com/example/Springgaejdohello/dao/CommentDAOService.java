@@ -3,15 +3,15 @@ package com.example.Springgaejdohello.dao;
 import com.example.Springgaejdohello.ObjectifyWorker;
 import com.example.Springgaejdohello.daoInterface.CommentDAO;
 import com.example.Springgaejdohello.model.CommentModel;
-import com.example.Springgaejdohello.model.IssueModel;
 import com.googlecode.objectify.Key;
 
 import java.util.Date;
 
 public class CommentDAOService implements CommentDAO {
 
+
     @Override
-    public String addComment(String issueID, String parentID, String message) {
+    public String addComment(String issueID, String parentID, String message,String author) {
 
         String commentID = String.valueOf(new Date().getTime());
         CommentModel comment = new CommentModel();
@@ -34,8 +34,10 @@ public class CommentDAOService implements CommentDAO {
 
     }
 
+
+
     @Override
-    public String addComment(String issueID, String message) {
+    public String addComment(String issueID, String message,String author) {
         String commentID = String.valueOf(new Date().getTime());
         CommentModel comment = new CommentModel();
         comment.setId(commentID);
@@ -75,7 +77,7 @@ public class CommentDAOService implements CommentDAO {
     }
 
     @Override
-    public String editComment(String issueID, String commentID,String newmessage) {
+    public String editComment(String commentID,String newmessage) {
 
         Key<CommentModel> commentkey = Key.valueOf(commentID);
         CommentModel commententity;
@@ -90,8 +92,4 @@ public class CommentDAOService implements CommentDAO {
         }
     }
 
-    @Override
-    public String editComment(String issueID, String commentID, String parentID, String newmessage) {
-        return null;
-    }
 }

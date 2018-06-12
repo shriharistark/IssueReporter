@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IssueDetailed</title>
+    <link rel="stylesheet" href="IssuedetailedStyles.css">
+</head>
+<body>
+
+<div id = "loading-icon" hidden>
+    <img src="img/infinity.gif">
+</div>
+
+<div id="header">
+    Header
+</div>
+<div id = "body-after-header">
+
+    <!--sidebar elements -->
+    <div id = "sidebar">
+        <div style="font-weight: 700; font-family: Helvetica; text-transform: uppercase; font-size: 10px">
+            Downvoters
+        </div>
+    </div>
+
+    <!-- issue container -->
+    <div class="issue-view-main-container">
+
+        <!-- issue- top -->
+        <div class="issue">
+            <div class="downvote-button">
+                <div>
+                    <img src="img/status-open-symbol.png">
+                </div>
+                <div class="button-downvote">
+                    <button class="btn">
+                        <div class="arrow-down"></div>
+                        <div class="downvote-numbers">10</div>
+                    </button>
+                </div>
+            </div>
+                <div class="issue-body">
+                    <div class="title">
+                        Appointments getting double booked
+                    </div>
+                    <div class="assignee">
+                        #257 by Maneesh
+                    </div>
+                    <div class="description" data-issue-id="1528455017257">
+                        Jun 12, 2018
+                    </div>
+                    <div class="assignedTo">
+                        to Claws/Velu
+                    </div>
+                </div>
+        </div>
+
+        <div class="issue-view-comment-box">
+            <div class="issue-view-comment-name">Karthick</div>
+            <div class="issue-view-comment-description">Karthick</div>
+
+            <!-- comment box -->
+            <div class="issue-view-comment-new">
+                <input type="text" placeholder="your name goes here..">
+                <textarea placeholder="your comment goes here"></textarea>
+                <button>Submit</button>
+            </div>
+
+        </div>
+
+        <div>Activity</div>
+
+        <div class = "issue-view-comments-section">
+
+            <!-- comments -->
+            <div class="issue-view-comment-box">
+                <div class="issue-view-comment-name">Hari</div>
+                <div class="issue-view-comment-description">This issue is non-replicable. I beleive we need to give this more
+                    priority as it affects crtiical portions of the application.
+                </div>
+
+                <div class="issue-view-comment-date-reply-container" class ="comment-parent">
+                    <div class="issue-view-comment-date-">
+                        Jun 12, 2018
+                    </div>
+                    <div class="issue-view-comment-reply">
+                        Reply
+                    </div>
+                </div>
+
+                <div class="issue-view-comment-date-reply-container" class ="comment-child">
+                    <div class="issue-view-comment-date-">
+                        Jun 12, 2018
+                    </div>
+                    <div class="issue-view-comment-reply">
+                        Reply
+                    </div>
+                </div>
+                <!-- comment box
+                    invoke this on clicking reply button -->
+                <div class="issue-view-comment-new">
+                    <input type="text" placeholder="your name goes here..">
+                    <textarea placeholder="your comment goes here"></textarea>
+                    <button>Submit</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

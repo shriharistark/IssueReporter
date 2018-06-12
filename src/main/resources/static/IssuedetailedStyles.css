@@ -1,0 +1,170 @@
+
+
+#issue-details-popup{
+
+    position: fixed;
+    top: 30%;
+    /*margin: -100px 0 0 0;*/
+    left: 100px;
+    height: 300px;
+    overflow-y: auto;
+    width: 60%;
+    margin: auto;
+}
+
+#issue-detailed-container{
+
+}
+
+.issue-detailed-content #issue-body{
+    padding-left: 15px;
+}
+
+.issue-detailed-container-body{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 5%;
+}
+
+.issue-detailed-text{
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    word-spacing: 0.02em;
+    font-family: "Helvetica Neue";
+}
+
+.issue-detailed-assignee{
+    font-family: 'DejaVu Serif', Georgia, "Times New Roman", Times, serif;
+    font-weight: 700;
+}
+
+.issue-detailed-status{
+    font-family: 'DejaVu Serif', Georgia, "Times New Roman", Times, serif;
+    font-weight: 300;
+    font-size: 13px;
+}
+
+.issue-detailed-subject{
+    font-family: 'DejaVu Serif', Georgia, "Times New Roman", Times, serif;
+    font-size: 13px;
+    font-weight: 300;
+}
+
+.issue-detailed-code{
+    font-size: 10px;
+    color: #ababab;
+    font-family: "helvetica neue";
+    font-weight: 100;
+}
+
+.issue-detailed-date-created{
+    font-size: 10px;
+    color: #ababab;
+    font-family: "helvetica neue";
+    font-weight: 100;
+}
+
+.issue-detailed-content{
+    display: flex;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -ms-flex-align: start;
+    align-items: flex-start;
+}
+
+.issue-detailed-content #downvote{
+    padding-left: 10px;
+    text-align: center;
+}
+
+#comment-box{
+    margin: 20px 70px;
+}
+
+.submit-comment-btn{
+    margin-left: -4px;
+    margin-top: 4px;
+    cursor: pointer;
+    /*-webkit-border-radius: 11;*/
+    /*-moz-border-radius: 11;*/
+    border-radius: 8px;
+    font-family: Helvetica;
+    font-weight: normal;
+    color: #fbfbfb;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    background: #6360f8;
+    padding: 10px 15px;
+    text-decoration: none;
+    margin-top: 20px;
+}
+
+.sumbit-comment-btn:focus-within {
+    background: #8a84f5;
+    text-decoration: none;
+}
+
+.textInput .inputContainer {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-align: start;
+    align-items: flex-start;
+}
+
+.textInput .inputContainer textarea {
+    -ms-flex: 1;
+    flex: 1;
+    width: 100%;
+    line-height: 21px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    resize: none;
+    outline: none;
+    color: #333;
+    background: none;
+    font-size: 13px;
+    line-height: 22px;
+    transform-style: preserve-3d;
+    -webkit-font-smoothing: antialiased;
+    opacity: 1;
+}
+
+
+.textInput .inputContainer textarea:focus-within {
+    -moz-box-shadow:    inset 0 0 10px #000000;
+    -webkit-box-shadow: inset 0 0 10px #000000;
+    box-shadow:          0 0 2px #ababab;}
+
+#activity{
+    margin: 20px 0;
+}
+
+.comment{
+    margin: 14px 0px;
+    padding: 0px;
+}
+
+.comment-author{
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.comment-body{
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    /*padding: 5px 30px 0 55px;*/
+    box-sizing: border-box;
+}
+
+.comment-replies{
+    display: flex;
+    flex-direction: column;
+    padding: 15px 0px 0px 43px;
+}

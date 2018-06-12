@@ -34,9 +34,10 @@ public class CommentsController {
         Key keygeneratedissue = Key.create(IssueModel.class,Long.parseLong(issueid));
         String parentid = commentpayload.get("parentid") == null ? keygeneratedissue.toWebSafeString() : commentpayload.get("parentid").toString();
         String message = commentpayload.get("message").toString();
+        String author = commentpayload.get("author").toString();
 
         //persisting
-        String commentID = commentDao.addComment(issueid,parentid,message);
+        String commentID = commentDao.addComment(issueid,parentid,message,author);
 
         Map<String,Object> response = new HashMap<>();
         response.put("ok", commentID.equals("failed")?false:true);

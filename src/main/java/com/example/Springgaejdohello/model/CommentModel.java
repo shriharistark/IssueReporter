@@ -17,18 +17,23 @@ public class CommentModel {
     @Parent @Index Key<IssueModel> issueID;
     @Index Key parentID;
     String message;
+    String author;
 
-    public CommentModel(String id, String issueID, String message) {
+    //without parentID
+    public CommentModel(String id, String issueID, String message, String author) {
         this.id = id;
         this.issueID = Key.valueOf(issueID);
         this.message = message;
+        this.author = author;
     }
 
-    public CommentModel(String id, String issueID, String parentID, String message) {
+    //with parentID
+    public CommentModel(String id, String issueID, String parentID, String message,String author) {
         this.id = id;
         this.issueID = Key.valueOf(issueID);
         this.parentID = Key.valueOf(parentID);
         this.message = message;
+        this.author = author;
     }
 
     public CommentModel() {
@@ -64,5 +69,13 @@ public class CommentModel {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }

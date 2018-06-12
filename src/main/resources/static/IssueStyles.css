@@ -94,7 +94,7 @@ body{
     float: left;
     padding: 1% 0% 1% 1%;
     cursor: pointer;
-    width:7%;
+    min-width:7%;
 }
 
 .issue .downvote-button:hover{
@@ -106,6 +106,7 @@ body{
     padding: 1.5% 2% 2% 1%;
     max-width:75%;
     min-width: 75%;
+    cursor:pointer;
 }
 
 .issue .downvotebutton .downvote-numbers{
@@ -135,6 +136,7 @@ body{
 
 
 .issue .btn {
+    outline:none;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -218,7 +220,8 @@ body{
     /*min-width: 90%;*/
 }
 
-#create-issue-popup{
+.issue-popup{
+    display: none;
     position: absolute;
     width: 50%;
     /*height: 70%;*/
@@ -246,7 +249,35 @@ body{
     /*text-align: center;*/
 }
 
-#create-issue-popup .create-issue-popup-title{
+#create-issue-popup{
+    /*position: absolute;*/
+    /*width: 50%;*/
+    /*!*height: 70%;*!*/
+    /*z-index: 15;*/
+    /*top: 16em; !*2 em from header *!*/
+    /*left: 30%;*/
+    /*margin: -100px 0 0 -150px;*/
+    /*background: white;*/
+    /*font-family: Helvetica;*/
+
+    /*font-size: 14px;*/
+    /*font-weight: 100;*/
+    /*font-style: normal;*/
+    /*font-stretch: normal;*/
+    /*line-height: normal;*/
+    /*letter-spacing: 0.8px;*/
+    /*text-align: left;*/
+    /*color: #333333;*/
+
+
+    /*!*border: 1px solid;*!*/
+    /*-moz-box-shadow:    inset 0 0 10px #000000;*/
+    /*-webkit-box-shadow: inset 0 0 10px #000000;*/
+    /*box-shadow:          0 0 5px #000000;*/
+    /*!*text-align: center;*!*/
+}
+
+.issue-popup .issue-popup-title{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -259,7 +290,7 @@ body{
     letter-spacing: 0.9px;
 }
 
-#create-issue-popup .create-issue-popup-close{
+.issue-popup .issue-popup-close{
     cursor: pointer;
 }
 
@@ -381,16 +412,6 @@ body{
     background: wheat;
 }
 
-#floater{
-    position: absolute;
-    float: right;
-    margin: 90% 10% 10% 90%;
-}
-
-#floater img{
-    width: 100%;
-}
-
 /*#create-issue-popup-form .create-issue-popup-tags input{*/
 /*border-radius: 4px;*/
 /*color: #3f3f3f;*/
@@ -468,36 +489,3 @@ body{
 /*!* height: 150%; *!*/
 /*padding: 1% 1% 1% 2%;*/
 /*}*/
-.issue-details-frame{
-
-    position: absolute;
-    display: none;
-    width: 50%;
-
-    z-index: 15;
-    top: 16em; /*2 em from header */
-    left: 30%;
-    margin: -100px 0 0 -150px;
-    background: white;
-    font-family: Helvetica;
-
-    font-size: 14px;
-    font-weight: 100;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: normal;
-    letter-spacing: 0.8px;
-    text-align: left;
-    color: #333333;
-
-
-    /*border: 1px solid;*/
-    -moz-box-shadow:    inset 0 0 10px #000000;
-    -webkit-box-shadow: inset 0 0 10px #000000;
-    box-shadow:          0 0 5px #000000;
-    /*justify-self:flex-end;*/
-}
-
-.issue-details-frame iframe{
-
-}
