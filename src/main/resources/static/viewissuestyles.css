@@ -1,4 +1,5 @@
 #sidebar{
+    margin: 0% 5% 0% 0%;
     padding: 1% 0%;
     display: flex;
     min-width: 15em;
@@ -8,24 +9,28 @@
     height: fit-content;
     border: none;
     border-radius: 20px;
-    background: #fbfbfb;
+    background: #F1F1F1;
 }
 
 #sidebar > div {
-    padding-top: 10px;
+    padding: 12px 0px 12px 14px;
 }
 
 #sidebar .names{
     color: #4e4e4e;
     /* font-family: Helvetica; */
     padding: 5%;
-    font-size: 16px;
+    font-size: 14px;
     align-items: flex-start;
     display: flex;
     font-family: helvetica;
     flex-direction: column;
     font-weight: 400;
-    letter-spacing: -0.5px;
+    letter-spacing: 1px;
+}
+
+.names div{
+    padding-bottom: 6px;
 }
 
 .issue-view-main-container{
@@ -46,7 +51,8 @@
     font-weight: 700;
     font-family: Helvetica;
     text-transform: uppercase;
-    font-size: 10px
+    font-size: 10px;
+    padding-bottom: 10px;
 }
 
 .issue-view-comment-box{
@@ -55,16 +61,24 @@
     flex-direction: column;
     font-size: 14px;
     font-family: "helvetica neue";
-    letter-spacing: 0.31px;
+    letter-spacing: 0.8px;
+    font-weight: 300;
+    line-height: 20px;
 }
 
 .issue-view-comment-new{
     margin: 3% 0%;
     padding: 1% 1%;
-    width:60%;
+    width:100%;
     background: #f5f5f5;
     display: flex;
     flex-direction: column;
+}
+
+.issue-view-comment-new .comment-heading{
+    margin: 0% 2.5% -2%;
+    color: #6d6d6d;
+    letter-spacing: 1.5px;
 }
 
 .issue-view-comment-new input{
@@ -108,7 +122,7 @@
 }
 
 .submit-btn{
-    margin: 2% 1%;
+    margin: 2% 2%;
     width:20%;
     cursor: pointer;
     /*-webkit-border-radius: 11;*/
@@ -137,7 +151,7 @@
 }
 
 .issue-view-comment-date-reply-container{
-    font-size:12px;
+    font-size:11px;
     display: flex;
     flex-direction: row;
     color: #6d6d6d;

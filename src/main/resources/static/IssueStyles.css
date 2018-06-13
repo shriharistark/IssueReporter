@@ -215,6 +215,7 @@ body{
 }
 
 #body-after-header{
+    padding: 12px;
     display: flex;
     flex-direction: row;
     /*min-width: 90%;*/
