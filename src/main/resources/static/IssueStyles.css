@@ -58,7 +58,7 @@ body{
     padding-bottom: 0.5%;
 }
 
-.issue .description {
+.issue .description, .issue .id {
     font-family: Helvetica;
     font-size: 13px;
     font-weight: lighter;
@@ -215,6 +215,7 @@ body{
 }
 
 #body-after-header{
+    padding: 12px;
     display: flex;
     flex-direction: row;
     /*min-width: 90%;*/

@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>IssueDetailed</title>
-    <link rel="stylesheet" href="viewissuestyles.css">
-    <link rel="stylesheet" href="IssueStyles.css">
+    <link rel="stylesheet" href="/viewissuestyles.css">
+    <link rel="stylesheet" href="/IssueStyles.css">
+    <script src="/js/jquery.js"></script>
+
 </head>
 <body>
 <!--- this is nohting ignore
@@ -18,7 +20,7 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
 //baby groot/toothless is the final choice
 -->
 <div id = "loading-icon" hidden>
-    <img src="img/infinity.gif">
+    <img src="/img/infinity.gif">
 </div>
 
 <div id="header">
@@ -28,7 +30,8 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
 
     <!--sidebar elements -->
     <div id = "sidebar">
-        <div style="font-weight: 900;font-family: Helvetica;text-transform: uppercase;font-size: 10px;padding-left: 5%;color: #ababab;">
+        <div style="ffont-weight: 900;font-family: Helvetica;text-transform: uppercase;
+        font-size: 10px;padding-left: 5%;color: #ababab;letter-spacing: 1px;">
             Downvoters
         </div>
 
@@ -48,7 +51,7 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
         <div class="issue">
             <div class="downvote-button">
                 <div>
-                    <img src="img/status-open-symbol.png">
+                    <img src="/img/status-open-symbol.png">
                 </div>
                 <div class="button-downvote">
                     <button class="btn">
@@ -61,10 +64,10 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
                     <div class="title">
                         Appointments getting double booked
                     </div>
-                    <div class="assignee">
-                        #257423423431
+                    <div class="assignee code" data-issueid="">
+                        #000
                     </div>
-                    <div class="description" data-issue-id="1528455017257">
+                    <div class="description date">
                         Jun 12, 2018
                     </div>
                     <div class="assignedTo">
@@ -84,9 +87,15 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
             </div>
 
             <!-- comment box -->
-            <div class="issue-view-comment-new">
+            <div class="comment-container">
+                <a href = "#" id = "add-comment" class="comment-show-anchor">comment</a>
+                <a href="#" id="close-issue" class="comment-show-anchor">close</a>
+            </div>
+
+            <div id ="primary-comment" class="issue-view-comment-new">
+                <!--<div class="comment-heading small-titles">Comment</div>-->
                 <input type="text" placeholder="your name goes here..">
-                <textarea placeholder="your comment goes here"></textarea>
+                <textarea placeholder="your comment goes here"></textarea><br>
                 <button class="submit-btn">Submit</button>
             </div>
 
@@ -94,6 +103,7 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
 
         <div class="small-titles">Activity</div>
 
+        <a id = "load-more-comments">View more comments</a>
         <div class = "issue-view-comments-section">
 
             <!-- comments -->
@@ -105,8 +115,9 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
 
                 <div class="issue-view-comment-date-reply-container" class ="comment-parent">
                     <div class="issue-view-comment-date-">
-                        Jun 12, 2018 .
+                        Jun 12, 2018
                     </div>
+                    <div style="padding: 0px 6px">.</div>
                     <div class="issue-view-comment-reply">
                         Reply
                     </div>
@@ -121,22 +132,21 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
 
                 <div class="issue-view-comment-date-reply-container">
                     <div class="issue-view-comment-date-">
-                        Jun 12, 2018 .
+                        Jun 12, 2018
                     </div>
+                    <div style="padding: 0px 6px">.</div>
                     <div class="issue-view-comment-reply">
                         Reply
                     </div>
                 </div>
 
                 <!-- append this on reply -->
-                <div class="issue-view-comment-new">
+                <div id = "add-reply" class="issue-view-comment-new">
                     <input type="text" placeholder="your name goes here..">
                     <textarea placeholder="your reply goes here"></textarea>
                     <button class="submit-btn">Submit</button>
                 </div>
             </div>
-
-
 
                 <!--<div class="issue-view-comment-date-reply-container" class ="comment-child">-->
                     <!--<div class="issue-view-comment-date-">-->
@@ -163,5 +173,7 @@ https://osomwear.in/products/don-t-push-the-a-button?variant=3631657779240
     </div>
 
 </div>
+
+<script src="/js/commentscript.js"></script>
 </body>
 </html>

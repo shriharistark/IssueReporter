@@ -1,19 +1,22 @@
 package com.example.Springgaejdohello.controller;
 
-import com.example.Springgaejdohello.ObjectifyWorker;
+import com.example.Springgaejdohello.dao.CommentBuilder;
 import com.example.Springgaejdohello.dao.CommentDAOService;
-import com.example.Springgaejdohello.daoInterface.CommentDAO;
+import com.example.Springgaejdohello.dao.IssueDAOService;
 import com.example.Springgaejdohello.model.CommentModel;
 import com.example.Springgaejdohello.model.IssueModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -37,14 +40,99 @@ public class CommentsController {
         String author = commentpayload.get("author").toString();
 
         //persisting
-        String commentID = commentDao.addComment(issueid,parentid,message,author);
+//        String commentID = commentDao.addComment(issueid,parentid,message,author);
+//
+//        Map<String,Object> response = new HashMap<>();
+//        response.put("ok", commentID.equals("failed")?false:true);
+//        response.put("id",commentID);
+//
+//        String jsonResponse = "problem with jackson";
+//        //mapper.writeValueAsString(response);
+//        try {
+//            jsonResponse = mapper.writeValueAsString(response);
+//        } catch (JsonProcessingException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//
+//        return jsonResponse;
+
+
+        return "";
+    }
+
+    @RequestMapping(value = "/new", method = RequestMethod.POST, consumes = "application/json")
+    public @ResponseBody String newComment(@RequestBody String commentPayload) throws IOException{
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String,Object> commentIn = mapper.readValue(commentPayload, new TypeReference<Map<String,Object>>(){});
+
+        CommentModel commentBuilder = new CommentBuilder(commentIn.get("message").toString(),
+                commentIn.get("author").toString())
+                .isParent(Boolean.getBoolean(commentIn.get("hasparent").toString()))
+                .addParent(commentIn.get("parentid").toString())
+                .bindTo(commentIn.get("issueid").toString())
+                .build();
+
+        CommentModel elem = commentBuilder;
+        CommentDAOService daoService = new CommentDAOService();
+        String commentID = daoService.addComment(elem);
+
 
         Map<String,Object> response = new HashMap<>();
         response.put("ok", commentID.equals("failed")?false:true);
         response.put("id",commentID);
+        response.put("commentwebsafekey",commentBuilder.getCommentWebSafeKey());
+        response.put("issuewebsafekey",commentBuilder.getIssueWebSafeKey());
 
         String jsonResponse = "problem with jackson";
         //mapper.writeValueAsString(response);
+        try {
+            jsonResponse = mapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return jsonResponse;
+
+    }
+
+
+    @RequestMapping(value = "/readall", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody String readAll(@RequestParam(value = "cursor", defaultValue = "") String cursorStr,
+                                        @RequestParam(value = "issueid") String issueID){
+
+
+        CommentDAOService commentDAOService = new CommentDAOService();
+        QueryResultIterator<CommentModel> resultSet = commentDAOService.getAllCommentsOf(issueID,cursorStr);
+        String cursorNext = "";
+        boolean continu = false;
+        List<CommentModel> comments = new ArrayList<CommentModel>();
+
+        while(resultSet.hasNext()) {
+            comments.add(resultSet.next());
+            continu = true;
+        }
+
+        if(continu) {
+            cursorNext = resultSet.getCursor().toWebSafeString();
+//			cursorNext = resultSet.getCursor().toWebSafeString();
+//			Queue queue = QueueFactory.getDefaultQueue();
+//	        String url = "/issue/readAll?cursor="+cursorNext;
+//	        TaskOptions fetchAllIssues = TaskOptions.Builder.withUrl(url);
+//	        queue.add(fetchAllIssues);
+        }
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("ok", true);
+        response.put("next",cursorNext);
+        response.put("commentsList", comments);
+
+        String jsonResponse = "";
+        ObjectMapper mapper = new ObjectMapper();
+
         try {
             jsonResponse = mapper.writeValueAsString(response);
         } catch (JsonProcessingException e) {

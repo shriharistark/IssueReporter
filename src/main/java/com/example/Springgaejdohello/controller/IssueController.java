@@ -11,12 +11,8 @@ import java.util.stream.Collectors;
 
 import com.googlecode.objectify.Key;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.Springgaejdohello.ObjectifyWorker;
 import com.example.Springgaejdohello.dao.IssueDAOService;
@@ -28,20 +24,24 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskHandle;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("/")
+//@RequestMapping("/")
 public class IssueController {
 
 	@RequestMapping("/")
 	public String home() {
 		return "home.html";
+	}
+
+	@RequestMapping(value = "/newissue/{issueid}")
+	public ModelAndView showIssue(@PathVariable("issueid") String issueId,
+								  ModelMap model){
+
+		model.addAttribute("issueid",issueId);
+		return new ModelAndView("redirect:/issuedetail.html",model);
 	}
 	
 	/*
@@ -71,6 +71,7 @@ public class IssueController {
 		if(issue != null){
 			response.put("ok",true);
 			response.put("issue",issue);
+			response.put("issuewebsafekey",issue.getWebSafeKey());
 		}
 
 		else{

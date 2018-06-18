@@ -2,21 +2,17 @@ package com.example.Springgaejdohello.dao;
 
 import com.example.Springgaejdohello.ObjectifyWorker;
 import com.example.Springgaejdohello.daoInterface.TagsDAO;
-import com.example.Springgaejdohello.model.IssueModel;
 import com.example.Springgaejdohello.model.TagsModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.cmd.Query;
-import com.sun.tools.javac.tree.JCTree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class TagsDAOService implements TagsDAO {
 

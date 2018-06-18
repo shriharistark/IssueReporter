@@ -63,10 +63,12 @@ var events = {
                 console.log("issue description is clicked");
                 // $("#issue-details-popup").toggle();
                 // dimBackgroundExcept("issue-details-popup");
-                let issueID = $(this).data("issue-id");
+                let issueID = $(this).closest(".issue").attr("issue-id");
                 //console.log("issueid: "+issueID);
                 let issueContent = "none";
                 evt.stopPropagation();
+
+                document.location.href = "newissue/"+issueID;
                 issueContent = getIssue(issueID).then((res) => {
                     return res;
                 });
@@ -75,6 +77,18 @@ var events = {
             });
         });
     },
+
+    CommentAdd : function(){
+        $(".comment-container a").click(function (ev) {
+            ev.preventDefault();
+            console.log("comment now clicked");
+            comments.showCommentBox(this);
+        });
+        //
+        // $(".issue-view-comment-reply").click(function () {
+        //     comments.showCommentBox(this);
+        // })
+    }
 }
 
 events[Symbol.iterator] = function() {
@@ -102,6 +116,7 @@ var issue = {};
     issue.addIssue = function(status, downvotes, subject, id, assignee, description, assignedTo, noofcomments) {
         var issue = document.createElement("div");
         issue.classList.add("issue");
+        issue.setAttribute("issue-id",id);
         issue.innerHTML = "            <div class = \"downvote-button\">\n" +
             "                <div>\n" +
             "                    <img src=\"img/status-" + status + "-symbol.png\">\n" +

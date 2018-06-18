@@ -14,27 +14,29 @@ public class CommentModel {
     @Id
     String id;
 
-    @Parent @Index Key<IssueModel> issueID;
+    @Index Key<IssueModel> issueKey;
     @Index Key parentID;
     String message;
     String author;
-
-    //without parentID
-    public CommentModel(String id, String issueID, String message, String author) {
-        this.id = id;
-        this.issueID = Key.valueOf(issueID);
-        this.message = message;
-        this.author = author;
-    }
-
-    //with parentID
-    public CommentModel(String id, String issueID, String parentID, String message,String author) {
-        this.id = id;
-        this.issueID = Key.valueOf(issueID);
-        this.parentID = Key.valueOf(parentID);
-        this.message = message;
-        this.author = author;
-    }
+    @Index Boolean hasParent;
+    @Index String issueID;
+//
+//    //without parentID
+//    public CommentModel(String id, String issueID, String message, String author) {
+//        this.id = id;
+//        this.issueID = Key.valueOf(issueID);
+//        this.message = message;
+//        this.author = author;
+//    }
+//
+//    //with parentID
+//    public CommentModel(String id, String issueID, String parentID, String message,String author) {
+//        this.id = id;
+//        this.issueID = Key.valueOf(issueID);
+//        this.parentID = Key.valueOf(parentID);
+//        this.message = message;
+//        this.author = author;
+//    }
 
     public CommentModel() {
     }
@@ -43,20 +45,34 @@ public class CommentModel {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId() {
         this.id = String.valueOf(new Date().getTime());
     }
 
-    public String getIssueID() {
-        return issueID.toWebSafeString();
+    public String getWebSafeIssueKey() {
+        return issueKey.toWebSafeString();
     }
 
-    public void setIssueID(String issueID) {
-        this.issueID = Key.valueOf(issueID);
+    public void setIssueKey(String issueIDe) {
+
+        this.issueKey = Key.create(IssueModel.class,issueIDe);
+    }
+
+    public String getIssueWebSafeKey(){
+        return this.issueKey.toWebSafeString();
+    }
+
+    public String getCommentWebSafeKey(){
+        return Key.create(CommentModel.class,this.id).toWebSafeString();
     }
 
     public String getParentID() {
-        return parentID.toWebSafeString();
+        if(parentID != null) {
+            return parentID.toWebSafeString();
+        }
+        else{
+            return "";
+        }
     }
 
     public void setParentID(String parentID) {
@@ -77,5 +93,24 @@ public class CommentModel {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public Boolean hasParent() {
+        return hasParent;
+    }
+
+    public void setParent(Boolean hasParent) {
+        this.hasParent = hasParent;
+    }
+
+
+    //issue id newly added
+
+    public String getIssueID() {
+        return issueID;
+    }
+
+    public void setIssueID(String issueID) {
+        this.issueID = issueID;
     }
 }
