@@ -17,6 +17,13 @@ function helper_getDateFromTimeStamp(timestampString){
         return ts.toDateString().slice(4,-5).concat(", ").concat(ts.getFullYear());
 };
 
+function scroll_to(divID){
+    $('html, body').animate({
+        scrollTop: $("#"+divID).offset().top - 120
+    },250);
+};
+
+
 var issueid = urlParams['issueid'];
 var issue = {};
 
@@ -99,15 +106,19 @@ var comments = {
     },
 
     showReplyBox : function (target, ...args) {
+
         console.log(target);
 
         let closestCommentBox = $(target).closest(".issue-view-comment-box");
+        console.log(closestCommentBox);
         if(closestCommentBox.hasClass("comment-parent")){
             let parentReplierName = $(closestCommentBox).find(".issue-view-comment-name").first().html();
             console.log($(target).first().closest(".issue-view-comment-name"));
             $("#add-reply textarea").val("@"+parentReplierName+": ");
         }
-        $("#add-reply").slideToggle(400,"swing");
+        $("#add-reply").hide();
+        $(closestCommentBox).find("#add-reply").slideToggle(300);
+        // scroll_to("add-reply");
     },
 
 
@@ -188,21 +199,77 @@ var comments = {
 
                         commentDiv.setAttribute("commentID",commentId);
 
-                        commentDiv.innerHTML += "<div class=\"issue-view-comment-name small-titles\">"+author+"</div>\n" +
-                            "                <div class=\"issue-view-comment-description\">"+message+
-                            "                </div>\n" + "\n" +
-                            "                <div class=\"issue-view-comment-date-reply-container\">\n" +
-                            "                    <div class=\"issue-view-comment-date-\">\n" +helper_getDateFromTimeStamp(issueID) +
-                            "                    </div>\n" +
-                            "                    <div style=\"padding: 0px 6px\">.</div>\n" +
-                            "                    <div class=\"issue-view-comment-reply\">\n" +
-                            "                        Reply\n" +
-                            "                    </div>\n" +
-                            "                </div>";
+                        let authorEl =  document.createElement("div");
+                        authorEl.classList.add("issue-view-comment-name","small-titles");
+                        authorEl.innerText = author;
+
+                        let descriptionEl =  document.createElement("div");
+                        descriptionEl.classList.add("issue-view-comment-description");
+                        descriptionEl.innerText = message;
+
+                        let replyContainer =  document.createElement("div");
+                        replyContainer.classList.add("issue-view-comment-date-reply-container");
+
+                        let dateEl =  document.createElement("div");
+                        dateEl.classList.add("issue-view-comment-date");
+                        dateEl.innerText = helper_getDateFromTimeStamp(issueID);
+
+                        let dotEl =  document.createElement("div");
+                        dotEl.style.padding = "0px 6px";
+                        dotEl.innerText = ".";
+
+                        let replyEl =  document.createElement("div");
+                        replyEl.classList.add("issue-view-comment-reply");
+                        replyEl.innerText = "Reply";
+
+                        let replyBoxEl = document.createElement("div");
+                        replyBoxEl.classList.add("issue-view-comment-new");
+                        replyBoxEl.setAttribute("id","add-reply");
+
+                        let inputEl = document.createElement("input");
+                        inputEl.setAttribute("placeholder","your name goes here..");
+                        inputEl.setAttribute("type","text");
+
+                        let textEl = document.createElement("textarea");
+                        textEl.setAttribute("placeholder","your reply goes here..");
+                        textEl.setAttribute("type","text");
+
+                        let submitButtonEl = document.createElement("button");
+                        submitButtonEl.classList.add("submit-btn");
+                        submitButtonEl.innerText = "Reply";
+
+                        replyBoxEl.append(inputEl);
+                        replyBoxEl.append(textEl);
+                        replyBoxEl.append(document.createElement("br"));
+                        replyBoxEl.append(submitButtonEl);
+
+                        commentDiv.append(authorEl);
+                        commentDiv.append(descriptionEl);
+                        commentDiv.append(replyContainer);
+                        commentDiv.appendChild(replyBoxEl);
+
+                        replyContainer.append(dateEl);
+                        replyContainer.append(dotEl);
+                        replyContainer.append(replyEl);
+
+                        document.body.appendChild(commentDiv);
+
+                        // commentDiv.innerHTML += "<div class=\"issue-view-comment-name small-titles\">"+author+"</div>\n" +
+                        //     "                <div class=\"issue-view-comment-description\">"+message+
+                        //     "                </div>\n" + "\n" +
+                        //     "                <div class=\"issue-view-comment-date-reply-container\">\n" +
+                        //     "                    <div class=\"issue-view-comment-date-\">\n" +helper_getDateFromTimeStamp(issueID) +
+                        //     "                    </div>\n" +
+                        //     "                    <div style=\"padding: 0px 6px\">.</div>\n" +
+                        //     "                    <div class=\"issue-view-comment-reply\">\n" +
+                        //     "                        Reply\n" +
+                        //     "                    </div>\n" +
+                        //     "                </div>";
 
 
                         document.getElementsByClassName("issue-view-comments-section")[0].appendChild(commentDiv);
-                        // this.addIssue(status, 10, subject, issueCode, assignee, description, assignedto, 5);
+                        //refresh events
+                        // events.replyAdd();
                     });
 
                 }
@@ -294,7 +361,8 @@ var events = {
 
     replyAdd : function () {
 
-        $(".issue-view-comment-reply").click(function (ev) {
+        $(".issue-view-comments-section").on("click", '.issue-view-comment-box .issue-view-comment-date-reply-container .issue-view-comment-reply'
+            ,function (ev) {
             ev.preventDefault();
             console.log("reply now clicked");
             comments.showReplyBox([ev.target,this]);
@@ -328,9 +396,10 @@ var events = {
             let commentBody = [];
             commentBody['author'] = $(commentContainer).find("input").val();
             commentBody['message'] = $(commentContainer).find("textarea").val();
-            commentBody['parentid'] = $(evt.target).closest("#primary-comment")
-            commentBody['issueid'] = issue.issuewebsafekey;
-            commentBody['isparent'] = true;
+            commentBody['parentid'] = $(evt.target).closest("")
+            commentBody['issueid'] = issue.issue.code;
+            commentBody['issuekey'] = issue.websafekey;
+            commentBody['hasparent'] = false;
 
             // comments.postCommentToServer(commentBody);
         })
