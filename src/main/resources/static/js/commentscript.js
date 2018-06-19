@@ -252,7 +252,7 @@ var comments = {
                         replyContainer.append(dotEl);
                         replyContainer.append(replyEl);
 
-                        document.body.appendChild(commentDiv);
+                        // document.body.appendChild(commentDiv);
 
                         // commentDiv.innerHTML += "<div class=\"issue-view-comment-name small-titles\">"+author+"</div>\n" +
                         //     "                <div class=\"issue-view-comment-description\">"+message+
@@ -267,8 +267,10 @@ var comments = {
                         //     "                </div>";
 
 
-                        document.getElementsByClassName("issue-view-comments-section")[0].appendChild(commentDiv);
+                        $(".issue-view-comments-section").prepend(commentDiv);
+                        // document.getElementsByClassName("issue-view-comments-section")[0].appendChild(commentDiv);
                         //refresh events
+                        scroll_to("load-more-comments");
                         // events.replyAdd();
                     });
 
@@ -413,9 +415,15 @@ var events = {
             console.log("load comments triggered...");
             event.stopPropagation();
 
-            comments.fetchCommentsFromServer(issue.issue.code,cursorNext).then(function (nextCur) {
-                cursorNext = nextCur;
-            })
+            if(cursorNext || cursorNext === "") {
+                comments.fetchCommentsFromServer(issue.issue.code, cursorNext).then(function (nextCur) {
+                    cursorNext = nextCur;
+                })
+            }
+
+            else{
+                console.log("end of comments");
+            }
         });
     },
 
