@@ -349,7 +349,32 @@ var comments = {
 
 var events = {
 
-    CommentAdd : function(){
+    showFullDate : function(){
+
+        $(".issue-view-comments-section").on("mouseenter",".issue-view-comment-date",function (evt) {
+
+            evt.stopPropagation();
+            let toolTipEl = document.createElement("div");
+            toolTipEl.classList.add("tooltip");
+
+            let dateContainerEl = document.createElement("div");
+            dateContainerEl.classList.add("tooltiptext");
+
+            let dateStr = $(this).closest(".issue-view-comment-box").first().attr("commentid");
+            let dateTextEl = document.createTextNode(dateStr);
+
+            dateContainerEl.appendChild(dateTextEl);
+            toolTipEl.appendChild(dateContainerEl);
+            console.log("it is mouse entered");
+            $(this).closest(".issue-view-comment-date-reply-container").first().append(toolTipEl);
+
+
+        }).mouseleave(function(){
+            $(".tooltip").remove();
+        });
+    },
+
+    CommentAdd : function (){
         $(".comment-container #add-comment").click(function (ev) {
             ev.preventDefault();
             console.log("comment now clicked");

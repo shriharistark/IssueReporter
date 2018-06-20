@@ -59,7 +59,7 @@ var events = {
 
             $(".issue .description").click(function(evt){
 
-                issue.showBox("issue-details-popup");
+                // issue.showBox("issue-details-popup");
                 console.log("issue description is clicked");
                 // $("#issue-details-popup").toggle();
                 // dimBackgroundExcept("issue-details-popup");
