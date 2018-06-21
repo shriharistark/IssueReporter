@@ -87,6 +87,28 @@ public class IssueDAOService implements IssueDAO{
 		return issuemodel;
 	}
 
+	@Override
+	public String DodownVote(String issueID, String downvoter) {
+
+		IssueModel issueObject = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(issueID)).now();
+		Integer downVotesPrev = issueObject.getDownvotes();
+		issueObject.setDownvotes(++downVotesPrev);
+		issueObject.setDownvoters(downvoter);
+
+		ObjectifyWorker.getofy().save().entity(issueObject);
+		return downVotesPrev.toString();
+
+	}
+
+	@Override
+	public List<String> getDownvoters(String issueID) {
+
+		IssueModel issueObject = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(issueID)).now();
+		List<String> downvoters = issueObject.getDownvoters();
+
+		return downvoters;
+	}
+
 	//createIssue
 	//readIssueBydate
 	//readIssueBystatus

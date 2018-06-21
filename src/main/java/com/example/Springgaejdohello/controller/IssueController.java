@@ -193,6 +193,79 @@ public class IssueController {
 		
 		return resultSet;
 	}
+
+	@RequestMapping("/downvote")
+	public @ResponseBody String downvote(@RequestParam(value = "name") String downvoterName,
+										 @RequestParam(value = "issueid") String issueID){
+
+		IssueDAOService issueDAOService = new IssueDAOService();
+		String numberOfDownvotes = issueDAOService.DodownVote(issueID,downvoterName);
+
+		Map<String,Object> response = new HashMap<>();
+		response.put("ok", true);
+		response.put("downvotes",numberOfDownvotes);
+
+		String jsonResponse = "";
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			jsonResponse = mapper.writeValueAsString(response);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return jsonResponse;
+
+	}
+
+	@RequestMapping("/getdownvoters")
+	public @ResponseBody String downvote(@RequestParam(value = "issueid") String issueID){
+
+		IssueDAOService issueDAOService = new IssueDAOService();
+		List<String> downvoters = issueDAOService.getDownvoters(issueID);
+
+		Map<String,Object> response = new HashMap<>();
+		response.put("ok", true);
+		response.put("downvoters",downvoters);
+
+		String jsonResponse = "";
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			jsonResponse = mapper.writeValueAsString(response);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return jsonResponse;
+
+	}
+
+	@RequestMapping("/getdownvotescount")
+	public @ResponseBody String downvoteCount(@RequestParam(value = "issueid") String issueID){
+
+		IssueDAOService issueDAOService = new IssueDAOService();
+		int downvoteCount = issueDAOService.getDownvoters(issueID).size();
+
+		Map<String,Object> response = new HashMap<>();
+		response.put("ok", true);
+		response.put("downvoteCount",downvoteCount);
+
+		String jsonResponse = "";
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			jsonResponse = mapper.writeValueAsString(response);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return jsonResponse;
+
+	}
 	
 	private IssueModel generateIssue(Map<String,Object> issuePayload){
 
@@ -210,6 +283,8 @@ public class IssueController {
 		newissue.setStatus(issuePayload.get("status") == null?"unassigned":issuePayload.get("status").toString());
 		newissue.setDescription(issuePayload.get("description").toString());
 		newissue.setSubject(issuePayload.get("subject").toString());
+		newissue.setDownvotes(1);
+		newissue.setDownvoters(issuePayload.get("assignee").toString());
 		
 		return newissue;
 	}

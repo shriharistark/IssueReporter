@@ -19,38 +19,46 @@ var events = {
 
         console.log("downvote is called");
 
-        $(".issue-main-container").click(function (evt) {
-            evt.preventDefault();
-            // console.log(this);
-            $(".button-downvote .btn").click(function(evt){
-                evt.stopImmediatePropagation();
-                console.log(evt.target);
-                // console.log($(evt).find(".downvote-numbers"));
-                if($(evt.target).hasClass("downvote-numbers")){
-                    let eletext = $(evt.target);
-                    eletext.html(+(eletext.html())+1);
-                    console.log($(eletext).html());
+        // $(".issue-main-container").click(function (evt) {
+        //     evt.preventDefault();
+        //     // console.log(this);
+        //     $(".button-downvote .btn").click(function(evt){
+        //         evt.stopImmediatePropagation();
+        //         console.log(evt.target);
+        //         // console.log($(evt).find(".downvote-numbers"));
+        //         if($(evt.target).hasClass("downvote-numbers")){
+        //             let eletext = $(evt.target);
+        //             eletext.html(+(eletext.html())+1);
+        //             console.log($(eletext).html());
+        //
+        //         }
+        //         else if($(evt.target).hasClass("arrow-down")) {
+        //             let dn = $(evt.target).siblings()[0];
+        //             console.log($(evt.target).siblings()[0]);
+        //             $(dn).html(+($(dn).html())+1);
+        //             console.log($(dn).html());
+        //
+        //         }
+        //
+        //         else{
+        //             let dn = $(evt.target).find(".downvote-numbers")[0];
+        //             console.log(dn);
+        //             $(dn).html(+($(dn).html()) + 1);
+        //             console.log($(dn).html());
+        //         }
+        //         //elet.html(+(elet.html()) + 1);
+        //     });
+        //     // let eletext = $(this).find(".downvote-numbers");
+        //     // console.log(eletext);
+        //     // eletext.html(+(eletext.html()) + 1);
+        // });
 
-                }
-                else if($(evt.target).hasClass("arrow-down")) {
-                    let dn = $(evt.target).siblings()[0];
-                    console.log($(evt.target).siblings()[0]);
-                    $(dn).html(+($(dn).html())+1);
-                    console.log($(dn).html());
+        $(".issue-main-container").on("click",".button-downvote .btn", function(){
 
-                }
+            let downvotes = +($(this).find(".downvote-numbers").first().html());
 
-                else{
-                    let dn = $(evt.target).find(".downvote-numbers")[0];
-                    console.log(dn);
-                    $(dn).html(+($(dn).html()) + 1);
-                    console.log($(dn).html());
-                }
-                //elet.html(+(elet.html()) + 1);
-            });
-            // let eletext = $(this).find(".downvote-numbers");
-            // console.log(eletext);
-            // eletext.html(+(eletext.html()) + 1);
+
+            $(this).find(".downvote-numbers").first().html(downvotes+1);
         });
     },
 

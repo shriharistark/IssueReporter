@@ -13,4 +13,7 @@ public interface IssueDAO {
 	List<IssueModel> getIssuesByAssignedTo();
 	List<IssueModel> getIssuesByFilters(List<String> filters);
 	IssueModel getIssueById(String id);
+
+	String DodownVote(String issueID,String downvoterName);
+	List<String> getDownvoters(String issueID);
 }

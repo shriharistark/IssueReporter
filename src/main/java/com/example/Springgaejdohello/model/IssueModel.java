@@ -19,12 +19,14 @@ public class IssueModel {
     @Index List<String> tags;
     @Index String status;
     @Index String description;
+    @Index Integer downvotes;
+    List<String> downvoters;
 
     public IssueModel(){
 
     }
 
-    public IssueModel(String subject, String assignee, String assignedto, List<String> tags, String status, String description) {
+    public IssueModel(String subject, String assignee, String assignedto, List<String> tags, String status, String description,Integer downvotes) {
         this.code = new Date().getTime();
         this.subject = subject;
         this.assignee = assignee;
@@ -32,7 +34,8 @@ public class IssueModel {
         this.tags = tags;
         this.status = status;
         this.description = description;
-
+        this.downvotes = downvotes;
+        this.downvoters = new ArrayList<>();
     }
 
     public Long getCode() {
@@ -95,4 +98,20 @@ public class IssueModel {
         return Key.create(IssueModel.class,this.code).toWebSafeString();
     }
 
+    public Integer getDownvotes() {
+        return downvotes;
+    }
+
+    public void setDownvotes(Integer downvotes) {
+        this.downvotes = downvotes;
+    }
+
+    public List<String> getDownvoters(){
+        return this.downvoters;
+    }
+
+    public void setDownvoters(String name){
+        this.downvoters = this.downvoters == null ? new ArrayList<>() : this.downvoters;
+        this.downvoters.add(name);
+    }
 }
