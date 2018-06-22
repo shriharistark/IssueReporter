@@ -95,7 +95,8 @@ public class IssueController {
 		
 		Map<String,Object> issuePayload = mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
         IssueModel newTicket = generateIssue(issuePayload);
-        
+
+
 
         Map<String,Object> response = new HashMap<>();
         //ObjectifyService.ofy().save().entity(newTicket).now();
@@ -194,19 +195,24 @@ public class IssueController {
 		return resultSet;
 	}
 
-	@RequestMapping("/downvote")
-	public @ResponseBody String downvote(@RequestParam(value = "name") String downvoterName,
-										 @RequestParam(value = "issueid") String issueID){
+	@RequestMapping(value = "/downvote", method = RequestMethod.POST, consumes = "application/json")
+	public @ResponseBody String downvote(@RequestBody String downvoteObj) throws IOException {
+
+		//to do - add additional parameter notes(may be required for later)
+
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String,Object> downvotePayload = mapper.readValue(downvoteObj, new TypeReference<Map<String, Object>>() {});
 
 		IssueDAOService issueDAOService = new IssueDAOService();
-		String numberOfDownvotes = issueDAOService.DodownVote(issueID,downvoterName);
+		String numberOfDownvotes = issueDAOService.DodownVote(downvotePayload.get("issue").toString(),
+				downvotePayload.get("name").toString());
 
 		Map<String,Object> response = new HashMap<>();
 		response.put("ok", true);
 		response.put("downvotes",numberOfDownvotes);
 
 		String jsonResponse = "";
-		ObjectMapper mapper = new ObjectMapper();
+		mapper = new ObjectMapper();
 
 		try {
 			jsonResponse = mapper.writeValueAsString(response);
@@ -220,7 +226,7 @@ public class IssueController {
 	}
 
 	@RequestMapping("/getdownvoters")
-	public @ResponseBody String downvote(@RequestParam(value = "issueid") String issueID){
+	public @ResponseBody String getDownvoters(@RequestParam(value = "issueid") String issueID){
 
 		IssueDAOService issueDAOService = new IssueDAOService();
 		List<String> downvoters = issueDAOService.getDownvoters(issueID);

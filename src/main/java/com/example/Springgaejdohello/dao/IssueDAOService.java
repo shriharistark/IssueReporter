@@ -91,11 +91,12 @@ public class IssueDAOService implements IssueDAO{
 	public String DodownVote(String issueID, String downvoter) {
 
 		IssueModel issueObject = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(issueID)).now();
+		System.out.print(issueObject.getWebSafeKey());
 		Integer downVotesPrev = issueObject.getDownvotes();
 		issueObject.setDownvotes(++downVotesPrev);
 		issueObject.setDownvoters(downvoter);
 
-		ObjectifyWorker.getofy().save().entity(issueObject);
+		ObjectifyWorker.getofy().save().entity(issueObject).now();
 		return downVotesPrev.toString();
 
 	}

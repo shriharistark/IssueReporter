@@ -490,3 +490,53 @@ body{
 /*!* height: 150%; *!*/
 /*padding: 1% 1% 1% 2%;*/
 /*}*/
+
+#downvote-form{
+
+    position: absolute;
+    z-index: 5;
+    padding: 10px;
+}
+
+.downvote-container{
+    display: flex;
+    flex-direction: column;
+}
+
+#downvote-form input{
+    margin-bottom: 10px;
+    border-bottom: 0px solid #009cb4;
+    resize: none;
+    outline: none;
+    padding-bottom: 5px;
+}
+
+#downvote-form input:focus-within{
+    border-bottom: 2px solid #00ddff;
+}
+
+
+#pointer{
+    color: #333333;
+    border: solid 10px transparent;
+    border-right-color: #878787;
+    position: absolute;
+    margin: 10px 0px 0px -30px;
+}
+
+#downvote-form .create-post-btn{
+    cursor: pointer;
+    /* -webkit-border-radius: 11; */
+    /* -moz-border-radius: 11; */
+    border-radius: 8px;
+    font-family: Helvetica;
+    font-weight: normal;
+    color: #fbfbfb;
+    font-size: 7px;
+    letter-spacing: 0.3px;
+    background: #6360f8;
+    padding: 12px 17px 12px 17px;
+    text-decoration: none;
+    margin-top: 2px;
+    text-transform: uppercase;
+}

@@ -19,46 +19,71 @@ var events = {
 
         console.log("downvote is called");
 
-        // $(".issue-main-container").click(function (evt) {
-        //     evt.preventDefault();
-        //     // console.log(this);
-        //     $(".button-downvote .btn").click(function(evt){
-        //         evt.stopImmediatePropagation();
-        //         console.log(evt.target);
-        //         // console.log($(evt).find(".downvote-numbers"));
-        //         if($(evt.target).hasClass("downvote-numbers")){
-        //             let eletext = $(evt.target);
-        //             eletext.html(+(eletext.html())+1);
-        //             console.log($(eletext).html());
-        //
-        //         }
-        //         else if($(evt.target).hasClass("arrow-down")) {
-        //             let dn = $(evt.target).siblings()[0];
-        //             console.log($(evt.target).siblings()[0]);
-        //             $(dn).html(+($(dn).html())+1);
-        //             console.log($(dn).html());
-        //
-        //         }
-        //
-        //         else{
-        //             let dn = $(evt.target).find(".downvote-numbers")[0];
-        //             console.log(dn);
-        //             $(dn).html(+($(dn).html()) + 1);
-        //             console.log($(dn).html());
-        //         }
-        //         //elet.html(+(elet.html()) + 1);
-        //     });
-        //     // let eletext = $(this).find(".downvote-numbers");
-        //     // console.log(eletext);
-        //     // eletext.html(+(eletext.html()) + 1);
-        // });
 
-        $(".issue-main-container").on("click",".button-downvote .btn", function(){
+        $(".issue-main-container").on("click",".button-downvote .btn", function(evt){
 
             let downvotes = +($(this).find(".downvote-numbers").first().html());
 
+            // $(this).find(".downvote-numbers").first().html(downvotes+1);
+            // issue.downvote("k");
+            issue.showBox("downvote-form");
 
-            $(this).find(".downvote-numbers").first().html(downvotes+1);
+            let downvoteButtonLeft = $(this).closest(".downvote-button").first().position().left;
+            let downvoteButtonTop = $(this).closest(".downvote-button").first().position().top;
+
+            let downvoteForm = $("#downvote-form");
+
+            downvoteForm.parent().css({position : 'relative'});
+            downvoteForm.css({top:downvoteButtonTop+120, left:downvoteButtonLeft+200, position:'absolute'});
+            /* downvoteForm.find(".inset").first().html("#"+$(this).closest(".issue").first().attr("issue-id"));*/
+
+            $("#sumbit-downvote").click(function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                let downvoteFormIn = $("#downvote-form input");
+                let downvoterName = downvoteFormIn.eq(0).val();
+                let additionalNotes = downvoteFormIn.eq(1).val();
+                let issueCode = $(evt.target).closest(".issue").first().attr("issue-id");
+
+                let downvoteObj = {
+                    name : downvoterName,
+                    notes : additionalNotes,
+                    issue : issueCode
+                };
+
+                let init = {
+                    method : "POST",
+                    body : JSON.stringify(downvoteObj),
+                    headers : {
+                        'Accept' : 'application/json,text/plain,*/*',
+                        'Content-type' : 'application/json'
+                    }
+                };
+
+                let url = "/downvote";
+
+                fetch(url,init).then(function (value) {
+                    return value.json();
+                },function (reason) {
+                    console.log(reason);
+                    return "{'result':'failed'}";
+                }).then(function (val) {
+
+                    let downvoteResponse = val;
+                    console.log(downvoteResponse);
+                    if(downvoteResponse.ok) {
+                        console.log(downvoteResponse);
+                        alert("ticket created | ticketCode: "+downvoteResponse.downvotes);
+                        $(evt.target).find(".downvote-numbers").first().html(downvotes+1);
+                        issue.hideBox("downvote-form");
+                    }
+
+                    else{
+                        alert("ticket creation failed | reason: "+issueTicketResponse.status);
+                    }
+                });
+            })
         });
     },
 
@@ -120,6 +145,28 @@ events[Symbol.iterator] = function() {
 };
 
 var issue = {};
+
+    issue.downvote = function(j){
+        //todo
+
+        let downvoteform = document.createElement("div");
+        downvoteform.setAttribute("id","downvote-form");
+        downvoteform.classList.add("issue-popup");
+
+        let nameInput = document.createElement("div");
+        $(nameInput).append("<div class=\"textInput\">\n" +
+            "                <div class=\"inset\">\n" +
+            "                    Name\n" +
+            "                </div>\n" +
+            "                <div class=\"inputContainer\">\n" +
+            "                    <input type=\"text\" placeholder=\"downvoter\'s name\" value=\"\">\n" +
+            "                </div>\n" +
+            "            </div>\n");
+
+        downvoteform.append(nameInput);
+        document.body.append(downvoteform);
+
+    }
 
     issue.addIssue = function(status, downvotes, subject, id, assignee, description, assignedTo, noofcomments) {
         var issue = document.createElement("div");
@@ -223,6 +270,7 @@ var issue = {};
                         let assignee = issue.assignee;
                         let assignedto = issue.assignedto;
                         let tags = issue.tags; //for debugging
+                        let downvotes = issue.downvotes;
 
                         let status = (function(){
                             if(issue.status != "open" && issue.status != "closed"){
@@ -237,7 +285,7 @@ var issue = {};
                         let description = issue.description;
                         console.log(this);
 
-                        this.issue.addIssue(status, 10, subject, issueCode, assignee, description, assignedto, 5);
+                        this.issue.addIssue(status, downvotes, subject, issueCode, assignee, description, assignedto, 5);
                         // this.addIssue(status, 10, subject, issueCode, assignee, description, assignedto, 5);
                     });
 
@@ -405,7 +453,7 @@ var issue = {};
         });
     }
 
-    issue.downvote = "";
+    // issue.downvote = "";
 
 //delete after refactor check
 // function addIssue(status, downvotes, subject, id, assignee, description, assignedTo, noofcomments){

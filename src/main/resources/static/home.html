@@ -110,145 +110,35 @@
     </form>
 </div>
 
-<div id="issue-details-popup" class="issue-popup">
-    <!-- issue - details - popup -->
+<div id="downvote-form" class="issue-popup">
+    <div class="downvote-container">
 
-    <div id = "issue-detailed-container">
-        <!-- title -->
-        <div class="issue-popup-title">
-            <div>VIEW ISSUE</div>
-            <div class ="issue-popup-close" onclick="issue.hideBox('issue-details-popup')">x</div>
+        <div>
+            <div class="inset" style="font-size: 10px">
+
+            </div>
+            <br>
+            <div class="textInput">
+                <div class="inputContainer">
+                    <div class="inset">
+                        Name(*)
+                    </div>
+                    <input type="text" placeholder="your name">
+                    <div class="inset">
+                        Notes(optional)
+                    </div>
+                    <input type="text" placeholder="additional notes..">
+                </div>
+            </div>
+            <button id ="sumbit-downvote" class="create-post-btn">Downvote</button>
         </div>
 
-        <!-- body -->
-        <div class="issue-detailed-container-body">
-            <div class = "issue-detailed-content">
+        <div id="pointer">
 
-                <div id ="downvote">
-                    <!-- downvote button -->
-                    <div class="issue-detailed-downvote">
-                        100
-                    </div>
-
-                    <!-- issue-close-action -->
-                    <div class = "issue-detailed-close-issue">
-                        <button>Close</button>
-                    </div>
-                </div>
-
-                <div id ="issue-body">
-
-                    <!-- issue-assignee -->
-                    <div class = "issue-detailed-text issue-detailed-assignee">
-                        Karthick
-                    </div>
-
-                    <!--issue-recent-status -->
-                    <div class = "issue-detailed-text issue-detailed-status" >
-                        Open with Claws/none
-                    </div>
-
-                    <!-- issue-subject -->
-                    <div class = "issue-detailed-text issue-detailed-subject">
-                        Reminders are delivered with 15 minute late
-                    </div>
-                    <!-- issue-code -->
-                    <div class = "issue-detailed-text issue-detailed-code">
-                        #8873529172
-                    </div>
-                    <!-- issue-date-created -->
-                    <div class = "issue-detailed-text issue-detailed-date-created">
-                        Jun 19, 2018
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div id ="comment-box">
-
-                <!-- leave a comment section -->
-                <!--<div class="textInput">-->
-                    <!--<div class="inputContainer">-->
-                        <!--<input type="text" placeholder="Leave a comment" value="">-->
-                        <!--<button>Submit</button>-->
-                    <!--</div>-->
-                <!--</div>-->
-
-                    <div class="textInput">
-                        <div class="inset">
-                            Leave a comment below
-                        </div>
-                        <div class="inputContainer">
-                            <input type="text" placeholder="Your name goes here.." value="">
-                            <textarea placeholder="Be nice on the comments section.." ></textarea>
-                            <button class="submit-comment-btn">Submit</button>
-                        </div>
-                    </div>
-
-            </div>
-            <!-- line -->
-
-            <!-- comments/activity -->
-
-            <div id="activity">
-
-                <h4>Activity</h4>
-                <!-- history of comments -->
-                <div class = "issue-detailed-comments-container">
-                    <div class="comment comment-parent">
-                        <div class="comment-author">
-                            Hari
-                        </div>
-                        <div class="comment-body">
-                            Comment text
-                        </div>
-                        <div class="comment-date">
-                            Jun 20,2018
-                        </div>
-                        <div class="comment-reply">
-                            <a href = "#">Reply</a>
-                        </div>
-                    </div>
-
-                    <div class = "comment-replies">
-                        <div class="comment">
-                            <div class="comment-author">
-                                Islam
-                            </div>
-                            <div class="comment-body">
-                                Will be fixed soon
-                            </div>
-                            <div class="comment-date">
-                                Jun 23,2018
-                            </div>
-                            <div class="comment-reply">
-                                <a href = "#">Reply</a>
-                            </div>
-                        </div>
-
-                        <div class="comment">
-                            <div class="comment-author">
-                                Thilak
-                            </div>
-                            <div class="comment-body">
-                                But might take a while
-                            </div>
-                            <div class="comment-date">
-                                Jun 24,2018
-                            </div>
-                            <div class="comment-reply">
-                                <a href = "#">Reply</a>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
         </div>
+
     </div>
 
-    <!-- -->
 </div>
 
 <script src="js/issuescript.js"></script>
