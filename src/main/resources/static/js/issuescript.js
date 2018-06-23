@@ -39,7 +39,7 @@ var events = {
 
             $("#sumbit-downvote").click(function (ev) {
                 ev.preventDefault();
-                ev.stopPropagation();
+                ev.stopImmediatePropagation();
 
                 let downvoteFormIn = $("#downvote-form input");
                 let downvoterName = downvoteFormIn.eq(0).val();
@@ -73,9 +73,9 @@ var events = {
                     let downvoteResponse = val;
                     console.log(downvoteResponse);
                     if(downvoteResponse.ok) {
-                        console.log(downvoteResponse);
+                        console.log(downvoteResponse,$(evt.target));
                         alert("ticket created | ticketCode: "+downvoteResponse.downvotes);
-                        $(evt.target).find(".downvote-numbers").first().html(downvotes+1);
+                        $(evt.target).closest(".downvote-numbers").first().html((+(downvoteResponse.downvotes)));
                         issue.hideBox("downvote-form");
                     }
 
@@ -348,15 +348,20 @@ var issue = {};
 
         //var elem = document.getElementById(boxId);
         console.log(this);
+
+        console.log($("#downvote-form").find("input").eq(0));
         // elem.innerHTML = "";
         //let form = $("#create-issue-popup-form");
-        $(window).on('keyup keypress', function(e) {
+        $(window).on('keyup', function(e) {
             var keyCode = e.keyCode || e.which;
 
             //prevent submit on enter key
             if (keyCode === 13) {
-                console.log(keyCode);
                 e.preventDefault();
+
+                console.log(keyCode);
+                issue.submitForm(boxId);
+                e.stopImmediatePropagation();
                 return false;
             }
 
@@ -364,6 +369,7 @@ var issue = {};
             else if(keyCode === 27){
                 this.issue.hideBox(boxId);
             }
+
         });
 
         //disables scroll while loading to prevent loading more data with redundant scrolling
@@ -374,7 +380,7 @@ var issue = {};
 
         // elem.removeAttribute("hidden");
         $("#"+boxId).show();
-
+        $(document).find("#"+boxId).find("input").eq(0).focus();
         //dims the bg while form creation
         dimBackgroundExcept(boxId);
 
@@ -390,6 +396,11 @@ var issue = {};
         $("#"+boxId).hide();
         //elem.setAttribute("hidden","");
         reverseDimBackgroundExcept(boxId);
+    }
+
+    issue.submitForm = function(formId){
+        console.log($("#"+formId).find("button").first().html());
+        $("#"+formId).find("button").first().click();
     }
 
     issue.createIssue = function(){
@@ -453,79 +464,6 @@ var issue = {};
         });
     }
 
-    // issue.downvote = "";
-
-//delete after refactor check
-// function addIssue(status, downvotes, subject, id, assignee, description, assignedTo, noofcomments){
-//     var issue = document.createElement("div");
-//     issue.classList.add("issue");
-//     issue.innerHTML="            <div class = \"downvote-button\">\n" +
-//         "                <div>\n" +
-//         "                    <img src=\"img/status-"+status+"-symbol.png\">\n" +
-//         "                </div>\n" +
-//         "                <div class =\"button-downvote\">\n" +
-//         "                    <button class=\"btn\">\n" +
-//         "                        <div class=\"arrow-down\"></div>\n" +
-//         "                        <div class=\"downvote-numbers\">"+downvotes+"</div>\n" +
-//         "                    </button>\n" +
-//         "                </div>\n" +
-//         "            </div>\n" +
-//         "            <div class=\"issue-body\">\n" +
-//         "                <div class = \"title\">\n" +
-//         "                    "+subject+"\n" +
-//         "                </div>\n" +
-//         "                <div class=\"assignee\">\n" +
-//         "                    #"+id.toString().slice(-3)+" by "+ assignee +
-//         "                </div>\n" +
-//         "                <div class=\"description\" data-issue-id="+id.toString()+">\n" +
-//         "                    "+description +
-//         "                </div>\n" +
-//         "                <div class=\"assignedTo\">\n" +
-//         "                    " +assignedTo+
-//         "                </div>\n" +
-//         "            </div>\n" +
-//         "            <div class=\"comments\">\n" +
-//         "                <img src=\"img/comment-symbol.png\">\n" +
-//         "                <div class=\"number-of-comments\">"+noofcomments+"</div>\n" +
-//         "            </div>";
-//     document.getElementsByClassName("issue-main-container")[0].appendChild(issue);
-// }
-
-//delete after refactor check
-// function createIssueButton(){
-//
-//     var elem = document.getElementById("create-issue-popup");
-//     // elem.innerHTML = "";
-//     //let form = $("#create-issue-popup-form");
-//     $(window).on('keyup keypress', function(e) {
-//         var keyCode = e.keyCode || e.which;
-//
-//         //prevent submit on enter key
-//         if (keyCode === 13) {
-//             console.log(keyCode);
-//             e.preventDefault();
-//             return false;
-//         }
-//
-//         //pressing esc closes the popup
-//         else if(keyCode === 27){
-//             hideIssueButton();
-//         }
-//     });
-//
-//     //disables scroll while loading to prevent loading more data with redundant scrolling
-//     $( 'body').css({
-//         overflow: 'hidden',
-//         height: '50%'
-//     });
-//
-//     elem.removeAttribute("hidden");
-//
-//     //dims the bg while form creation
-//     dimBackgroundExcept("create-issue-popup");
-//
-// }
-
 //global function or util fn.
 function dimBackgroundExcept(id){
 
@@ -538,20 +476,6 @@ function dimBackgroundExcept(id){
 }
 
 
-//delet after refactor check
-// function hideIssueButton(){
-//     var elem = document.getElementById("create-issue-popup");
-//     //re-enable the locked scrolling
-//     $('body').css({
-//         overflow: 'auto',
-//         height: 'auto'
-//     });
-//     elem.setAttribute("hidden","");
-//
-//
-//     reverseDimBackgroundExcept("create-issue-popup");
-// }
-
 //global fn or util fn.
 function reverseDimBackgroundExcept(id){
     var elem = document.getElementById(id);
@@ -563,145 +487,6 @@ function reverseDimBackgroundExcept(id){
         }
     });
 }
-
-//not required at all -->>>
-// $(".create-issue-popup-done .create-post-btn").click(function(ev){
-//     ev.preventDefault();
-//
-//     // createIssue();
-//
-//     //refactor to do
-//     let tags = $(".create-issue-popup-tags input").val();
-//     let subject = $(".create-issue-popup-subject input").val();
-//     let description = $(".create-issue-popup-description textarea").val();
-//     let assignee = $(".create-issue-popup-assignee input").val();
-//     let assignedTo = $(".create-issue-popup-assigned-to input").val();
-//
-//     let tagsList = tags.split(",");
-//
-//     for(let i = 0 ; i < tagsList.length ; i++){
-//         tagsList[i] = tagsList[i].trim();
-//     }
-//
-//     console.log(tags+","+subject+","+description+","+assignedTo+","+assignee);
-//
-//     let issue = {};
-//
-//     issue.tags = tagsList;
-//     issue.subject = subject;
-//     issue.description = description;
-//     issue.assignee = assignee;
-//     issue.assignedTo = assignedTo;
-//     issue.toString = function(){
-//         return this.tags+this.subject+this.description+this.assignee+this.assignedTo;
-//     }
-//
-//     console.log(issue.toString());
-//
-//     let init = {
-//         method : "POST",
-//         body : JSON.stringify(issue),
-//         headers : {
-//             'Accept' : 'application/json,text/plain,*/*',
-//             'Content-type' : 'application/json'
-//         }
-//     };
-//
-//     let url = "/issue/create";
-//
-//     fetch(url,init).then(function (value) {
-//         return value.json();
-//     },function (reason) {
-//         console.log(reason);
-//         return "{'result':'failed'}";
-//     }).then(function (val) {
-//
-//         let issueTicketResponse = val;
-//         console.log(issueTicketResponse);
-//         if(issueTicketResponse.ok) {
-//             console.log(issueTicketResponse);
-//             alert("ticket created | ticketCode: "+issueTicketResponse.code);
-//             hideIssueButton();
-//         }
-//
-//         else{
-//             alert("ticket creation failed | reason: "+issueTicketResponse.status);
-//         }
-//     });
-// });
-
-//hits backend api /issue/create{payload}
-//delete after refactor
-// function createIssue(){
-//
-//     let tags = $(".create-issue-popup-tags input").val();
-//     let subject = $(".create-issue-popup-subject input").val();
-//     let description = $(".create-issue-popup-description textarea").val();
-//     let assignee = $(".create-issue-popup-assignee input").val();
-//     let assignedTo = $(".create-issue-popup-assigned-to input").val();
-//
-//     let tagsList = tags.split(",");
-//
-//     for(let i = 0 ; i < tagsList.length ; i++){
-//         tagsList[i] = tagsList[i].trim();
-//     }
-//
-//     console.log(tags+","+subject+","+description+","+assignedTo+","+assignee);
-//
-//     let issue = {};
-//
-//     issue.tags = tagsList;
-//     issue.subject = subject;
-//     issue.description = description;
-//     issue.assignee = assignee;
-//     issue.assignedTo = assignedTo;
-//     issue.toString = function(){
-//         return this.tags+this.subject+this.description+this.assignee+this.assignedTo;
-//     }
-//
-//     console.log(issue.toString());
-//
-//     let init = {
-//         method : "POST",
-//         body : JSON.stringify(issue),
-//         headers : {
-//             'Accept' : 'application/json,text/plain,*/*',
-//             'Content-type' : 'application/json'
-//         }
-//     };
-//
-//     let url = "/issue/create";
-//
-//     fetch(url,init).then(function (value) {
-//         return value.json();
-//     },function (reason) {
-//         console.log(reason);
-//         return "{'result':'failed'}";
-//     }).then(function (val) {
-//
-//         let issueTicketResponse = val;
-//         console.log(issueTicketResponse);
-//         if(issueTicketResponse.ok) {
-//             console.log(issueTicketResponse);
-//             alert("ticket created | ticketCode: "+issueTicketResponse.code);
-//             hideIssueButton();
-//         }
-//
-//         else{
-//             alert("ticket creation failed | reason: "+issueTicketResponse.status);
-//         }
-//     });
-// }
-
-//add downvotes
-//delete after refactor
-// $(".button-downvote").click(function(evt){
-//     evt.preventDefault();
-//     console.log($(this));
-//     let eletext = $(this).find(".downvote-numbers");
-//     console.log(eletext);
-//     eletext.html(+(eletext.html())+1);
-// });
 
 
 let tags = ( function() {
@@ -814,101 +599,6 @@ $(".create-issue-popup-tags input").on("keyup",{index : 0, prev:""},function(ev)
             break;
     }
 });
-
-//populate home page - below is a util fn for readonscroll()
-//remove after re-factoring
-// function readIssues(limit,cursor){
-//
-//     let url = "/issue/readall?cursor="+cursor+"&limit="+limit;
-//     let init = {
-//         method : "GET",
-//         headers : {
-//             'Accept' : 'application/json,text/plain,*/*'
-//         }
-//     };
-//
-//     loading = true;
-//
-//     let nextcurs = "o";
-//
-//     return fetch(url,init).then(function(val){
-//         $(window).trigger("loading");
-//
-//         function x() {
-//             var promise = new Promise(function(resolve, reject) {
-//                 window.setTimeout(function() {
-//                     resolve('done!');
-//                 },500);
-//             });
-//             return promise;
-//         }
-//
-//         return x().then(function() {
-//             if(cursor !== undefined){
-//                 console.log(val); // --> 'done!'
-//                 return val.json();
-//             }
-//
-//             else{
-//                 throw "Fatal : cursor undefined";
-//             }
-//         });
-//
-//     }, function (reason) {
-//         console.log("fetch failed due to "+reason);
-//         return "{'result':'failed'}"
-//     }).then((valuejson) => {
-//
-//         if(valuejson.result === 'failed' || !valuejson.next){
-//             throw "end of line reached";
-//         }
-//
-//         console.log("next cursor: "+valuejson.next);
-//         nextcurs = valuejson.next;
-//         return valuejson;
-//     }).then(function(value){
-//
-//         //console.log(value);
-//         if(value.ok && nextcurs !== "") {
-//             let issues = value.issues;
-//             if(issues.length > 0) {
-//                 issues.forEach(issue => {
-//                     let issueCode = issue.code;
-//                     let subject = issue.subject;
-//                     let assignee = issue.assignee;
-//                     let assignedto = issue.assignedto;
-//                     let tags = issue.tags; //for debugging
-//
-//                     let status = (function(){
-//                         if(issue.status != "open" && issue.status != "closed"){
-//                             return "open";
-//                         }
-//
-//                         else{
-//                             return issue.status;
-//                         }
-//                     })();
-//
-//                     let description = issue.description;
-//
-//                     addIssue(status, 10, subject, issueCode, assignee, description, assignedto, 5);
-//                 });
-//
-//
-//             }
-//         }
-//         //loading = false;
-//         return value.next;
-//     }).catch(function(reason){
-//         //loading = false;
-//         console.log("end of results "+reason);
-//         loading = false;
-//     }).finally(()=>{
-//         loading = false;
-//         $(window).trigger("loading");
-//     });
-//
-// }
 
 //refactor to do
 var loading = false;
@@ -1043,25 +733,6 @@ function getIssue(issueId){
     });
 
 }
-
-// $(window).click(function(evt){
-//
-//     $(".issue .description").click(function(evt){
-//         console.log("issue description is clicked");
-//         let issueID = $(this).data("issue-id");
-//         //console.log("issueid: "+issueID);
-//         let issueContent = "none";
-//         evt.stopPropagation();
-//         issueContent = getIssue(issueID).then((res) => {
-//             return res;
-//         });
-//
-//         console.log(issueContent);
-//     });
-// });
-
-
-
 
 
 function addComment(issueID, parentID, message, author){

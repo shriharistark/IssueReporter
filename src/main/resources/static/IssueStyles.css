@@ -295,17 +295,17 @@ body{
     cursor: pointer;
 }
 
-#create-issue-popup #create-issue-popup-form .textInput{
+#create-issue-popup #create-issue-popup-form .textInput, .textInput .inputContainer textarea{
     margin: 0 0 15px;
-    border: 1px solid #efefef;
+    /*border: 1px solid #efefef;*/
 }
 
-#create-issue-popup #create-issue-popup-form .textInput:focus-within{
-    -moz-box-shadow:    inset 0 0 2px #000000;
-    -webkit-box-shadow: inset 0 0 2px #000000;
-    box-shadow:          0 0 4px #a9a9a9;
-    /*border: 1px solid #9e9e9e;*/
-}
+/*#create-issue-popup #create-issue-popup-form .textInput:focus-within{*/
+    /*-moz-box-shadow:    inset 0 0 2px #000000;*/
+    /*-webkit-box-shadow: inset 0 0 2px #000000;*/
+    /*box-shadow:          0 0 4px #a9a9a9;*/
+    /*!*border: 1px solid #9e9e9e;*!*/
+/*}*/
 
 .textInput .inset {
     display: -ms-flexbox;
@@ -325,16 +325,16 @@ body{
     user-select: none;
 }
 
-.textInput .inputContainer {
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: row;
-    flex-direction: row;
-    -ms-flex-align: center;
-    align-items: center;
-}
+/*.textInput .inputContainer {*/
+    /*display: -ms-flexbox;*/
+    /*display: flex;*/
+    /*-ms-flex-direction: row;*/
+    /*flex-direction: row;*/
+    /*-ms-flex-align: center;*/
+    /*align-items: center;*/
+/*}*/
 
-.textInput .inputContainer input {
+.textInput .inputContainer input, .textInput .inputContainer textarea {
     -ms-flex: 1;
     flex: 1;
     width: 100%;
@@ -353,24 +353,28 @@ body{
     opacity: 1;
 }
 
-.textInput .inputContainer textarea {
-    -ms-flex: 1;
-    flex: 1;
-    width: 100%;
-    line-height: 21px;
-    border: 0;
-    margin: 0;
-    padding: 0;
-    resize: none;
-    outline: none;
-    color: #333;
-    background: none;
-    font-size: 13px;
-    line-height: 22px;
-    transform-style: preserve-3d;
-    -webkit-font-smoothing: antialiased;
-    opacity: 1;
-    align-self: flex-start;
+/*.textInput .inputContainer textarea {*/
+    /*-ms-flex: 1;*/
+    /*flex: 1;*/
+    /*width: 100%;*/
+    /*line-height: 21px;*/
+    /*border: 0;*/
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*resize: none;*/
+    /*outline: none;*/
+    /*color: #333;*/
+    /*background: none;*/
+    /*font-size: 13px;*/
+    /*line-height: 22px;*/
+    /*transform-style: preserve-3d;*/
+    /*-webkit-font-smoothing: antialiased;*/
+    /*opacity: 1;*/
+/*}*/
+
+.textInput .inputContainer input:focus-within, .textInput .inputContainer textarea:focus-within{
+    border-bottom: 1px solid #00ddff;
+    box-shadow: 0px 4px 20px -1px #bef3ff;
 }
 
 #create-issue-popup #create-issue-popup-form{
@@ -505,16 +509,17 @@ body{
 
 #downvote-form input{
     margin-bottom: 10px;
-    border-bottom: 0px solid #009cb4;
+    border-bottom: 1px solid #efefef;
     resize: none;
     outline: none;
-    padding-bottom: 5px;
+    padding-bottom: 0px;
 }
 
 #downvote-form input:focus-within{
-    border-bottom: 2px solid #00ddff;
+    border-bottom: 1px solid #00ddff;
+    box-shadow: 0 2px 6px 1px #bef3ff;
+    padding-bottom: 3px;
 }
-
 
 #pointer{
     color: #333333;
@@ -522,6 +527,16 @@ body{
     border-right-color: #878787;
     position: absolute;
     margin: 10px 0px 0px -30px;
+}
+
+#downvote-form #close-downvote-form{
+    align-self: flex-end;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+#downvote-form .downvote-body{
+    margin-top: -25px;
 }
 
 #downvote-form .create-post-btn{
