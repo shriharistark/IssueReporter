@@ -90,4 +90,12 @@ public class CommentDAOService implements CommentDAO {
 
         return query.iterator();
     }
+
+    public List<CommentModel> getReplies(String issueId, String parentComment){
+
+        List<CommentModel> replies = ObjectifyWorker.getofy().load().type(CommentModel.class)
+                .filter("parentID",parentComment).list();
+
+        return replies;
+    }
 }

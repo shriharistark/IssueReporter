@@ -15,7 +15,7 @@ public class CommentModel {
     String id;
 
     @Index Key<IssueModel> issueKey;
-    @Index Key parentID;
+    @Index String parentID;
     String message;
     String author;
     @Index Boolean hasParent;
@@ -68,7 +68,7 @@ public class CommentModel {
 
     public String getParentID() {
         if(parentID != null) {
-            return parentID.toWebSafeString();
+            return parentID;
         }
         else{
             return "";
@@ -76,7 +76,7 @@ public class CommentModel {
     }
 
     public void setParentID(String parentID) {
-        this.parentID = Key.valueOf(parentID);
+        this.parentID = parentID;
     }
 
     public String getMessage() {
@@ -112,5 +112,10 @@ public class CommentModel {
 
     public void setIssueID(String issueID) {
         this.issueID = issueID;
+    }
+
+    @Override
+    public String toString() {
+        return "issueCode:"+this.getId()+"issueKey:"+this.getIssueWebSafeKey()+"parent:"+this.getParentID();
     }
 }

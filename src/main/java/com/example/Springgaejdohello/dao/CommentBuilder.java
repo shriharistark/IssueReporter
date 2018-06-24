@@ -26,14 +26,16 @@ public class CommentBuilder extends CommentModel {
         commentModel.setId();// sets timestamp as the id
     }
 
-    public CommentBuilder isParent(Boolean isparent){
+    public CommentBuilder hasParent(Boolean isparent){
         commentModel.setParent(isparent);
+        System.out.println("has parents test? "+commentModel.hasParent());
         return this;
     }
 
     public CommentBuilder addParent(String parentId){
 
         //set parent ID only if it is a parent
+        System.out.println("has add parents test? "+commentModel.hasParent());
         if(commentModel.hasParent()) {
             commentModel.setParentID(parentId);
         }

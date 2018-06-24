@@ -47,42 +47,45 @@ var events = {
                 let issueCode = $(evt.target).closest(".issue").first().attr("issue-id");
 
                 let downvoteObj = {
-                    name : downvoterName,
-                    notes : additionalNotes,
-                    issue : issueCode
+                    name: downvoterName,
+                    notes: additionalNotes,
+                    issue: issueCode
                 };
 
                 let init = {
-                    method : "POST",
-                    body : JSON.stringify(downvoteObj),
-                    headers : {
-                        'Accept' : 'application/json,text/plain,*/*',
-                        'Content-type' : 'application/json'
+                    method: "POST",
+                    body: JSON.stringify(downvoteObj),
+                    headers: {
+                        'Accept': 'application/json,text/plain,*/*',
+                        'Content-type': 'application/json'
                     }
                 };
 
                 let url = "/downvote";
 
-                fetch(url,init).then(function (value) {
-                    return value.json();
-                },function (reason) {
-                    console.log(reason);
-                    return "{'result':'failed'}";
-                }).then(function (val) {
+                if(downvoterName){
 
-                    let downvoteResponse = val;
-                    console.log(downvoteResponse);
-                    if(downvoteResponse.ok) {
-                        console.log(downvoteResponse,$(evt.target));
-                        alert("ticket created | ticketCode: "+downvoteResponse.downvotes);
-                        $(evt.target).closest(".downvote-numbers").first().html((+(downvoteResponse.downvotes)));
-                        issue.hideBox("downvote-form");
-                    }
+                    fetch(url, init).then(function (value) {
+                        return value.json();
+                    }, function (reason) {
+                        console.log(reason);
+                        return "{'result':'failed'}";
+                    }).then(function (val) {
 
-                    else{
-                        alert("ticket creation failed | reason: "+issueTicketResponse.status);
-                    }
-                });
+                        let downvoteResponse = val;
+                        console.log(downvoteResponse);
+                        if (downvoteResponse.ok) {
+                            console.log(downvoteResponse, $(evt.target));
+                            alert("ticket created | ticketCode: " + downvoteResponse.downvotes);
+                            $(evt.target).closest(".downvote-numbers").first().html((+(downvoteResponse.downvotes)));
+                            issue.hideBox("downvote-form");
+                        }
+
+                        else {
+                            alert("ticket creation failed | reason: " + issueTicketResponse.status);
+                        }
+                    });
+                }
             })
         });
     },

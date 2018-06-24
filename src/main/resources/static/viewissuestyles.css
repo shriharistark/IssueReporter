@@ -50,6 +50,10 @@
     font-size: 12px !important;
 }
 
+.issue .title{
+    -webkit-line-clamp:3 !important;
+}
+
 .small-titles{
     margin: 1% 0%;
     font-weight: 700;

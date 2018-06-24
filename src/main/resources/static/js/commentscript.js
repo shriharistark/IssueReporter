@@ -27,6 +27,58 @@ function scroll_to(divID){
 var issueid = urlParams['issueid'];
 var issue = {};
 
+var downvotes = {
+
+    populateDownvoters : function (issueCode) {
+
+        let url = "/getdownvoters?issueid="+issueCode;
+        let init = {
+            method : "GET",
+            headers : {
+                'Accept' : 'application/json, text/plain, */*'
+            }
+        };
+
+        fetch(url,init).then(function (resp) {
+            return resp.json();
+        }, function (respErr) {
+            console.log(respErr.json());
+            return "{'ok' : 'failed'}'";
+        }).then(function(jsonVal){
+
+            if(jsonVal.ok) {
+                let downvotersEl = $("#sidebar").find(".names").first();
+                let downvoters = jsonVal.downvoters;
+                console.log(downvoters);
+
+                let removeDuplicates = function(downvoters){
+                    let auxArr = downvoters;
+                    let multipleDownvotersMap = new Map();
+                    downvoters.forEach(ele => {
+
+                            if(multipleDownvotersMap.get(ele.toLowerCase())) {
+                                multipleDownvotersMap.set(ele.toLowerCase(),
+                                    multipleDownvotersMap.get(ele.toLowerCase())+1);
+                            }
+                            else {
+                                multipleDownvotersMap.set(ele.toLowerCase(), 1);
+                            }
+                    });
+
+                    console.log(multipleDownvotersMap);
+                    return multipleDownvotersMap;
+                }
+
+                let downvotersNonDupicated = removeDuplicates(downvoters);
+                downvotersNonDupicated.forEach((v,k) => {
+                    downvotersEl.append("<div>" + k.toString()+" ("+v.toString()+") " + "</div>");
+                });
+            }
+        })
+    }
+};
+
+
 (function () {
 
     let issueObj = {};
@@ -66,6 +118,7 @@ var issue = {};
             let issueWebSafeKey = issuereturn.issuewebsafekey;
 
             let issueEl = $(".issue-view-main-container .issue");
+            $(issueEl).first().find(".downvote-numbers").html(issueObject.downvotes);
 
             let issueBody = $(issueEl).find(".issue-body").first();
             $(issueBody).find(".title").html(issueObject.subject);
@@ -85,12 +138,19 @@ var issue = {};
             $(detailel).find(".issue-view-comment-description").html(issueObject.description);
 
             issue = issuereturn;
-
         })
 
     };
 
+    // let exec = new Promise(getIssue(issueid,()=>{
+    //     console.log("failed");
+    // }).then(()=>{
+    //     downvotes.populateDownvoters(issueObj.code);
+    // }, ()=>{
+    //     console.log("whoops")
+    // })
     getIssue(issueid);
+    downvotes.populateDownvoters(issueid);
 
     $("#load-more-comments").trigger("click");
 
@@ -175,12 +235,81 @@ var comments = {
 
             console.log("next cursor: "+valuejson.next);
             nextcurs = valuejson.next;
+            console.log(valuejson);
             return valuejson;
         }).then(function(value){
 
+            function helper_createCommentBox(commentId,message,author,parentID,issueID){
+                let commentDiv = document.createElement("div");
+                commentDiv.classList.add("issue-view-comment-box");
+                parentID === "" ? commentDiv.classList.add("comment-parent") : commentDiv.classList.add("comment-child");
+
+                commentDiv.setAttribute("commentID",commentId);
+
+                let authorEl =  document.createElement("div");
+                authorEl.classList.add("issue-view-comment-name","small-titles");
+                authorEl.innerText = author;
+
+                let descriptionEl =  document.createElement("div");
+                descriptionEl.classList.add("issue-view-comment-description");
+                descriptionEl.innerText = message;
+
+                let replyContainer =  document.createElement("div");
+                replyContainer.classList.add("issue-view-comment-date-reply-container");
+
+                let dateEl =  document.createElement("div");
+                dateEl.classList.add("issue-view-comment-date");
+                dateEl.innerText = helper_getDateFromTimeStamp(issueID);
+
+                let dotEl =  document.createElement("div");
+                dotEl.style.padding = "0px 6px";
+                dotEl.innerText = ".";
+
+                let replyEl =  document.createElement("div");
+                replyEl.classList.add("issue-view-comment-reply");
+                replyEl.innerText = "Reply";
+
+                let replyBoxEl = document.createElement("div");
+                replyBoxEl.classList.add("issue-view-comment-new");
+                replyBoxEl.setAttribute("id","add-reply");
+
+                let inputEl = document.createElement("input");
+                inputEl.setAttribute("placeholder","your name goes here..");
+                inputEl.setAttribute("type","text");
+
+                let textEl = document.createElement("textarea");
+                textEl.setAttribute("placeholder","your reply goes here..");
+                textEl.setAttribute("type","text");
+
+                let submitButtonEl = document.createElement("button");
+                submitButtonEl.classList.add("submit-btn");
+                submitButtonEl.innerText = "Reply";
+
+                replyBoxEl.append(inputEl);
+                replyBoxEl.append(textEl);
+                replyBoxEl.append(document.createElement("br"));
+                replyBoxEl.append(submitButtonEl);
+
+                commentDiv.append(authorEl);
+                commentDiv.append(descriptionEl);
+                commentDiv.append(replyContainer);
+                commentDiv.appendChild(replyBoxEl);
+
+                replyContainer.append(dateEl);
+                replyContainer.append(dotEl);
+                replyContainer.append(replyEl);
+
+                return commentDiv;
+            }
             //console.log(value);
             if(value.ok && nextcurs !== "") {
                 let comments = value.commentsList;
+                let replies = value.replies;
+
+                //test
+                // console.log(value.replies);
+                // testGlobalReplies = value.replies;
+
                 if(comments.length > 0) {
                     comments.forEach(comment => {
                         let commentId = comment.id;
@@ -191,8 +320,26 @@ var comments = {
                         let parentID = comment.parentID;
                         let issueID = comment.issueID;
 
+                        // let replies = replies[commentId];
+
                         console.log(this);
 
+                        let commentDiv = helper_createCommentBox(commentId,message,author,parentID,issueID);
+                        let replyData = replies[commentId];
+
+                        // console.log(commentDiv);
+
+                        console.log(replyData);
+
+                        if(replyData.length > 0) {
+                            replyData.forEach(rep => {
+                                let replyEl = helper_createCommentBox(rep.id, rep.message, rep.author, rep.parentID, rep.issueID);
+                                console.log(commentDiv);
+                                $(commentDiv).append(replyEl);
+                            });
+                        }
+
+                        /*
                         let commentDiv = document.createElement("div");
                         commentDiv.classList.add("issue-view-comment-box");
                         parentID === "" ? commentDiv.classList.add("comment-parent") : commentDiv.classList.add("comment-child");
@@ -250,22 +397,7 @@ var comments = {
 
                         replyContainer.append(dateEl);
                         replyContainer.append(dotEl);
-                        replyContainer.append(replyEl);
-
-                        // document.body.appendChild(commentDiv);
-
-                        // commentDiv.innerHTML += "<div class=\"issue-view-comment-name small-titles\">"+author+"</div>\n" +
-                        //     "                <div class=\"issue-view-comment-description\">"+message+
-                        //     "                </div>\n" + "\n" +
-                        //     "                <div class=\"issue-view-comment-date-reply-container\">\n" +
-                        //     "                    <div class=\"issue-view-comment-date-\">\n" +helper_getDateFromTimeStamp(issueID) +
-                        //     "                    </div>\n" +
-                        //     "                    <div style=\"padding: 0px 6px\">.</div>\n" +
-                        //     "                    <div class=\"issue-view-comment-reply\">\n" +
-                        //     "                        Reply\n" +
-                        //     "                    </div>\n" +
-                        //     "                </div>";
-
+                        replyContainer.append(replyEl); */
 
                         $(".issue-view-comments-section").prepend(commentDiv);
                         // document.getElementsByClassName("issue-view-comments-section")[0].appendChild(commentDiv);
@@ -337,7 +469,7 @@ var comments = {
 
         fetch(url,init).then(function (value) {
             console.log(value);
-            return value;
+            return value.json();
         }, function (reason) {
             return reason.json();
         }).then(function (comments) {
@@ -412,23 +544,29 @@ var events = {
             commentBody['issuekey'] = issue.websafekey;
             commentBody['hasparent'] = false;
 
+            console.log(commentBody);
+
             comments.postCommentToServer(commentBody);
         });
 
-        $("#add-reply").on("click",function (evt) {
+
+        //adding replies
+        $(".issue-view-comments-section").on("click","#add-reply .submit-btn",function (evt) {
 
 
-            let commentContainer = $("#primary-comment");
+            let commentContainer = $("#add-reply");
 
+            console.log($(evt.target).siblings("input").first());
             let commentBody = [];
-            commentBody['author'] = $(commentContainer).find("input").val();
-            commentBody['message'] = $(commentContainer).find("textarea").val();
-            commentBody['parentid'] = $(evt.target).closest("")
+            commentBody['author'] = $(evt.target).siblings("input").first().val();
+            commentBody['message'] = $(evt.target).siblings("textarea").first().val();
+            commentBody['parentid'] = $(evt.target).closest(".issue-view-comment-box").first().attr("commentid");
             commentBody['issueid'] = issue.issue.code;
-            commentBody['issuekey'] = issue.websafekey;
-            commentBody['hasparent'] = false;
+            commentBody['issuekey'] = issue.issuewebsafekey;
+            commentBody['hasparent'] = true;
 
-            // comments.postCommentToServer(commentBody);
+            console.log(commentBody);
+            comments.postCommentToServer(commentBody);
         })
     },
 
@@ -486,16 +624,6 @@ events[Symbol.iterator] = function() {
 
 (function(){
     console.log(this);
-    // var context = issue.readOnScroll;
-    // var bound = context.bind(issue);
-    // bound();
-
-    /*
-    issue.readOnScroll.call(this.issue,"");
-    $(window).trigger("scroll");*/
-
-
-    //issue.downvote.call(this.issue,"");
 
     //initialising all the event listeners
     for(let event of events){

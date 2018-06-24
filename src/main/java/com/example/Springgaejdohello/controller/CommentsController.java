@@ -68,9 +68,11 @@ public class CommentsController {
 
         Map<String,Object> commentIn = mapper.readValue(commentPayload, new TypeReference<Map<String,Object>>(){});
 
+        System.out.println(Boolean.valueOf(commentIn.get("hasparent").toString()));
+
         CommentModel commentBuilder = new CommentBuilder(commentIn.get("message").toString(),
                 commentIn.get("author").toString())
-                .isParent(Boolean.getBoolean(commentIn.get("hasparent").toString()))
+                .hasParent(Boolean.valueOf(commentIn.get("hasparent").toString()))
                 .addParent(commentIn.get("parentid").toString())
                 .bindTo(commentIn.get("issueid").toString())
                 .build();
@@ -104,6 +106,34 @@ public class CommentsController {
     public @ResponseBody String readAll(@RequestParam(value = "cursor", defaultValue = "") String cursorStr,
                                         @RequestParam(value = "issueid") String issueID){
 
+        // not required
+//        class CommentAux{
+//            String commentId;
+//            String message;
+//            String author;
+//
+//            public CommentAux(String commentId, String message, String author) {
+//                this.commentId = commentId;
+//                this.message = message;
+//                this.author = author;
+//            }
+//
+//            public String json() throws JsonProcessingException {
+//                Map<String,Object> jsonResp = new HashMap<>();
+//                ObjectMapper mapper = new ObjectMapper();
+//
+//                jsonResp.put("commentid",commentId);
+//                jsonResp.put("message",message);
+//                jsonResp.put("author",author);
+//
+//                return mapper.writeValueAsString(jsonResp);
+//            }
+//
+//            @Override
+//            public String toString() {
+//                return super.toString();
+//            }
+//        }
 
         CommentDAOService commentDAOService = new CommentDAOService();
         QueryResultIterator<CommentModel> resultSet = commentDAOService.getAllCommentsOf(issueID,cursorStr);
@@ -115,6 +145,15 @@ public class CommentsController {
             comments.add(resultSet.next());
             continu = true;
         }
+
+        Map<String,List<CommentModel>> commentReplyMap = new HashMap<String,List<CommentModel>>();
+
+        System.out.println("get replies test: "+commentDAOService.getReplies(issueID,comments.get(0).getId()));
+        comments.forEach(comment -> {
+            System.out.print(commentDAOService.getReplies(issueID,comment.getId().toString()));
+                commentReplyMap.put(comment.getId()
+                        ,commentDAOService.getReplies(issueID,comment.getId().toString()));
+        });
 
         if(continu) {
             cursorNext = resultSet.getCursor().toWebSafeString();
@@ -129,6 +168,7 @@ public class CommentsController {
         response.put("ok", true);
         response.put("next",cursorNext);
         response.put("commentsList", comments);
+        response.put("replies",commentReplyMap);
 
         String jsonResponse = "";
         ObjectMapper mapper = new ObjectMapper();
