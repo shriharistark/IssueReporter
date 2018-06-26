@@ -11,6 +11,18 @@
 </head>
 <body>
 
+<!-- sample -->
+<form enctype="text/plain" method="get" name="putFile" id="putFile">
+    <div>
+        Bucket: <input type="text" name="bucket" />
+        File Name: <input type="text" name="fileName" />
+        <br /> File Contents: <br />
+        <textarea name="content" id="content" rows="3" cols="60"></textarea>
+        <br />
+        <input type="submit" onclick='uploadFile()' value="Upload Content" />
+    </div>
+</form>
+
 <div id = "loading-icon" hidden>
     <img src="img/infinity.gif">
 </div>
@@ -142,6 +154,7 @@
     </div>
 
 </div>
+
 
 <script src="js/issuescript.js"></script>
 </body>

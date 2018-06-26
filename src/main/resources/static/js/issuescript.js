@@ -777,3 +777,40 @@ function addComment(issueID, parentID, message, author){
         }
     });
 }
+
+//test code
+
+function uploadFile() {
+    var bucket = document.forms["putFile"]["bucket"].value;
+    var filename = document.forms["putFile"]["fileName"].value;
+    if (bucket == null || bucket == "" || filename == null || filename == "") {
+        alert("Both Bucket and FileName are required");
+        return false;
+    } else {
+
+        console.log("this fn. is working");
+        var postData = document.forms["putFile"]["content"].value;
+        console.log(postData);
+        document.getElementById("content").value = null;
+        let init = {
+            method : "POST",
+            body : postData,
+            headers : {
+                'Content-type' : 'text-plain'
+            }
+        };
+
+        let url = "/gcs/"+bucket+"/"+filename;
+
+        fetch(url,init).then(function (value) {
+            return value.json();
+        },function (reason) {
+            console.log(reason);
+            return "{'result':'failed'}";
+        }).then(function (val) {
+
+            let issueTicketResponse = val;
+            console.log(issueTicketResponse);
+        });
+    }
+}

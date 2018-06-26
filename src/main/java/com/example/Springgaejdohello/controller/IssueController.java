@@ -1,6 +1,9 @@
 package com.example.Springgaejdohello.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.google.appengine.tools.cloudstorage.*;
 import com.googlecode.objectify.Key;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -26,6 +30,9 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 //@RequestMapping("/")
@@ -294,4 +301,72 @@ public class IssueController {
 		
 		return newissue;
 	}
+
+	@RequestMapping(value = {"/gcs/{bucket}/{fileName}"},method = RequestMethod.POST)
+	public @ResponseBody String uploadFile(@PathVariable("bucket") String bucket,
+			@PathVariable("fileName") String nameFile,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+
+		System.out.print("I am here inside sampleuplaod");
+		final GcsService gcsService = GcsServiceFactory.createGcsService(new RetryParams.Builder()
+				.initialRetryDelayMillis(10)
+				.retryMaxAttempts(10)
+				.totalRetryPeriodMillis(15000)
+				.build());
+
+
+		GcsFileOptions instance = GcsFileOptions.getDefaultInstance();
+		GcsFilename fileName = new GcsFilename(bucket,nameFile);
+		GcsOutputChannel outputChannel;
+		outputChannel = gcsService.createOrReplace(fileName, instance);
+		copy(request.getInputStream(), Channels.newOutputStream(outputChannel));
+
+		return "{'name':'hari'}";
+	}
+
+	@RequestMapping(value = {"/gcs/{bucket}/{fileName}"},method = RequestMethod.GET)
+	public void getFile(@PathVariable("bucket") String bucket,
+										   @PathVariable("fileName") String nameFile,
+										   HttpServletRequest request,
+										   HttpServletResponse response) throws IOException {
+
+		System.out.print("I am here inside sample get");
+		final GcsService gcsService = GcsServiceFactory.createGcsService(new RetryParams.Builder()
+				.initialRetryDelayMillis(10)
+				.retryMaxAttempts(10)
+				.totalRetryPeriodMillis(15000)
+				.build());
+
+		GcsFilename fileName = new GcsFilename(bucket,nameFile);
+		GcsInputChannel readChannel = gcsService.openPrefetchingReadChannel(fileName, 0, 2 * 1024 * 1024);
+		copy(Channels.newInputStream(readChannel), response.getOutputStream());
+
+		System.out.println("op stream: "+response.getOutputStream().toString());
+	}
+
+	private GcsFilename getFileName(HttpServletRequest req) {
+		String[] splits = req.getRequestURI().split("/", 4);
+		if (!splits[0].equals("") || !splits[1].equals("gcs")) {
+			throw new IllegalArgumentException("The URL is not formed as expected. " +
+					"Expecting /gcs/<bucket>/<object>");
+		}
+		return new GcsFilename(splits[2], splits[3]);
+	}
+
+	private void copy(InputStream input, OutputStream output) throws IOException {
+		try {
+			byte[] buffer = new byte[2 * 1024 * 1024];
+			int bytesRead = input.read(buffer);
+			while (bytesRead != -1) {
+				output.write(buffer, 0, bytesRead);
+				System.out.println("bytres: "+buffer);
+				bytesRead = input.read(buffer);
+			}
+		} finally {
+			input.close();
+			output.close();
+		}
+	}
+
 }
