@@ -1,5 +1,6 @@
 package com.example.Springgaejdohello.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,8 +13,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.google.api.services.storage.Storage;
 import com.google.appengine.tools.cloudstorage.*;
 import com.googlecode.objectify.Key;
+import com.sun.org.apache.xml.internal.security.utils.Base64;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +38,7 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -326,10 +334,10 @@ public class IssueController {
 	}
 
 	@RequestMapping(value = {"/gcs/{bucket}/{fileName}"},method = RequestMethod.GET)
-	public void getFile(@PathVariable("bucket") String bucket,
-										   @PathVariable("fileName") String nameFile,
-										   HttpServletRequest request,
-										   HttpServletResponse response) throws IOException {
+	public @ResponseBody String getFile(@PathVariable("bucket") String bucket,
+													   @PathVariable("fileName") String nameFile,
+													   HttpServletRequest request,
+													   HttpServletResponse response) throws IOException {
 
 		System.out.print("I am here inside sample get");
 		final GcsService gcsService = GcsServiceFactory.createGcsService(new RetryParams.Builder()
@@ -340,9 +348,38 @@ public class IssueController {
 
 		GcsFilename fileName = new GcsFilename(bucket,nameFile);
 		GcsInputChannel readChannel = gcsService.openPrefetchingReadChannel(fileName, 0, 2 * 1024 * 1024);
-		copy(Channels.newInputStream(readChannel), response.getOutputStream());
 
-		System.out.println("op stream: "+response.getOutputStream().toString());
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+		int nRead;
+		byte[] data = new byte[16384];
+
+		StringBuilder encodedImage = new StringBuilder();
+
+		while ((nRead = Channels.newInputStream(readChannel).read(data, 0, data.length)) != -1) {
+			buffer.write(data, 0, nRead);
+			encodedImage.append(Base64.encode(data));
+		}
+
+
+		Map<String,Object> responseMap = new HashMap<>();
+		responseMap.put("ok", true);
+
+		String jsonResponse = "";
+		ObjectMapper mapper = new ObjectMapper();
+
+		responseMap.put("image",encodedImage);
+		System.out.println("Image: "+encodedImage);
+
+		try {
+			jsonResponse = mapper.writeValueAsString(responseMap);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return jsonResponse;
+
 	}
 
 	private GcsFilename getFileName(HttpServletRequest req) {

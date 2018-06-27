@@ -789,14 +789,21 @@ function uploadFile() {
     } else {
 
         console.log("this fn. is working");
-        var postData = document.forms["putFile"]["content"].value;
-        console.log(postData);
+        var postData = document.forms["putFile"]["img"].value;
+        var file = new FileReader();
+        var input = document.getElementById("img");
+
+        file.readAsDataURL(input.files[0]);
+        file.onload = function(){
+            console.log(file);
+        };
+
         document.getElementById("content").value = null;
         let init = {
             method : "POST",
-            body : postData,
+            body : file,
             headers : {
-                'Content-type' : 'text-plain'
+                'Content-type' : 'image/png'
             }
         };
 
@@ -814,3 +821,16 @@ function uploadFile() {
         });
     }
 }
+
+var openFile = function(file) {
+    var input = file.target;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+        var dataURL = reader.result;
+        // var output = document.getElementById('output');
+        // output.src = dataURL;
+    };
+    reader.readAsDataURL(input.files[0]);
+    return reader;
+};
