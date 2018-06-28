@@ -246,3 +246,16 @@
 .tooltip:hover .tooltiptext {
 }
 
+#refresh-comments{
+
+    cursor: pointer;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+}
+
+#refresh-comments:hover{
+    width: 16px;
+    height: 16px;
+}
+

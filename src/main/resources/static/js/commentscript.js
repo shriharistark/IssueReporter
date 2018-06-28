@@ -339,65 +339,6 @@ var comments = {
                             });
                         }
 
-                        /*
-                        let commentDiv = document.createElement("div");
-                        commentDiv.classList.add("issue-view-comment-box");
-                        parentID === "" ? commentDiv.classList.add("comment-parent") : commentDiv.classList.add("comment-child");
-
-                        commentDiv.setAttribute("commentID",commentId);
-
-                        let authorEl =  document.createElement("div");
-                        authorEl.classList.add("issue-view-comment-name","small-titles");
-                        authorEl.innerText = author;
-
-                        let descriptionEl =  document.createElement("div");
-                        descriptionEl.classList.add("issue-view-comment-description");
-                        descriptionEl.innerText = message;
-
-                        let replyContainer =  document.createElement("div");
-                        replyContainer.classList.add("issue-view-comment-date-reply-container");
-
-                        let dateEl =  document.createElement("div");
-                        dateEl.classList.add("issue-view-comment-date");
-                        dateEl.innerText = helper_getDateFromTimeStamp(issueID);
-
-                        let dotEl =  document.createElement("div");
-                        dotEl.style.padding = "0px 6px";
-                        dotEl.innerText = ".";
-
-                        let replyEl =  document.createElement("div");
-                        replyEl.classList.add("issue-view-comment-reply");
-                        replyEl.innerText = "Reply";
-
-                        let replyBoxEl = document.createElement("div");
-                        replyBoxEl.classList.add("issue-view-comment-new");
-                        replyBoxEl.setAttribute("id","add-reply");
-
-                        let inputEl = document.createElement("input");
-                        inputEl.setAttribute("placeholder","your name goes here..");
-                        inputEl.setAttribute("type","text");
-
-                        let textEl = document.createElement("textarea");
-                        textEl.setAttribute("placeholder","your reply goes here..");
-                        textEl.setAttribute("type","text");
-
-                        let submitButtonEl = document.createElement("button");
-                        submitButtonEl.classList.add("submit-btn");
-                        submitButtonEl.innerText = "Reply";
-
-                        replyBoxEl.append(inputEl);
-                        replyBoxEl.append(textEl);
-                        replyBoxEl.append(document.createElement("br"));
-                        replyBoxEl.append(submitButtonEl);
-
-                        commentDiv.append(authorEl);
-                        commentDiv.append(descriptionEl);
-                        commentDiv.append(replyContainer);
-                        commentDiv.appendChild(replyBoxEl);
-
-                        replyContainer.append(dateEl);
-                        replyContainer.append(dotEl);
-                        replyContainer.append(replyEl); */
 
                         if(!comment.parentID) {
                             $(".issue-view-comments-section").prepend(commentDiv);
@@ -470,13 +411,14 @@ var comments = {
             }
         };
 
-        fetch(url,init).then(function (value) {
+        return fetch(url,init).then(function (value) {
             console.log(value);
             return value.json();
         }, function (reason) {
             return reason.json();
         }).then(function (comments) {
             console.log(comments);
+            return comments;
         });
     }
 }
@@ -550,6 +492,8 @@ var events = {
             console.log(commentBody);
 
             comments.postCommentToServer(commentBody);
+
+            // events.refreshComments();   //empties comments div and fetches new
         });
 
 
@@ -575,8 +519,16 @@ var events = {
             commentBody['hasparent'] = true;
 
             console.log(commentBody);
-            comments.postCommentToServer(commentBody);
-            comments.showReplyBox([evt.target,this]);
+            comments.postCommentToServer(commentBody).then((commentObj) =>{
+                if(commentObj.id){
+                    setTimeout($("#refresh-comments").click(),1000);
+                    // events.refreshComments();
+                }
+            });
+
+            comments.showReplyBox([evt.target,this]);   //this toggles the reply box | to fix later
+
+               //refresh the comments section
 
         })
     },
@@ -613,19 +565,27 @@ var events = {
                 $(".issue-view-comments-section").trigger("loadComments");
             },350);
         });
+    },
 
-        $("#fetch-fresh-comments").click(function () {
+    refreshComments : function () {
+
+        $("#refresh-comments").click(function () {
+
+            console.log("refreshing comments ...");
+            $(".issue-view-comments-section").off("loadComments");
+            events.loadCommentsHelper();
+
 
             let moreCommentsAnchorEl = document.createElement("a");
             moreCommentsAnchorEl.setAttribute("id","load-more-comments");
             moreCommentsAnchorEl.innerHTML = "view-more-comments";
-
             $(".issue-view-comments-section").html("");
             $(".issue-view-comments-section").append(moreCommentsAnchorEl);
 
-            $(this).trigger("loading");
-        })
-    },
+            $(".issue-view-comments-section").trigger("loadComments");
+
+        });
+    }
 
 };
 

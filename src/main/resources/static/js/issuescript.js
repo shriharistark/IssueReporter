@@ -93,13 +93,17 @@ var events = {
     showIssueDetails : function(){
         $(window).click(function(evt){
 
-            $(".issue .description").click(function(evt){
+            console.log("wndow clicked",evt.target);
+
+            if(evt.target.classList.contains("description")){
+
+            // $(".issue .description").click(function(evt){
 
                 // issue.showBox("issue-details-popup");
                 console.log("issue description is clicked");
                 // $("#issue-details-popup").toggle();
                 // dimBackgroundExcept("issue-details-popup");
-                let issueID = $(this).closest(".issue").attr("issue-id");
+                let issueID = $(evt.target).closest(".issue").attr("issue-id");
                 //console.log("issueid: "+issueID);
                 let issueContent = "none";
                 evt.stopPropagation();
@@ -110,7 +114,7 @@ var events = {
                 });
 
                 console.log(issueContent);
-            });
+            };
         });
     },
 
