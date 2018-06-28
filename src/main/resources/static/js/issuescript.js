@@ -779,58 +779,58 @@ function addComment(issueID, parentID, message, author){
 }
 
 //test code
-
-function uploadFile() {
-    var bucket = document.forms["putFile"]["bucket"].value;
-    var filename = document.forms["putFile"]["fileName"].value;
-    if (bucket == null || bucket == "" || filename == null || filename == "") {
-        alert("Both Bucket and FileName are required");
-        return false;
-    } else {
-
-        console.log("this fn. is working");
-        var postData = document.forms["putFile"]["img"].value;
-        var file = new FileReader();
-        var input = document.getElementById("img");
-
-        file.readAsDataURL(input.files[0]);
-        file.onload = function(){
-            console.log(file);
-        };
-
-        document.getElementById("content").value = null;
-        let init = {
-            method : "POST",
-            body : file,
-            headers : {
-                'Content-type' : 'image/png'
-            }
-        };
-
-        let url = "/gcs/"+bucket+"/"+filename;
-
-        fetch(url,init).then(function (value) {
-            return value.json();
-        },function (reason) {
-            console.log(reason);
-            return "{'result':'failed'}";
-        }).then(function (val) {
-
-            let issueTicketResponse = val;
-            console.log(issueTicketResponse);
-        });
-    }
-}
-
-var openFile = function(file) {
-    var input = file.target;
-
-    var reader = new FileReader();
-    reader.onload = function(){
-        var dataURL = reader.result;
-        // var output = document.getElementById('output');
-        // output.src = dataURL;
-    };
-    reader.readAsDataURL(input.files[0]);
-    return reader;
-};
+//
+// function uploadFile() {
+//     var bucket = document.forms["putFile"]["bucket"].value;
+//     var filename = document.forms["putFile"]["fileName"].value;
+//     if (bucket == null || bucket == "" || filename == null || filename == "") {
+//         alert("Both Bucket and FileName are required");
+//         return false;
+//     } else {
+//
+//         console.log("this fn. is working");
+//         var postData = document.forms["putFile"]["img"].value;
+//         var file = new FileReader();
+//         var input = document.getElementById("img");
+//
+//         file.readAsDataURL(input.files[0]);
+//         file.onload = function(){
+//             console.log(file);
+//         };
+//
+//         document.getElementById("content").value = null;
+//         let init = {
+//             method : "POST",
+//             body : file,
+//             headers : {
+//                 'Content-type' : 'image/png'
+//             }
+//         };
+//
+//         let url = "/gcs/"+bucket+"/"+filename;
+//
+//         fetch(url,init).then(function (value) {
+//             return value.json();
+//         },function (reason) {
+//             console.log(reason);
+//             return "{'result':'failed'}";
+//         }).then(function (val) {
+//
+//             let issueTicketResponse = val;
+//             console.log(issueTicketResponse);
+//         });
+//     }
+// }
+//
+// var openFile = function(file) {
+//     var input = file.target;
+//
+//     var reader = new FileReader();
+//     reader.onload = function(){
+//         var dataURL = reader.result;
+//         // var output = document.getElementById('output');
+//         // output.src = dataURL;
+//     };
+//     reader.readAsDataURL(input.files[0]);
+//     return reader;
+// };

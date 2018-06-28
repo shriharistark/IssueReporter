@@ -107,33 +107,6 @@ public class CommentsController {
                                         @RequestParam(value = "issueid") String issueID){
 
         // not required
-//        class CommentAux{
-//            String commentId;
-//            String message;
-//            String author;
-//
-//            public CommentAux(String commentId, String message, String author) {
-//                this.commentId = commentId;
-//                this.message = message;
-//                this.author = author;
-//            }
-//
-//            public String json() throws JsonProcessingException {
-//                Map<String,Object> jsonResp = new HashMap<>();
-//                ObjectMapper mapper = new ObjectMapper();
-//
-//                jsonResp.put("commentid",commentId);
-//                jsonResp.put("message",message);
-//                jsonResp.put("author",author);
-//
-//                return mapper.writeValueAsString(jsonResp);
-//            }
-//
-//            @Override
-//            public String toString() {
-//                return super.toString();
-//            }
-//        }
 
         CommentDAOService commentDAOService = new CommentDAOService();
         QueryResultIterator<CommentModel> resultSet = commentDAOService.getAllCommentsOf(issueID,cursorStr);
@@ -148,11 +121,11 @@ public class CommentsController {
 
         Map<String,List<CommentModel>> commentReplyMap = new HashMap<String,List<CommentModel>>();
 
-        System.out.println("get replies test: "+commentDAOService.getReplies(issueID,comments.get(0).getId()));
+//        System.out.println("get replies test: "+commentDAOService.getReplies(issueID,comments.get(0).getId()));
         comments.forEach(comment -> {
-            System.out.print(commentDAOService.getReplies(issueID,comment.getId().toString()));
+//            System.out.print(commentDAOService.getReplies(issueID,comment.getId()));
                 commentReplyMap.put(comment.getId()
-                        ,commentDAOService.getReplies(issueID,comment.getId().toString()));
+                        ,commentDAOService.getReplies(issueID,comment.getId()));
         });
 
         if(continu) {

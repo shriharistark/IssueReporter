@@ -171,12 +171,12 @@ var comments = {
 
         let closestCommentBox = $(target).closest(".issue-view-comment-box");
         console.log(closestCommentBox);
-        if(closestCommentBox.hasClass("comment-parent")){
+        if(closestCommentBox.hasClass("comment-parent")||closestCommentBox.hasClass("comment-child")){
             let parentReplierName = $(closestCommentBox).find(".issue-view-comment-name").first().html();
             console.log($(target).first().closest(".issue-view-comment-name"));
             $("#add-reply textarea").val("@"+parentReplierName+": ");
         }
-        $("#add-reply").hide();
+        // $("#add-reply").hide();
         $(closestCommentBox).find("#add-reply").slideToggle(300);
         // scroll_to("add-reply");
     },
@@ -207,7 +207,7 @@ var comments = {
 
                     window.setTimeout(function () {
                         resolve('done!');
-                    }, 200);
+                    }, 0);
                 });
 
                 return promise;
@@ -399,7 +399,10 @@ var comments = {
                         replyContainer.append(dotEl);
                         replyContainer.append(replyEl); */
 
-                        $(".issue-view-comments-section").prepend(commentDiv);
+                        if(!comment.parentID) {
+                            $(".issue-view-comments-section").prepend(commentDiv);
+                        }
+
                         // document.getElementsByClassName("issue-view-comments-section")[0].appendChild(commentDiv);
                         //refresh events
                         scroll_to("load-more-comments");
@@ -416,7 +419,7 @@ var comments = {
             loading = false;
         }).finally(()=>{
             loading = false;
-            $(window).trigger("loading");
+            $(".issue-view-comments-section").trigger("loading");
         });
 
     },
@@ -559,14 +562,22 @@ var events = {
             console.log($(evt.target).siblings("input").first());
             let commentBody = [];
             commentBody['author'] = $(evt.target).siblings("input").first().val();
+            let parentAuthor_name = $(evt.target).closest(".issue-view-comment-box").first().find(".issue-view-comment-name").html();
+            console.log("parent name: ",parentAuthor_name);
+
+            //append parent name to comment of child
+            // $(evt.target).siblings("textarea").first().val("@"+parentAuthor_name+": ");
             commentBody['message'] = $(evt.target).siblings("textarea").first().val();
-            commentBody['parentid'] = $(evt.target).closest(".issue-view-comment-box").first().attr("commentid");
+            console.log(commentBody['message']);
+            commentBody['parentid'] = $(evt.target).closest(".comment-parent").first().attr("commentid");
             commentBody['issueid'] = issue.issue.code;
             commentBody['issuekey'] = issue.issuewebsafekey;
             commentBody['hasparent'] = true;
 
             console.log(commentBody);
             comments.postCommentToServer(commentBody);
+            comments.showReplyBox([evt.target,this]);
+
         })
     },
 
@@ -574,9 +585,14 @@ var events = {
 
         let cursorNext = "";
 
-        $(window).on("loadComments",function (event) {
+        $(".issue-view-comments-section").on("loadComments",function (event) {
             console.log("load comments triggered...");
             event.stopPropagation();
+
+            console.log(event.target);
+            if(event.target.getAttribute("ID") === "fetch-fresh-comments"){
+                cursorNext = "";
+            }
 
             if(cursorNext || cursorNext === "") {
                 comments.fetchCommentsFromServer(issue.issue.code, cursorNext).then(function (nextCur) {
@@ -594,8 +610,20 @@ var events = {
 
         $("#load-more-comments").click(function () {
             setTimeout(function(){
-                $(window).trigger("loadComments");
+                $(".issue-view-comments-section").trigger("loadComments");
             },350);
+        });
+
+        $("#fetch-fresh-comments").click(function () {
+
+            let moreCommentsAnchorEl = document.createElement("a");
+            moreCommentsAnchorEl.setAttribute("id","load-more-comments");
+            moreCommentsAnchorEl.innerHTML = "view-more-comments";
+
+            $(".issue-view-comments-section").html("");
+            $(".issue-view-comments-section").append(moreCommentsAnchorEl);
+
+            $(this).trigger("loading");
         })
     },
 

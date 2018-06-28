@@ -328,7 +328,6 @@ public class IssueController {
 		GcsFilename fileName = new GcsFilename(bucket,nameFile);
 		GcsOutputChannel outputChannel;
 		outputChannel = gcsService.createOrReplace(fileName, instance);
-		copy(request.getInputStream(), Channels.newOutputStream(outputChannel));
 
 		return "{'name':'hari'}";
 	}
@@ -380,30 +379,6 @@ public class IssueController {
 
 		return jsonResponse;
 
-	}
-
-	private GcsFilename getFileName(HttpServletRequest req) {
-		String[] splits = req.getRequestURI().split("/", 4);
-		if (!splits[0].equals("") || !splits[1].equals("gcs")) {
-			throw new IllegalArgumentException("The URL is not formed as expected. " +
-					"Expecting /gcs/<bucket>/<object>");
-		}
-		return new GcsFilename(splits[2], splits[3]);
-	}
-
-	private void copy(InputStream input, OutputStream output) throws IOException {
-		try {
-			byte[] buffer = new byte[2 * 1024 * 1024];
-			int bytesRead = input.read(buffer);
-			while (bytesRead != -1) {
-				output.write(buffer, 0, bytesRead);
-				System.out.println("bytres: "+buffer);
-				bytesRead = input.read(buffer);
-			}
-		} finally {
-			input.close();
-			output.close();
-		}
 	}
 
 }
