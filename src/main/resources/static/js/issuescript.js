@@ -128,6 +128,36 @@ var events = {
         // $(".issue-view-comment-reply").click(function () {
         //     comments.showCommentBox(this);
         // })
+    },
+
+    closeIssue : function () {
+
+        $(".issue-main-container").on("mouseenter",".issue-body",function () {
+            let tempHoverEl = document.createElement("DIV");
+            tempHoverEl.setAttribute("ID","issue-action-element");
+            tempHoverEl.classList.add("issue-action");
+            tempHoverEl.style.width = $(".issue-body").first().width();
+            tempHoverEl.style.height = $(".issue-body").first().height();
+
+            let tempTop = $(this).closest(".issue-body").first().position().top;
+            let tempLeft = $(this).closest(".issue-body").first().position().left;
+
+            $(tempHoverEl).css({top: tempTop, left: tempLeft, position:'absolute'});
+
+
+            let closeIssueButton = document.createElement("button");
+            closeIssueButton.innerHTML = "Close this issue";
+
+            let viewIssueButton = document.createElement("button");
+            viewIssueButton.innerHTML = "view this issue";
+
+            tempHoverEl.appendChild(closeIssueButton);
+
+            $(this).append(tempHoverEl);
+
+        }).mouseleave(function(){
+            $("#issue-action-element").remove();
+        })
     }
 }
 
@@ -272,6 +302,7 @@ var issue = {};
                 let issues = value.issues;
                 if(issues.length > 0) {
                     issues.forEach(issue => {
+
                         let issueCode = issue.code;
                         let subject = issue.subject;
                         let assignee = issue.assignee;
@@ -433,9 +464,11 @@ var issue = {};
         issuej.description = description;
         issuej.assignee = assignee;
         issuej.assignedTo = assignedTo;
+        issuej.status = "open";     //when creating, this is default
         issuej.toString = function(){
-            return this.tags+this.subject+this.description+this.assignee+this.assignedTo;
-        }
+            return this.tags+this.subject+this.description+this.assignee+this.assignedTo+this.status;
+        };
+
 
         console.log(issuej.toString());
 
@@ -467,6 +500,37 @@ var issue = {};
 
             else{
                 alert("ticket creation failed | reason: "+issueTicketResponse.status);
+            }
+        });
+    }
+
+    issue.closeIssue = function(issueId){
+
+        let issueObject = {};
+        issueObject.id = issueId;
+
+        let init = {
+            method : "POST",
+            body : JSON.stringify(issuej),
+            headers : {
+                'Accept' : 'application/json,text/plain,*/*',
+                'Content-type' : 'application/json'
+            }
+        };
+
+        let url = "/closeissue";
+
+        fetch(url,init).then(function (value) {
+            return value.json();
+        },function (reason) {
+            console.log(reason);
+            return "{'result':'failed'}";
+        }).then(function (val) {
+
+            let issueClose = val;
+            console.log(issueClose);
+            if(issueClose.ok) {
+                console.log("issue", val, "is closed successfully")
             }
         });
     }
@@ -631,31 +695,6 @@ function hideLoading(){
     reverseDimBackgroundExcept("loading-icon");
 }
 
-//remove after re-factr
-// function readOnscroll(){
-//
-//     var cursor = {next:""};
-//
-//     $(window).on('scroll',function(evt) {
-//         if ($(window).scrollTop() == $(document).height() - $(window).height() ) {
-//
-//             console.log("scrolled!");
-//
-//             (function displayNextCursor(){
-//
-//                 readIssues(6,cursor.next).then((y) =>{
-//                     if(y) {
-//                         console.log("I got this: " + y);
-//                         cursor.next = y;
-//                     }
-//                 });
-//
-//                 // return x;
-//             })();
-//         }
-//     });
-// };
-
 //global func.
 $(window).on("loading",function (event) {
 
@@ -781,60 +820,3 @@ function addComment(issueID, parentID, message, author){
         }
     });
 }
-
-//test code
-//
-// function uploadFile() {
-//     var bucket = document.forms["putFile"]["bucket"].value;
-//     var filename = document.forms["putFile"]["fileName"].value;
-//     if (bucket == null || bucket == "" || filename == null || filename == "") {
-//         alert("Both Bucket and FileName are required");
-//         return false;
-//     } else {
-//
-//         console.log("this fn. is working");
-//         var postData = document.forms["putFile"]["img"].value;
-//         var file = new FileReader();
-//         var input = document.getElementById("img");
-//
-//         file.readAsDataURL(input.files[0]);
-//         file.onload = function(){
-//             console.log(file);
-//         };
-//
-//         document.getElementById("content").value = null;
-//         let init = {
-//             method : "POST",
-//             body : file,
-//             headers : {
-//                 'Content-type' : 'image/png'
-//             }
-//         };
-//
-//         let url = "/gcs/"+bucket+"/"+filename;
-//
-//         fetch(url,init).then(function (value) {
-//             return value.json();
-//         },function (reason) {
-//             console.log(reason);
-//             return "{'result':'failed'}";
-//         }).then(function (val) {
-//
-//             let issueTicketResponse = val;
-//             console.log(issueTicketResponse);
-//         });
-//     }
-// }
-//
-// var openFile = function(file) {
-//     var input = file.target;
-//
-//     var reader = new FileReader();
-//     reader.onload = function(){
-//         var dataURL = reader.result;
-//         // var output = document.getElementById('output');
-//         // output.src = dataURL;
-//     };
-//     reader.readAsDataURL(input.files[0]);
-//     return reader;
-// };

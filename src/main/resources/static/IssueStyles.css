@@ -555,3 +555,13 @@ body{
     margin-top: 2px;
     text-transform: uppercase;
 }
+
+.issue-action{
+    position: absolute;
+    background-color: black;
+    opacity: 0.5;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    z-index: 100;
+}

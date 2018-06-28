@@ -110,6 +110,24 @@ public class IssueDAOService implements IssueDAO{
 		return downvoters;
 	}
 
+	@Override
+	public IssueModel closeIssue(String id) {
+		IssueModel issueToClose = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
+		issueToClose.setStatus("close");
+
+		ObjectifyWorker.getofy().save().entity(issueToClose);
+		return issueToClose;
+	}
+
+	@Override
+	public IssueModel openIssue(String id) {
+		IssueModel issueToOpen = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
+		issueToOpen.setStatus("open");
+
+		ObjectifyWorker.getofy().save().entity(issueToOpen);
+		return issueToOpen;
+	}
+
 	//createIssue
 	//readIssueBydate
 	//readIssueBystatus

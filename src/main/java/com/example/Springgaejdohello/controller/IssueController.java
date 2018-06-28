@@ -287,7 +287,62 @@ public class IssueController {
 		return jsonResponse;
 
 	}
-	
+
+	@RequestMapping(value = "/closeissue", method = RequestMethod.POST, produces = "application/json")
+	public @ResponseBody String closeIssue(@RequestBody String issueId) throws IOException {
+
+		IssueDAOService issueService = new IssueDAOService();
+
+		ObjectMapper mapperIn = new ObjectMapper();
+		Map<String, Object> issue = mapperIn.readValue(issueId, new TypeReference<Map<String, Object>>() {});
+
+		IssueModel responseIssue = issueService.closeIssue(issue.get("id").toString());
+
+		String jsonResponse = "";
+		ObjectMapper mapperOut = new ObjectMapper();
+
+		Map<String,Object> response = new HashMap<>();
+		response.put("ok",true);
+		response.put("id",responseIssue.getWebSafeKey());
+		response.put("message","issue is closed");
+
+		try{
+			jsonResponse = mapperOut.writeValueAsString(response);
+		}catch (JsonProcessingException j){
+			j.printStackTrace();
+		}
+
+		return jsonResponse;
+	}
+
+	@RequestMapping(value = "/openissue", method = RequestMethod.POST, produces = "application/json")
+	public String openIssue(@RequestBody String issueId) throws IOException {
+
+		IssueDAOService issueService = new IssueDAOService();
+
+		ObjectMapper mapperIn = new ObjectMapper();
+		Map<String, Object> issue = mapperIn.readValue(issueId, new TypeReference<Map<String, Object>>() {});
+
+		IssueModel responseIssue = issueService.openIssue(issue.get("id").toString());
+
+		String jsonResponse = "";
+		ObjectMapper mapper = new ObjectMapper();
+
+		Map<String,Object> response = new HashMap<>();
+		response.put("ok",true);
+		response.put("id",responseIssue.getWebSafeKey());
+		response.put("message","issue is re-opened");
+
+		try{
+			jsonResponse = mapper.writeValueAsString(response);
+		}catch (JsonProcessingException j){
+			j.printStackTrace();
+		}
+
+		return jsonResponse;
+	}
+
+	//helper code
 	private IssueModel generateIssue(Map<String,Object> issuePayload){
 
 		List<Object> tagsArray = Arrays.asList(issuePayload.get("tags"));
@@ -301,7 +356,8 @@ public class IssueController {
 		newissue.setTags(tagsList);
 		newissue.setAssignedto(issuePayload.get("assignedTo").toString());
 		newissue.setAssignee(issuePayload.get("assignee").toString());
-		newissue.setStatus(issuePayload.get("status") == null?"unassigned":issuePayload.get("status").toString());
+		System.out.println("issue status from frontend: "+issuePayload.get("status").toString());
+		newissue.setStatus(issuePayload.get("status") == null?"open":issuePayload.get("status").toString().toLowerCase());
 		newissue.setDescription(issuePayload.get("description").toString());
 		newissue.setSubject(issuePayload.get("subject").toString());
 		newissue.setDownvotes(1);
@@ -309,6 +365,8 @@ public class IssueController {
 		
 		return newissue;
 	}
+
+	/* junk code
 
 	@RequestMapping(value = {"/gcs/{bucket}/{fileName}"},method = RequestMethod.POST)
 	public @ResponseBody String uploadFile(@PathVariable("bucket") String bucket,
@@ -379,6 +437,6 @@ public class IssueController {
 
 		return jsonResponse;
 
-	}
+	}*/
 
 }
