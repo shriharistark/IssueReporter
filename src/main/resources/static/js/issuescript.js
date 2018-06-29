@@ -90,6 +90,7 @@ var events = {
         });
     },
 
+    //we won't be needing this because of new hover feature
     showIssueDetails : function(){
         $(window).click(function(evt){
 
@@ -132,31 +133,58 @@ var events = {
 
     closeIssue : function () {
 
-        $(".issue-main-container").on("mouseenter",".issue-body",function () {
+        var issueEl = "";
+
+        $(".issue-main-container").on("mouseenter",".issue-body",function (ev) {
+
             let tempHoverEl = document.createElement("DIV");
             tempHoverEl.setAttribute("ID","issue-action-element");
             tempHoverEl.classList.add("issue-action");
-            tempHoverEl.style.width = $(".issue-body").first().width();
-            tempHoverEl.style.height = $(".issue-body").first().height();
+
 
             let tempTop = $(this).closest(".issue-body").first().position().top;
             let tempLeft = $(this).closest(".issue-body").first().position().left;
 
-            $(tempHoverEl).css({top: tempTop, left: tempLeft, position:'absolute'});
+            // $(tempHoverEl).css({top: tempTop, left: tempLeft, position:'absolute'});
 
 
             let closeIssueButton = document.createElement("button");
             closeIssueButton.innerHTML = "Close this issue";
+            closeIssueButton.classList.add("close-issue")
 
             let viewIssueButton = document.createElement("button");
             viewIssueButton.innerHTML = "view this issue";
+            viewIssueButton.classList.add("view-issue");
 
             tempHoverEl.appendChild(closeIssueButton);
+            tempHoverEl.appendChild(viewIssueButton);
 
-            $(this).append(tempHoverEl);
+            if($(this).closest(".issue-body").find(".issue-action").length < 1 &&
+            $("#issue-action-element").length < 1) {
+                //
+                issueEl = $(this).closest(".issue-body").first();
+                console.log(issueEl);
+                for(let el of issueEl[0].children){
+                    $(el).css({ opacity:0.1});
+                }
+                //
 
-        }).mouseleave(function(){
-            $("#issue-action-element").remove();
+                $(this).closest(".issue-body").first().prepend(tempHoverEl);
+
+            }
+
+        }).on("mouseleave",".issue-body",function(evt){
+            console.log(issueEl);
+            // var issueEl = $(this).find(".issue-body").first();
+            console.log($(this)," ",$(this).find(".issue-body").first().text());
+            for(let el of issueEl[0].children){
+                $(el).css({ opacity:1});
+            }
+
+            let actionEl = $("#issue-action-element");
+            if(actionEl.length > 0){
+                actionEl.remove();
+            }
         })
     }
 }
@@ -511,7 +539,7 @@ var issue = {};
 
         let init = {
             method : "POST",
-            body : JSON.stringify(issuej),
+            body : JSON.stringify(issueObject),
             headers : {
                 'Accept' : 'application/json,text/plain,*/*',
                 'Content-type' : 'application/json'
