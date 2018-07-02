@@ -58,6 +58,10 @@ body{
     padding-bottom: 0.5%;
 }
 
+.issue .issue-body .description{
+    pointer-events: none;
+}
+
 .issue .description, .issue .id {
     font-family: Helvetica;
     font-size: 13px;
@@ -107,6 +111,7 @@ body{
     max-width:75%;
     min-width: 75%;
     cursor:pointer;
+
 }
 
 .issue .downvotebutton .downvote-numbers{
@@ -582,10 +587,17 @@ body{
     /* height: 80px; */
     width: 45%;
     opacity: 0.85 !important;
+    cursor: pointer;
+    outline: none;
+}
+
+.issue-action button:hover{
+    background-color: #a30000;
+    text-decoration: underline;
 }
 
 .close-issue{
-
+    
 }
 
 .view-issue{

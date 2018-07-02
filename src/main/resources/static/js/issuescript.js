@@ -87,36 +87,44 @@ var events = {
                     });
                 }
             })
+        }).on("click",".issue-main-container",function (ev) {
+            if(!ev.target.classList.contains("button-downvote")){
+                var e = $.Event("keyup");
+                e.which = 27;
+                $(".issue-main-container").trigger(e);
+            }
         });
     },
 
     //we won't be needing this because of new hover feature
     showIssueDetails : function(){
-        $(window).click(function(evt){
+        //re- enable it please
 
-            console.log("wndow clicked",evt.target);
-
-            if(evt.target.classList.contains("description")){
-
-            // $(".issue .description").click(function(evt){
-
-                // issue.showBox("issue-details-popup");
-                console.log("issue description is clicked");
-                // $("#issue-details-popup").toggle();
-                // dimBackgroundExcept("issue-details-popup");
-                let issueID = $(evt.target).closest(".issue").attr("issue-id");
-                //console.log("issueid: "+issueID);
-                let issueContent = "none";
-                evt.stopPropagation();
-
-                document.location.href = "newissue/"+issueID;
-                issueContent = getIssue(issueID).then((res) => {
-                    return res;
-                });
-
-                console.log(issueContent);
-            };
-        });
+        // $(window).click(function(evt){
+        //
+        //     console.log("wndow clicked",evt.target);
+        //
+        //     if(evt.target.classList.contains("description")){
+        //
+        //     // $(".issue .description").click(function(evt){
+        //
+        //         // issue.showBox("issue-details-popup");
+        //         console.log("issue description is clicked");
+        //         // $("#issue-details-popup").toggle();
+        //         // dimBackgroundExcept("issue-details-popup");
+        //         let issueID = $(evt.target).closest(".issue").attr("issue-id");
+        //         //console.log("issueid: "+issueID);
+        //         let issueContent = "none";
+        //         evt.stopPropagation();
+        //
+        //         document.location.href = "newissue/"+issueID;
+        //         issueContent = getIssue(issueID).then((res) => {
+        //             return res;
+        //         });
+        //
+        //         console.log(issueContent);
+        //     };
+        // });
     },
 
     CommentAdd : function(){
@@ -141,16 +149,30 @@ var events = {
             tempHoverEl.setAttribute("ID","issue-action-element");
             tempHoverEl.classList.add("issue-action");
 
-
-            let tempTop = $(this).closest(".issue-body").first().position().top;
-            let tempLeft = $(this).closest(".issue-body").first().position().left;
-
             // $(tempHoverEl).css({top: tempTop, left: tempLeft, position:'absolute'});
 
 
             let closeIssueButton = document.createElement("button");
-            closeIssueButton.innerHTML = "Close this issue";
-            closeIssueButton.classList.add("close-issue")
+            let issueStatus = function() {
+
+                console.log($(ev.target).prev(".downvote-button").find("img").attr("src"));
+                let issueStatus = $(ev.target).prev(".downvote-button").find("img").attr("src")
+                    .split("/")[1].split("-")[1].toString();
+
+                if(issueStatus === "open" || issueStatus === "close"){
+                    if(issueStatus === "open") {
+                        closeIssueButton.classList.add("close-issue")
+                        return "close";
+                    }
+                    closeIssueButton.classList.add("open-issue")
+                    return "re-open";
+                }
+                else{
+                    return "something is broken!";
+                }
+            }();
+            closeIssueButton.innerHTML = issueStatus+ " this issue";
+            // closeIssueButton.classList.add("close-issue")
 
             let viewIssueButton = document.createElement("button");
             viewIssueButton.innerHTML = "view this issue";
@@ -185,6 +207,65 @@ var events = {
             if(actionEl.length > 0){
                 actionEl.remove();
             }
+        }).on("click",".issue-body",function (evt) {
+            console.log("issue description is clicked");
+
+            let clickedActionEl = $(evt.target).attr("class").split(" ")[0];
+            console.log(clickedActionEl);
+            let issueID = $(evt.target).closest(".issue").attr("issue-id");
+
+            switch (clickedActionEl){
+
+                case "view-issue":
+                    console.log("has class view issue?",$(evt.target));
+                    //console.log("issueid: "+issueID);
+                    let issueContent = "none";
+                    evt.stopPropagation();
+
+                    document.location.href = "newissue/"+issueID;
+                    issueContent = getIssue(issueID).then((res) => {
+                        return res;
+                    });
+
+                    console.log(issueContent);
+                    break;
+
+                case "close-issue":
+                    console.log("close issue clicked");
+                    issue.closeIssue(issueID).then(function (resp) {
+                        console.log("close issue response",resp);
+                        issue.readOnScroll();
+                        $(window).trigger("scroll");
+                    });
+                    break;
+
+                case "open-issue":
+                    console.log("open issue clicked");
+                    issue.openIssue(issueID).then(function (resp) {
+                        console.log("re-open issue response",resp);
+                        issue.readOnScroll();
+                        $(window).trigger("scroll");
+                    });
+                    break;
+
+                case "default":
+                    console.log("default case");
+                    break;
+            }
+            // $("#issue-details-popup").toggle();
+            // dimBackgroundExcept("issue-details-popup");
+            // let issueID = $(evt.target).closest(".issue").attr("issue-id");
+            // console.log("has class view issue?",$(evt.target));
+            // //console.log("issueid: "+issueID);
+            // let issueContent = "none";
+            // evt.stopPropagation();
+            //
+            // document.location.href = "newissue/"+issueID;
+            // issueContent = getIssue(issueID).then((res) => {
+            //     return res;
+            // });
+            //
+            // console.log(issueContent);
         })
     }
 }
@@ -339,7 +420,7 @@ var issue = {};
                         let downvotes = issue.downvotes;
 
                         let status = (function(){
-                            if(issue.status != "open" && issue.status != "closed"){
+                            if(issue.status !== "open" && issue.status !== "close"){
                                 return "open";
                             }
 
@@ -548,7 +629,7 @@ var issue = {};
 
         let url = "/closeissue";
 
-        fetch(url,init).then(function (value) {
+        return fetch(url,init).then(function (value) {
             return value.json();
         },function (reason) {
             console.log(reason);
@@ -562,6 +643,37 @@ var issue = {};
             }
         });
     }
+
+issue.openIssue = function(issueId){
+
+    let issueObject = {};
+    issueObject.id = issueId;
+
+    let init = {
+        method : "POST",
+        body : JSON.stringify(issueObject),
+        headers : {
+            'Accept' : 'application/json,text/plain,*/*',
+            'Content-type' : 'application/json'
+        }
+    };
+
+    let url = "/openissue";
+
+    return fetch(url,init).then(function (value) {
+        return value.json();
+    },function (reason) {
+        console.log(reason);
+        return "{'result':'failed'}";
+    }).then(function (val) {
+
+        let issueClose = val;
+        console.log(issueClose);
+        if(issueClose.ok) {
+            console.log("issue", val, "is re-opened successfully")
+        }
+    });
+};
 
 //global function or util fn.
 function dimBackgroundExcept(id){
