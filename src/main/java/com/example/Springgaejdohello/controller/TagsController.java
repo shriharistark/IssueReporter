@@ -27,35 +27,7 @@ public class TagsController {
         return response;
     }
 
-    @RequestMapping("/getpossibletags")
-    public @ResponseBody String getPossibleTags(@RequestParam("partialTag")String partialTag){
-
-        TagsDAOService tagservice = new TagsDAOService();
-        List<String> possibleTags = tagservice.getTagsByPartialText(partialTag);
-
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String,Object> response = new HashMap<>();
-        String jsonResponse = "";
-
-
-        try{
-            response.put("ok",true);
-            response.put("tagsSub",possibleTags.toString());
-        }catch (Exception e){
-            response.put("ok",false);
-            response.put("reason",e.getMessage());
-        }
-
-        try {
-            jsonResponse = mapper.writeValueAsString(response);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        return jsonResponse;
-    }
-
-    @RequestMapping("/getalltags")
+    @RequestMapping("/loadtags")
     public @ResponseBody String getAllTags(){
 
         TagsDAOService tagservice = new TagsDAOService();

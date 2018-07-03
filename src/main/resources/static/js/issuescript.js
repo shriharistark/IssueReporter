@@ -76,7 +76,23 @@ var events = {
                         console.log(downvoteResponse);
                         if (downvoteResponse.ok) {
                             console.log(downvoteResponse, $(evt.target));
-                            alert("ticket created | ticketCode: " + downvoteResponse.downvotes);
+                            // alert("ticket created | ticketCode: " + downvoteResponse.downvotes);
+                            $.alert({
+                                title : 'Downvote',
+                                content : issueCode +" is downvoted",
+                                boxWidth : "30%",
+                                useBootstrap : false,
+                                type:'red',
+                                buttons :{
+                                    ok : function () {
+                                        setTimeout(()=>{
+                                            $(".issue-main-container").html("");
+                                            issue.readOnScroll()();
+                                            // $(window).trigger("scroll");
+                                        },350);
+                                    }
+                                }
+                            });
                             $(evt.target).closest(".downvote-numbers").first().html((+(downvoteResponse.downvotes)));
                             issue.hideBox("downvote-form");
                         }
@@ -143,7 +159,7 @@ var events = {
 
         var issueEl = "";
 
-        $(".issue-main-container").on("mouseenter",".issue-body",function (ev) {
+        $(".issue-main-container").on("mouseover",".issue-body",function (ev) {
 
             let tempHoverEl = document.createElement("DIV");
             tempHoverEl.setAttribute("ID","issue-action-element");
@@ -156,8 +172,12 @@ var events = {
             let issueStatus = function() {
 
                 console.log($(ev.target).prev(".downvote-button").find("img").attr("src"));
-                let issueStatus = $(ev.target).prev(".downvote-button").find("img").attr("src")
-                    .split("/")[1].split("-")[1].toString();
+
+                let issueStatus = "";
+                if($(ev.target).prev(".downvote-button").find("img").attr("src")) {
+                    issueStatus = $(ev.target).prev(".downvote-button").find("img").attr("src")
+                        .split("/")[1].split("-")[1].toString();
+                }
 
                 if(issueStatus === "open" || issueStatus === "close"){
                     if(issueStatus === "open") {
@@ -168,7 +188,7 @@ var events = {
                     return "re-open";
                 }
                 else{
-                    return "something is broken!";
+                    return "";
                 }
             }();
             closeIssueButton.innerHTML = issueStatus+ " this issue";
@@ -182,8 +202,9 @@ var events = {
             tempHoverEl.appendChild(viewIssueButton);
 
             if($(this).closest(".issue-body").find(".issue-action").length < 1 &&
-            $("#issue-action-element").length < 1) {
+            $("#issue-action-element").length < 1 && issueStatus) {
                 //
+
                 issueEl = $(this).closest(".issue-body").first();
                 console.log(issueEl);
                 for(let el of issueEl[0].children){
@@ -243,15 +264,25 @@ var events = {
                             confirm: function () {
                                 issue.closeIssue(issueID).then(function (resp) {
                                     console.log("close issue response",resp);
-                                    issue.readOnScroll();
-                                    $(window).trigger("scroll");
                                 });
                                 $.alert({
                                     content : "Issue Closed!",
                                     type : 'red',
                                     boxWidth : '30%',
-                                    useBootstrap : false
+                                    useBootstrap : false,
+                                    buttons :{
+                                        ok : function () {
+                                            setTimeout(()=>{
+                                                console.log($( ".issue[issue-id="+issueID+"]"));
+                                                $(".issue-main-container").html("");
+                                                issue.readOnScroll()();
+                                                // $(window).trigger("scroll");
+                                            },1000);
+                                        }
+                                    }
+
                                 });
+
                             },
                             cancel: function () {
                                 $(this).remove();
@@ -273,14 +304,22 @@ var events = {
                             confirm: function () {
                                 issue.openIssue(issueID).then(function (resp) {
                                     console.log("re-open issue response",resp);
-                                    issue.readOnScroll();
-                                    $(window).trigger("scroll");
                                 });
                                 $.alert({
                                     content : "Issue re-opened",
                                     type : 'green',
                                     boxWidth : '30%',
-                                    useBootstrap : false
+                                    useBootstrap : false,
+                                    buttons :{
+                                        ok : function () {
+                                            setTimeout(()=>{
+                                                console.log($( ".issue[issue-id="+issueID+"]"));
+                                                $(".issue-main-container").html("");
+                                                issue.readOnScroll()();
+                                                // $(window).trigger("scroll");
+                                            },350);
+                                        }
+                                    }
                                 });
                             },
                             cancel: function () {
@@ -500,7 +539,7 @@ var issue = {};
         var cursor = {next:""};
 
         function read(evt) {
-            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+            if (true) {
 
                 console.log("scrolled!");
                 (function displayNextCursor(){
@@ -532,6 +571,8 @@ var issue = {};
                 },350)
             }
         });
+
+        return read;
     }
 
     issue.showBox= function(boxId){
@@ -599,23 +640,17 @@ var issue = {};
 
     issue.createIssue = function(){
 
-        let tags = $(".create-issue-popup-tags input").val();
+        let tags = $(".create-issue-popup-tags select").val();
         let subject = $(".create-issue-popup-subject input").val();
         let description = $(".create-issue-popup-description textarea").val();
-        let assignee = $(".create-issue-popup-assignee input").val();
+        let assignee = $(".create-issue-popup-assignee select").val();
         let assignedTo = $(".create-issue-popup-assigned-to input").val();
-
-        let tagsList = tags.split(",");
-
-        for(let i = 0 ; i < tagsList.length ; i++){
-            tagsList[i] = tagsList[i].trim();
-        }
 
         console.log(tags+","+subject+","+description+","+assignedTo+","+assignee);
 
         let issuej = {};
 
-        issuej.tags = tagsList;
+        issuej.tags = tags;
         issuej.subject = subject;
         issuej.description = description;
         issuej.assignee = assignee;
@@ -1014,10 +1049,14 @@ function addComment(issueID, parentID, message, author){
         width : "100%",
         inherit_select_classes : true,
     });
-    $(".chosen-results").css({
-        'max-height':"120px"
-    });
+    // $(".chosen-results").css({
+    //     'max-height':"120px"
+    // });
 
-    $(".tag-select .chosen-choices input").val("Enter tags ..");
-    console.log($(".chosen-container").addClass(""));
+    $(".create-issue-popup-assignee .assignee-select").chosen({
+        width: "100%",
+    })
+
+    //get and inject all the tags todo
+
 })();

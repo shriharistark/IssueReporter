@@ -345,15 +345,15 @@ public class IssueController {
 	//helper code
 	private IssueModel generateIssue(Map<String,Object> issuePayload){
 
-		List<Object> tagsArray = Arrays.asList(issuePayload.get("tags"));
-		List<String> tagsList = new ArrayList<>();
-		for (Object object : tagsArray) {
-		    tagsList.add(Objects.toString(object, null));
-		}
-		
+		System.out.println(issuePayload.get("tags").toString());
+
+		String tagsStr[]= issuePayload.get("tags").toString()
+				.substring(1,issuePayload.get("tags").toString().length()-1)
+				.split(",");
+
 		IssueModel newissue = new IssueModel();
 		newissue.setCode();
-		newissue.setTags(tagsList);
+		newissue.setTags(Arrays.asList(tagsStr));
 		newissue.setAssignedto(issuePayload.get("assignedTo").toString());
 		newissue.setAssignee(issuePayload.get("assignee").toString());
 		System.out.println("issue status from frontend: "+issuePayload.get("status").toString());

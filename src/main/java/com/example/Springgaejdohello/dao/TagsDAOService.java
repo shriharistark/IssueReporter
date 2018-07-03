@@ -19,24 +19,12 @@ public class TagsDAOService implements TagsDAO {
     static Objectify objectifyInstance;
     Query<TagsModel> listOfTags;
 
+
     public TagsDAOService(){
         if(objectifyInstance == null) {
             objectifyInstance = ObjectifyWorker.getofy();
         }
-    }
 
-    @Override
-    public List<String> getTagsByPartialText(String partialTag) {
-        listOfTags = objectifyInstance.load().type(TagsModel.class).filter("tagSubs",partialTag);
-
-        List<String> matchedTags = new ArrayList<>();
-
-        if(listOfTags.list().size() > 0) {
-            for (TagsModel tagEntity : listOfTags) {
-                matchedTags.add(tagEntity.getTag());
-            }
-        }
-        return matchedTags;
     }
 
     @Override

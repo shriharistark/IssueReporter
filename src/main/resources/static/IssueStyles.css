@@ -608,6 +608,29 @@ body{
     max-height: 120px;
 }
 
+.create-issue-popup-assignee .chosen-container .chosen-single{
+    cursor: text !important;
+    border:none!important;
+    background: none !important;
+    /*border-bottom: 1px solid #5897fb !important;*/
+    box-shadow:none !important;
+    padding-left: 2px !important;
+}
+
+.create-issue-popup-assignee .chosen-container .chosen-container-active{
+    border-bottom: 1px solid #5897fb !important;
+    box-shadow: 0 0 10px rgba(0,0,0,.3);
+    outline: none;
+}
+
+.create-issue-popup-assignee .chosen-container .chosen-drop{
+    top:0% !important;
+}
+
+
+.create-issue-popup-assignee .chosen-container-single .chosen-search{
+    padding: 3px 1px !important;
+}
 /*.inputContainer .chosen-container{*/
     /*width : 100% !important;*/
 /*}*/
