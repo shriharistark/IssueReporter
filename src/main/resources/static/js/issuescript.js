@@ -214,27 +214,6 @@ var events = {
             console.log(clickedActionEl);
             let issueID = $(evt.target).closest(".issue").attr("issue-id");
 
-            //using confirm/alert plugin
-            $.confirm({
-                title: '#'+issueID,
-                content: 'Confirm closing the issue.',
-                buttons: {
-                    confirm: function () {
-                        $.alert('Issue closed!');
-                    },
-                    cancel: function () {
-                        $(this).remove();
-                    },
-                    somethingElse: {
-                        text: 'Something else',
-                        btnClass: 'btn-blue',
-                        keys: ['enter', 'shift'],
-                        action: function(){
-                            $.alert('Something else?');
-                        }
-                    }
-                }
-            });
 
             switch (clickedActionEl){
 
@@ -254,20 +233,62 @@ var events = {
 
                 case "close-issue":
                     console.log("close issue clicked");
-                    issue.closeIssue(issueID).then(function (resp) {
-                        console.log("close issue response",resp);
-                        issue.readOnScroll();
-                        $(window).trigger("scroll");
+                    //using confirm/alert plugin
+                    $.confirm({
+                        title: '#'+issueID,
+                        content: 'Confirm closing the issue.',
+                        boxWidth :'30%',
+                        useBootstrap : false,
+                        buttons: {
+                            confirm: function () {
+                                issue.closeIssue(issueID).then(function (resp) {
+                                    console.log("close issue response",resp);
+                                    issue.readOnScroll();
+                                    $(window).trigger("scroll");
+                                });
+                                $.alert({
+                                    content : "Issue Closed!",
+                                    type : 'red',
+                                    boxWidth : '30%',
+                                    useBootstrap : false
+                                });
+                            },
+                            cancel: function () {
+                                $(this).remove();
+                            },
+                        }
                     });
+
                     break;
 
                 case "open-issue":
                     console.log("open issue clicked");
-                    issue.openIssue(issueID).then(function (resp) {
-                        console.log("re-open issue response",resp);
-                        issue.readOnScroll();
-                        $(window).trigger("scroll");
+
+                    $.confirm({
+                        title: '#'+issueID,
+                        content: 'Confirm re-opening the issue.',
+                        boxWidth :'30%',
+                        useBootstrap : false,
+                        buttons: {
+                            confirm: function () {
+                                issue.openIssue(issueID).then(function (resp) {
+                                    console.log("re-open issue response",resp);
+                                    issue.readOnScroll();
+                                    $(window).trigger("scroll");
+                                });
+                                $.alert({
+                                    content : "Issue re-opened",
+                                    type : 'green',
+                                    boxWidth : '30%',
+                                    useBootstrap : false
+                                });
+                            },
+                            cancel: function () {
+                                $(this).remove();
+                            },
+                        }
                     });
+
                     break;
 
                 case "default":
@@ -991,6 +1012,7 @@ function addComment(issueID, parentID, message, author){
 (function(){
     $("#tags-ui-test .tag-select").chosen({
         width : "100%",
+        inherit_select_classes : true,
     });
     $(".chosen-results").css({
         'max-height':"120px"
