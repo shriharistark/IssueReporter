@@ -3,11 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Bugdog</title>
-    <link rel="stylesheet" href="IssueStyles.css">
     <!--<link rel="stylesheet" href="IssuedetailedStyles.css">-->
     <script src="js/jquery.js"></script>
-
-    <!--<link rel="stylesheet" href="stylenewissue.css">-->
 </head>
 <body>
 
@@ -42,23 +39,62 @@
     </div>
 
     <form id = "create-issue-popup-form">
+
         <!-- tags -->
-        <div class="create-issue-popup-tags">
+        <!--<div id = "tags-ui-test">-->
+            <!--<select class="tag-select" multiple="true" name="faculty" style="width:200px;">-->
+                <!--<option value="Calendar">Calendar</option>-->
+                <!--<option value="Appointment">Appt.</option>-->
+                <!--<option value="Bug">Bugreport</option>-->
+                <!--<option value="Calendar">Calendar</option>-->
+                <!--<option value="Appointment">Appt.</option>-->
+                <!--<option value="Bug">Bugreport</option>-->
+                <!--<option value="Calendar">Calendar</option>-->
+                <!--<option value="Appointment">Appt.</option>-->
+                <!--<option value="Bug">Bugreport</option>-->
+            <!--</select>-->
+
+        <!--</div>-->
+
+        <!--<div class="create-issue-popup-tags">-->
+            <!--<div class="textInput">-->
+                <!--<div class="inset">-->
+                    <!--Tags-->
+                <!--</div>-->
+                <!--<div class="inputContainer">-->
+                    <!--<input id = "autoC" type="text" placeholder="Add cripsy tags" value="">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <!--&lt;!&ndash; dropdown &ndash;&gt;-->
+        <!--<div class = "create-issue-popup-listing">-->
+            <!--<ul>-->
+            <!--</ul>-->
+        <!--</div>-->
+
+        <div id = "tags-ui-test" class="create-issue-popup-tags">
             <div class="textInput">
                 <div class="inset">
                     Tags
                 </div>
                 <div class="inputContainer">
-                    <input id = "autoC" type="text" placeholder="Add cripsy tags" value="">
+                <select class="tag-select" multiple="true" name="faculty" value = "enter tags.." data-placeholder = "Enter tags.." data-autocomplete = "on">
+                    <option value="Calendar">Calendar</option>
+                    <option value="Appointment">Appt.</option>
+                    <option value="Bug">Bugreport</option>
+                    <option value="Calendar">Calendar</option>
+                    <option value="Appointment">Appt.</option>
+                    <option value="Bug">Bugreport</option>
+                    <option value="Calendar">Calendar</option>
+                    <option value="Appointment">Appt.</option>
+                    <option value="Bug">Bugreport</option>
+                </select>
                 </div>
             </div>
+
         </div>
 
-        <!-- dropdown -->
-        <div class = "create-issue-popup-listing">
-            <ul>
-            </ul>
-        </div>
         <!-- subject -->
         <div class = "create-issue-popup-subject">
             <div class="textInput">
@@ -143,7 +179,31 @@
 
 </div>
 
+<!--<div id = "tags-ui-test">-->
+    <!--<select class="tag-select" multiple="true" name="faculty" style="width:200px;">-->
+        <!--<option value="Calendar">Calendar</option>-->
+        <!--<option value="Appointment">Appt.</option>-->
+        <!--<option value="Bug">Bugreport</option>-->
+        <!--<option value="Calendar">Calendar</option>-->
+        <!--<option value="Appointment">Appt.</option>-->
+        <!--<option value="Bug">Bugreport</option>-->
+        <!--<option value="Calendar">Calendar</option>-->
+        <!--<option value="Appointment">Appt.</option>-->
+        <!--<option value="Bug">Bugreport</option>-->
+    <!--</select>-->
+<!--</div>-->
+
+<!--alert box plugins-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
+
+<!--chosen (for tags) plugins -->
+<link rel="stylesheet" type="text/css" href="Plugins/chosen/chosen.css">
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js"></script>
+
 
 <script src="js/issuescript.js"></script>
+<link rel="stylesheet" href="IssueStyles.css">
+
 </body>
 </html>

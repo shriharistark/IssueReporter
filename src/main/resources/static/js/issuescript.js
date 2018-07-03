@@ -214,6 +214,28 @@ var events = {
             console.log(clickedActionEl);
             let issueID = $(evt.target).closest(".issue").attr("issue-id");
 
+            //using confirm/alert plugin
+            $.confirm({
+                title: '#'+issueID,
+                content: 'Confirm closing the issue.',
+                buttons: {
+                    confirm: function () {
+                        $.alert('Issue closed!');
+                    },
+                    cancel: function () {
+                        $(this).remove();
+                    },
+                    somethingElse: {
+                        text: 'Something else',
+                        btnClass: 'btn-blue',
+                        keys: ['enter', 'shift'],
+                        action: function(){
+                            $.alert('Something else?');
+                        }
+                    }
+                }
+            });
+
             switch (clickedActionEl){
 
                 case "view-issue":
@@ -503,13 +525,17 @@ var issue = {};
             var keyCode = e.keyCode || e.which;
 
             //prevent submit on enter key
-            if (keyCode === 13) {
+            if (keyCode === 13 && e.metaKey) {
                 e.preventDefault();
 
                 console.log(keyCode);
                 issue.submitForm(boxId);
                 e.stopImmediatePropagation();
                 return false;
+            }
+
+            else if(keyCode === 13){
+                e.preventDefault();
             }
 
             //pressing esc closes the popup
@@ -960,3 +986,16 @@ function addComment(issueID, parentID, message, author){
         }
     });
 }
+
+//tags plugin test
+(function(){
+    $("#tags-ui-test .tag-select").chosen({
+        width : "100%",
+    });
+    $(".chosen-results").css({
+        'max-height':"120px"
+    });
+
+    $(".tag-select .chosen-choices input").val("Enter tags ..");
+    console.log($(".chosen-container").addClass(""));
+})();
