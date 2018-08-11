@@ -8,12 +8,8 @@ import com.example.Springgaejdohello.daoInterface.IssueDAO;
 import com.example.Springgaejdohello.model.IssueModel;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
 public class IssueDAOService implements IssueDAO{
@@ -22,15 +18,41 @@ public class IssueDAOService implements IssueDAO{
 	Query<IssueModel> result;
 	
 	public IssueDAOService() {
+		//singleton
 		if(objectifyInstance == null) {
 			objectifyInstance = ObjectifyWorker.getofy();
 		}
 	}
 
 	@Override
-	public QueryResultIterator<IssueModel> getAllIssues(String cursorStr,int limit) {
-		
-		Query<IssueModel> query = ObjectifyWorker.getofy().load().type(IssueModel.class).limit(limit);
+	public QueryResultIterator<IssueModel> getAllIssues(String cursorStr,int limit,String orderByProperty, String order) {
+
+		String sortProp = "";
+
+		//add - to sort descending
+		sortProp = order.startsWith("desc")?"-":"";
+
+		//select corresponding property filter
+		if(orderByProperty.contains("date")){
+			sortProp += "lastDateModified";
+		}
+		else if(orderByProperty.contains("down")){
+			sortProp += "downvotes";
+		}
+
+		else if(orderByProperty.contains("comment")){
+			sortProp += "numberOfComments";
+		}
+
+		else if(orderByProperty.contains("assigne")){
+			sortProp += "assignee";
+		}
+
+		else {
+			sortProp = "";
+		}
+
+		Query<IssueModel> query = ObjectifyWorker.getofy().load().type(IssueModel.class).order(sortProp).limit(limit);
 		
 		if(!cursorStr.isEmpty()) {
 			query = query.startAt(Cursor.fromWebSafeString(cursorStr));
@@ -95,6 +117,7 @@ public class IssueDAOService implements IssueDAO{
 		Integer downVotesPrev = issueObject.getDownvotes();
 		issueObject.setDownvotes(++downVotesPrev);
 		issueObject.setDownvoters(downvoter);
+		IssueDAO.updateTimeModified(issueID);
 
 		ObjectifyWorker.getofy().save().entity(issueObject).now();
 		return downVotesPrev.toString();
@@ -113,6 +136,7 @@ public class IssueDAOService implements IssueDAO{
 	@Override
 	public IssueModel closeIssue(String id) {
 		IssueModel issueToClose = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
+		IssueDAO.updateTimeModified(id);
 		issueToClose.setStatus("close");
 
 		ObjectifyWorker.getofy().save().entity(issueToClose);
@@ -123,9 +147,21 @@ public class IssueDAOService implements IssueDAO{
 	public IssueModel openIssue(String id) {
 		IssueModel issueToOpen = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
 		issueToOpen.setStatus("open");
-
+		IssueDAO.updateTimeModified(id);
 		ObjectifyWorker.getofy().save().entity(issueToOpen);
 		return issueToOpen;
+	}
+
+	@Override
+	public Key<IssueModel> createIssue(IssueModel issue) {
+		Key<IssueModel> issuekey = null;
+		try {
+			issuekey = ObjectifyWorker.getofy().save().entity(issue).now();
+		}catch(Exception e) {
+			System.out.print(e.getCause());
+		}
+
+		return issuekey;
 	}
 
 	//createIssue

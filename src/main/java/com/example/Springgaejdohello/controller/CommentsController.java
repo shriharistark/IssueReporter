@@ -12,8 +12,15 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,20 +89,28 @@ public class CommentsController {
         String commentID = daoService.addComment(elem);
 
 
-        Map<String,Object> response = new HashMap<>();
-        response.put("ok", commentID.equals("failed")?false:true);
-        response.put("id",commentID);
-        response.put("commentwebsafekey",commentBuilder.getCommentWebSafeKey());
-        response.put("issuewebsafekey",commentBuilder.getIssueWebSafeKey());
+        Map<String,Object> responseMap = new HashMap<>();
+        responseMap.put("ok", commentID.equals("failed")?false:true);
+        responseMap.put("id",commentID);
+        responseMap.put("commentwebsafekey",commentBuilder.getCommentWebSafeKey());
+        responseMap.put("issuewebsafekey",commentBuilder.getIssueWebSafeKey());
 
         String jsonResponse = "problem with jackson";
         //mapper.writeValueAsString(response);
         try {
-            jsonResponse = mapper.writeValueAsString(response);
+            jsonResponse = mapper.writeValueAsString(responseMap);
         } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        //making internal call - hackjob code
+        String webSafeIssueKey = commentBuilder.getIssueWebSafeKey();
+        final String uriToRead =  "http://localhost:8080/issue/readbyid?id="+commentIn.get("issueid");
+//        String reqJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString();
+        RestTemplate restTemplate = new RestTemplate();
+        String issueResp = restTemplate.getForObject(uriToRead, String.class);
+        System.out.print("internal call response: "+issueResp);
 
         return jsonResponse;
 
@@ -155,4 +170,32 @@ public class CommentsController {
 
         return jsonResponse;
     }
+
+    /*
+    @RequestMapping(value = "/getcommentscount", method = RequestMethod.POST, produces = "application/json")
+    public String getCommentsCount(@RequestBody String issueId) throws IOException {
+
+        CommentDAOService issueService = new CommentDAOService();
+
+        ObjectMapper mapperIn = new ObjectMapper();
+        Map<String, Object> issue = mapperIn.readValue(issueId, new TypeReference<Map<String, Object>>() {});
+
+        IssueModel responseIssue = issueService.openIssue(issue.get("id").toString());
+
+        String jsonResponse = "";
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("ok",true);
+        response.put("id",responseIssue.getWebSafeKey());
+        response.put("message","issue is re-opened");
+
+        try{
+            jsonResponse = mapper.writeValueAsString(response);
+        }catch (JsonProcessingException j){
+            j.printStackTrace();
+        }
+
+        return jsonResponse;
+    }*/
 }

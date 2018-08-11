@@ -31,6 +31,8 @@ public class IssueModel {
     @Index String description;
     @Index Integer downvotes;
     List<String> downvoters;
+    @Index Long lastDateModified;
+    @Index int numberOfComments;
 
     public IssueModel(){
 
@@ -123,5 +125,21 @@ public class IssueModel {
     public void setDownvoters(String name){
         this.downvoters = this.downvoters == null ? new ArrayList<>() : this.downvoters;
         this.downvoters.add(name);
+    }
+
+    public Long getLastDateModified() {
+        return lastDateModified;
+    }
+
+    public void setLastDateModified(Long lastDateModified) {
+        this.lastDateModified = lastDateModified;
+    }
+
+    public int getNumberOfComments() {
+        return numberOfComments;
+    }
+
+    public void setNumberOfComments(int numberOfComments) {
+        this.numberOfComments = numberOfComments;
     }
 }

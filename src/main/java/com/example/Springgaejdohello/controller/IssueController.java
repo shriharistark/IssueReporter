@@ -1,26 +1,10 @@
 package com.example.Springgaejdohello.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.Channels;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.*;
 
-import com.google.api.services.storage.Storage;
-import com.google.appengine.tools.cloudstorage.*;
 import com.googlecode.objectify.Key;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -38,13 +22,19 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 @Controller
-//@RequestMapping("/")
+@RequestMapping("/")
 public class IssueController {
+
+	//singleton - so the wiring is done only at the run time
+	IssueDAOService issueDAOService;
+
+	IssueDAOService getIssueDAOService(){
+		if(issueDAOService == null){
+			return new IssueDAOService();
+		}
+		return issueDAOService;
+	}
 
 	@RequestMapping("/")
 	public String home() {
@@ -78,9 +68,7 @@ public class IssueController {
 	@RequestMapping(value = "/issue/readbyid", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody String getIssueById(@RequestParam("id")String id) throws JsonProcessingException {
 
-		IssueDAOService issueDAOService = new IssueDAOService();
-
-		IssueModel issue = issueDAOService.getIssueById(id);
+		IssueModel issue = getIssueDAOService().getIssueById(id);
 		Map<String,Object> response = new HashMap<>();
 
 		if(issue != null){
@@ -109,21 +97,39 @@ public class IssueController {
 		ObjectMapper mapper = new ObjectMapper();
 		
 		Map<String,Object> issuePayload = mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
-        IssueModel newTicket = generateIssue(issuePayload);
 
+		//boiler plate ugly piece of code
+		System.out.println(issuePayload.get("tags").toString());
+		String tagsStr[]= issuePayload.get("tags").toString()
+				.substring(1,issuePayload.get("tags").toString().length()-1)
+				.split(",");
 
+		IssueModel newissue = new IssueModel();
+		newissue.setCode();
+		newissue.setTags(Arrays.asList(tagsStr));
+		newissue.setAssignedto(issuePayload.get("assignedTo").toString());
+		newissue.setAssignee(issuePayload.get("assignee").toString());
+		System.out.println("issue status from frontend: "+issuePayload.get("status").toString());
+		newissue.setStatus(issuePayload.get("status") == null?"open":issuePayload.get("status").toString().toLowerCase());
+		newissue.setDescription(issuePayload.get("description").toString());
+		newissue.setSubject(issuePayload.get("subject").toString());
+		newissue.setDownvotes(1);
+		newissue.setDownvoters(issuePayload.get("assignee").toString());
+		newissue.setLastDateModified(new Date().getTime());
+		newissue.setNumberOfComments(0);
 
         Map<String,Object> response = new HashMap<>();
         //ObjectifyService.ofy().save().entity(newTicket).now();
 
         
         try {
-            Key<IssueModel> issuekey = ObjectifyWorker.getofy().save().entity(newTicket).now();
+			Key<IssueModel> issueKeyObtained = getIssueDAOService().createIssue(newissue);
             response.put("ok",true);
             response.put("status","entity save success");
-            response.put("code",issuekey.toWebSafeString());
+            response.put("code",issueKeyObtained.toWebSafeString());
         }catch(Exception e) {
-        		
+			System.out.print("Writing erorr on the DB. From the Issue DAOService ");
+			e.printStackTrace();
         }
         
         String jsonResponse = "problem with jackson";
@@ -140,11 +146,12 @@ public class IssueController {
 	
 	@RequestMapping(value = "/issue/readall", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody String readAll(@RequestParam(value = "cursor", defaultValue = "") String cursorStr,
-										@RequestParam(value = "limit", defaultValue = "5") String limit){
+										@RequestParam(value = "limit", defaultValue = "5") String limit,
+										@RequestParam(value = "sortby", defaultValue = "lastDateModified", required = false) String sortProperty,
+										@RequestParam(value = "order", defaultValue = "ascending", required = false) String sortOrder){
 
 
-		IssueDAOService issuedao = new IssueDAOService();
-		QueryResultIterator<IssueModel> resultSet = issuedao.getAllIssues(cursorStr,Integer.parseInt(limit));
+		QueryResultIterator<IssueModel> resultSet = getIssueDAOService().getAllIssues(cursorStr,Integer.parseInt(limit), sortProperty, sortOrder);
 		String cursorNext = "";
 		boolean continu = false;
 		List<IssueModel> issues = new ArrayList<IssueModel>();
@@ -183,7 +190,7 @@ public class IssueController {
 	
 	@RequestMapping("/issue/readbybatch")
 	protected List<IssueModel> readAllService(@RequestParam(value = "cursor", defaultValue = "") String cursorStr) {
-		
+
 		Query<IssueModel> query = ObjectifyWorker.getofy().load().type(IssueModel.class).limit(10);
 		
 		if(!cursorStr.isEmpty()) {
@@ -218,8 +225,7 @@ public class IssueController {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String,Object> downvotePayload = mapper.readValue(downvoteObj, new TypeReference<Map<String, Object>>() {});
 
-		IssueDAOService issueDAOService = new IssueDAOService();
-		String numberOfDownvotes = issueDAOService.DodownVote(downvotePayload.get("issue").toString(),
+		String numberOfDownvotes = getIssueDAOService().DodownVote(downvotePayload.get("issue").toString(),
 				downvotePayload.get("name").toString());
 
 		Map<String,Object> response = new HashMap<>();
@@ -243,8 +249,7 @@ public class IssueController {
 	@RequestMapping("/getdownvoters")
 	public @ResponseBody String getDownvoters(@RequestParam(value = "issueid") String issueID){
 
-		IssueDAOService issueDAOService = new IssueDAOService();
-		List<String> downvoters = issueDAOService.getDownvoters(issueID);
+		List<String> downvoters = getIssueDAOService().getDownvoters(issueID);
 
 		Map<String,Object> response = new HashMap<>();
 		response.put("ok", true);
@@ -267,8 +272,7 @@ public class IssueController {
 	@RequestMapping("/getdownvotescount")
 	public @ResponseBody String downvoteCount(@RequestParam(value = "issueid") String issueID){
 
-		IssueDAOService issueDAOService = new IssueDAOService();
-		int downvoteCount = issueDAOService.getDownvoters(issueID).size();
+		int downvoteCount = getIssueDAOService().getDownvoters(issueID).size();
 
 		Map<String,Object> response = new HashMap<>();
 		response.put("ok", true);
@@ -291,12 +295,11 @@ public class IssueController {
 	@RequestMapping(value = "/closeissue", method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody String closeIssue(@RequestBody String issueId) throws IOException {
 
-		IssueDAOService issueService = new IssueDAOService();
 
 		ObjectMapper mapperIn = new ObjectMapper();
 		Map<String, Object> issue = mapperIn.readValue(issueId, new TypeReference<Map<String, Object>>() {});
 
-		IssueModel responseIssue = issueService.closeIssue(issue.get("id").toString());
+		IssueModel responseIssue = getIssueDAOService().closeIssue(issue.get("id").toString());
 
 		String jsonResponse = "";
 		ObjectMapper mapperOut = new ObjectMapper();
@@ -318,12 +321,10 @@ public class IssueController {
 	@RequestMapping(value = "/openissue", method = RequestMethod.POST, produces = "application/json")
 	public String openIssue(@RequestBody String issueId) throws IOException {
 
-		IssueDAOService issueService = new IssueDAOService();
-
 		ObjectMapper mapperIn = new ObjectMapper();
 		Map<String, Object> issue = mapperIn.readValue(issueId, new TypeReference<Map<String, Object>>() {});
 
-		IssueModel responseIssue = issueService.openIssue(issue.get("id").toString());
+		IssueModel responseIssue = getIssueDAOService().openIssue(issue.get("id").toString());
 
 		String jsonResponse = "";
 		ObjectMapper mapper = new ObjectMapper();
@@ -343,28 +344,29 @@ public class IssueController {
 	}
 
 	//helper code
-	private IssueModel generateIssue(Map<String,Object> issuePayload){
-
-		System.out.println(issuePayload.get("tags").toString());
-
-		String tagsStr[]= issuePayload.get("tags").toString()
-				.substring(1,issuePayload.get("tags").toString().length()-1)
-				.split(",");
-
-		IssueModel newissue = new IssueModel();
-		newissue.setCode();
-		newissue.setTags(Arrays.asList(tagsStr));
-		newissue.setAssignedto(issuePayload.get("assignedTo").toString());
-		newissue.setAssignee(issuePayload.get("assignee").toString());
-		System.out.println("issue status from frontend: "+issuePayload.get("status").toString());
-		newissue.setStatus(issuePayload.get("status") == null?"open":issuePayload.get("status").toString().toLowerCase());
-		newissue.setDescription(issuePayload.get("description").toString());
-		newissue.setSubject(issuePayload.get("subject").toString());
-		newissue.setDownvotes(1);
-		newissue.setDownvoters(issuePayload.get("assignee").toString());
-		
-		return newissue;
-	}
+//	private IssueModel generateIssue(Map<String,Object> issuePayload){
+//
+//		System.out.println(issuePayload.get("tags").toString());
+//
+//		String tagsStr[]= issuePayload.get("tags").toString()
+//				.substring(1,issuePayload.get("tags").toString().length()-1)
+//				.split(",");
+//
+//		IssueModel newissue = new IssueModel();
+//		newissue.setCode();
+//		newissue.setTags(Arrays.asList(tagsStr));
+//		newissue.setAssignedto(issuePayload.get("assignedTo").toString());
+//		newissue.setAssignee(issuePayload.get("assignee").toString());
+//		System.out.println("issue status from frontend: "+issuePayload.get("status").toString());
+//		newissue.setStatus(issuePayload.get("status") == null?"open":issuePayload.get("status").toString().toLowerCase());
+//		newissue.setDescription(issuePayload.get("description").toString());
+//		newissue.setSubject(issuePayload.get("subject").toString());
+//		newissue.setDownvotes(1);
+//		newissue.setDownvoters(issuePayload.get("assignee").toString());
+//		newissue.setLastDateModified(new Date().getTime());
+//		newissue.setNumberOfComments(0);
+//		return newissue;
+//	}
 
 	/* junk code
 

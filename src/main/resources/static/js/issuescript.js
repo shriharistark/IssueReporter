@@ -432,9 +432,10 @@ var issue = {};
         document.getElementsByClassName("issue-main-container")[0].appendChild(issue);
     }
 
-    issue.fetchAndPopulateView = function(limit,cursor){
+    issue.fetchAndPopulateView = function(limit,cursor,filterParams){
 
-        let url = "/issue/readall?cursor="+cursor+"&limit="+limit;
+        let url = "/issue/readall?cursor="+cursor+"&limit="+limit
+            +"&sortby="+filterParams["sortProperty"]+"&order="+filterParams["order"];
         let init = {
             method : "GET",
             headers : {
@@ -546,7 +547,8 @@ var issue = {};
 
                     console.log(this);
                     // let caller = issue.fetchAndPopulateView.bind(issue);
-                    issue.fetchAndPopulateView.call(issue,6,cursor.next).then((y) =>{
+                    //sort order is hardcoded for now
+                    issue.fetchAndPopulateView.call(issue,6,cursor.next,{sortProperty : "downvotes", order : "descending"}).then((y) =>{
 
                         if(y) {
                             console.log("I got this: " + y);

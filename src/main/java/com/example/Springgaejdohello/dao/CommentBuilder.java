@@ -1,5 +1,6 @@
 package com.example.Springgaejdohello.dao;
 
+import com.example.Springgaejdohello.daoInterface.IssueDAO;
 import com.example.Springgaejdohello.model.CommentModel;
 
 public class CommentBuilder extends CommentModel {
@@ -48,7 +49,11 @@ public class CommentBuilder extends CommentModel {
         return this;
     }
 
+    //call to static method of issueDAO which updates the last modified
+    //coupling the comment entity to the issues entity
+    //whenever a comment is built - issue is considered as modified
     public CommentModel build(){
+        IssueDAO.updateTimeModified(commentModel.getIssueID());
         return commentModel;
     }
 
