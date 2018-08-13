@@ -10,13 +10,20 @@ body{
     top: 6em;
     /*left: 50%;*/
 }
+
+.issue-container{
+    display: flex;
+    flex-direction: column;
+}
+
 .issue-main-container{
     /*background: url("img/tic-tac-toe.png") repeat;*/
-    max-width: 55%;
+    /*max-width: 55%;*/
     min-width: 50%;
     /*height: 600px;*/
     /*background-repeat: repeat;*/
 }
+
 
 .issue{
     overflow: hidden;
@@ -631,6 +638,58 @@ body{
 .create-issue-popup-assignee .chosen-container-single .chosen-search{
     padding: 3px 1px !important;
 }
+
+.header-box{
+    height: fit-content;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    /* overflow: hidden; */
+    padding: 0.5% 2% 0% 2%;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.header-box-label{
+    margin: 0 0 5px;
+    color: #999;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    line-height: 15px;
+    text-transform: uppercase;
+    /* cursor: text; */
+    user-select: none;
+}
+
+.sort-box div{
+    padding-top: 5%;
+}
+
+.sort-box {
+    box-shadow: 0px 6px 9px #d8d8d8;
+     display: none;
+    min-width: 50%;
+    /* min-height: 150px; */
+    position: absolute;
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* z-index: 1200; */
+    margin: 4% 2% 2% 0%;
+    padding: 1% 1% 3% 1%;
+    font-family: Helvetica;
+    font-size: 12px;
+    font-weight: 500;
+    /* font-style: oblique; */
+    line-height: normal;
+    letter-spacing: 0.8px;
+    text-align: left;
+    color: #9E9E9E;
+    background-color: white;
+    /* text-transform: uppercase; */
+}
+
 /*.inputContainer .chosen-container{*/
     /*width : 100% !important;*/
 /*}*/

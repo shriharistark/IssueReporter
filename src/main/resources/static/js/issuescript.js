@@ -15,6 +15,33 @@ document.getElementById("create-post").addEventListener("click",function (ev) {
 
 var events = {
 
+    sortBox : function(){
+        $(".header-box").on("click",function(ev){
+            $(".sort-box").first().slideDown(200);
+            ev.stopImmediatePropagation();
+            $("body").on("click",function(evt){
+                console.log($(evt.target));
+                if($(".sort-box").first().css("display") !== "none" && $(evt.target).attr('class') !== 'sort-box'){
+                    console.log($(evt.target));
+                    $(".sort-box").first().slideUp(200);
+                }
+            })
+
+            $(".sort-box div").on("click",function(event){
+                event.stopImmediatePropagation();
+                let element = (event.target);
+                console.log($(element).siblings());
+                let siblingSorts = $(element).siblings();
+                siblingSorts.each(function(){
+                    $(this).css("color","#9E9E9E");
+                });
+                $(element).css("color","black");
+                $(".sort-box").first().slideUp(200);
+                issue.fetchAndPopulateView(5,"",{sortProperty:$(element).text().toLowerCase(), order:"descending"});
+            })
+        });
+    },
+
     issueDownvote : function () {
 
         console.log("downvote is called");
@@ -432,10 +459,28 @@ var issue = {};
         document.getElementsByClassName("issue-main-container")[0].appendChild(issue);
     }
 
-    issue.fetchAndPopulateView = function(limit,cursor,filterParams){
+    issue.fetchAndPopulateView = function(limit,cursor,filterparams){
+
+        var filters = {
+            sortProperty: (function(){
+                if(filterparams.sortProperty){
+                    return filterparams.sortProperty;
+                }
+                return "date";
+            })(),
+
+            order : (function(){
+                if(filterparams.order) {
+                    if (filterparams.order.toLowerCase().startsWith("asc") || filterparams.order.toLowerCase().startsWith("desc")) {
+                        return filterparams.order.toLowerCase();
+                    }
+                }
+                return "descending";
+            })(),
+        }
 
         let url = "/issue/readall?cursor="+cursor+"&limit="+limit
-            +"&sortby="+filterParams["sortProperty"]+"&order="+filterParams["order"];
+            +"&sortby="+filters["sortProperty"]+"&order="+filters["order"];
         let init = {
             method : "GET",
             headers : {
@@ -489,6 +534,9 @@ var issue = {};
             return valuejson;
         }).then(function(value){
 
+            if(cursor === ""){
+                $(".issue-main-container").html("");
+            }
             //console.log(value);
             if(value.ok && nextcurs !== "") {
                 let issues = value.issues;
@@ -548,7 +596,7 @@ var issue = {};
                     console.log(this);
                     // let caller = issue.fetchAndPopulateView.bind(issue);
                     //sort order is hardcoded for now
-                    issue.fetchAndPopulateView.call(issue,6,cursor.next,{sortProperty : "downvotes", order : "descending"}).then((y) =>{
+                    issue.fetchAndPopulateView.call(issue,6,cursor.next,{}).then((y) =>{
 
                         if(y) {
                             console.log("I got this: " + y);
@@ -1057,8 +1105,7 @@ function addComment(issueID, parentID, message, author){
 
     $(".create-issue-popup-assignee .assignee-select").chosen({
         width: "100%",
-    })
+    });
 
-    //get and inject all the tags todo
 
 })();
