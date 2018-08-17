@@ -116,8 +116,21 @@ public class IssueController {
 		if(issuePayload.get("test") != null){
 			IssueModel testissue = new IssueModel();
 			testissue.setCode();
-			testissue.setSubject("objector");
-			testissue.setStatus("open");
+			//for tags
+			String tagsStr[]= issuePayload.get("tags").toString()
+					.substring(1,issuePayload.get("tags").toString().length()-1)
+					.split(",");
+			testissue.setTags(Arrays.asList(tagsStr));
+			testissue.setAssignedto(issuePayload.get("assignedTo").toString());
+			testissue.setAssignee(issuePayload.get("assignee").toString());
+			System.out.println("issue status from frontend: "+issuePayload.get("status").toString());
+			testissue.setStatus(issuePayload.get("status") == null?"open":issuePayload.get("status").toString().toLowerCase());
+			testissue.setDescription(issuePayload.get("description").toString());
+			testissue.setSubject(issuePayload.get("subject").toString());
+			testissue.setDownvotes(1);
+			testissue.setDownvoters(issuePayload.get("assignee").toString());
+			testissue.setLastDateModified(new Date().getTime());
+			testissue.setNumberOfComments(0);
 			try {
 				getBatchWrite().addToQueue(testissue, IssueModel.class);
 			} catch (BatchWrite.BatchWriteException e) {
