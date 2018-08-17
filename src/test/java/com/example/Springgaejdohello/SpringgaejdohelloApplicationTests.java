@@ -11,6 +11,7 @@ public class SpringgaejdohelloApplicationTests {
 
 	@Test
 	public void contextLoads() {
+
 	}
 
 }

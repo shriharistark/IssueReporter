@@ -1,12 +1,11 @@
 package com.example.Springgaejdohello.dao;
 
-import com.example.Springgaejdohello.ObjectifyWorker;
 import com.example.Springgaejdohello.daoInterface.CommentDAO;
 import com.example.Springgaejdohello.model.CommentModel;
-import com.example.Springgaejdohello.model.IssueModel;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class CommentDAOService implements CommentDAO {
 
         String result = "";
         try{
-            ObjectifyWorker.getofy().save().entity((CommentModel)comment).now();
+            ObjectifyService.ofy().save().entity((CommentModel)comment).now();
             result = "success";
         }catch (Exception e){
             result = "fail";
@@ -41,8 +40,8 @@ public class CommentDAOService implements CommentDAO {
 
         String result = "";
         try{
-            commentEntity = ObjectifyWorker.getofy().load().key(comment).now();
-            ObjectifyWorker.getofy().delete().entity(commentEntity);
+            commentEntity = ObjectifyService.ofy().load().key(comment).now();
+            ObjectifyService.ofy().delete().entity(commentEntity);
             result = "success";
             return true;
         }catch (Exception e){
@@ -60,7 +59,7 @@ public class CommentDAOService implements CommentDAO {
         CommentModel commententity;
 
         try{
-            commententity = ObjectifyWorker.getofy().load().key(commentkey).now();
+            commententity = ObjectifyService.ofy().load().key(commentkey).now();
             commententity.setMessage(newmessage);
             return "success";
         }catch (Exception e){
@@ -73,7 +72,7 @@ public class CommentDAOService implements CommentDAO {
     public QueryResultIterator<CommentModel> getAllCommentsOf(String issueId,String cursorStr) {
 
 
-        Query<CommentModel> query = ObjectifyWorker.getofy().load().type(CommentModel.class)
+        Query<CommentModel> query = ObjectifyService.ofy().load().type(CommentModel.class)
                .filter("issueID",issueId).limit(3);
         if(!cursorStr.isEmpty()) {
             query = query.startAt(Cursor.fromWebSafeString(cursorStr));
@@ -93,7 +92,7 @@ public class CommentDAOService implements CommentDAO {
 
     public List<CommentModel> getReplies(String issueId, String parentComment){
 
-        List<CommentModel> replies = ObjectifyWorker.getofy().load().type(CommentModel.class)
+        List<CommentModel> replies = ObjectifyService.ofy().load().type(CommentModel.class)
                 .filter("parentID",parentComment).list();
 
         return replies;

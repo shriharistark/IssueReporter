@@ -3,13 +3,15 @@ package com.example.Springgaejdohello.controller;
 import java.io.IOException;
 import java.util.*;
 
+import com.example.Springgaejdohello.Service.BatchWrite;
 import com.googlecode.objectify.Key;
 
+import com.googlecode.objectify.ObjectifyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.Springgaejdohello.ObjectifyWorker;
 import com.example.Springgaejdohello.dao.IssueDAOService;
 import com.example.Springgaejdohello.model.IssueModel;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -27,13 +29,25 @@ import org.springframework.web.servlet.ModelAndView;
 public class IssueController {
 
 	//singleton - so the wiring is done only at the run time
+	@Autowired
 	IssueDAOService issueDAOService;
 
-	IssueDAOService getIssueDAOService(){
-		if(issueDAOService == null){
-			return new IssueDAOService();
+	@Autowired
+	BatchWrite batchWrite;
+
+//	IssueDAOService issueDAOService{
+//		if(issueDAOService == null){
+//			return new IssueDAOService();
+//		}
+//		return issueDAOService;
+//	}
+
+	BatchWrite getBatchWrite(){
+		if(batchWrite == null){
+			return new BatchWrite();
 		}
-		return issueDAOService;
+
+		return batchWrite;
 	}
 
 	@RequestMapping("/")
@@ -68,7 +82,7 @@ public class IssueController {
 	@RequestMapping(value = "/issue/readbyid", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody String getIssueById(@RequestParam("id")String id) throws JsonProcessingException {
 
-		IssueModel issue = getIssueDAOService().getIssueById(id);
+		IssueModel issue = issueDAOService.getIssueById(id);
 		Map<String,Object> response = new HashMap<>();
 
 		if(issue != null){
@@ -98,6 +112,20 @@ public class IssueController {
 		
 		Map<String,Object> issuePayload = mapper.readValue(body, new TypeReference<Map<String, Object>>() {});
 
+		//temporary piece of code. Remove if you see it
+		if(issuePayload.get("test") != null){
+			IssueModel testissue = new IssueModel();
+			testissue.setCode();
+			testissue.setSubject("objector");
+			testissue.setStatus("open");
+			try {
+				getBatchWrite().addToQueue(testissue, IssueModel.class);
+			} catch (BatchWrite.BatchWriteException e) {
+				e.printStackTrace();
+			}
+			return "test done.. check on the admin";
+		}
+
 		//boiler plate ugly piece of code
 		System.out.println(issuePayload.get("tags").toString());
 		String tagsStr[]= issuePayload.get("tags").toString()
@@ -123,7 +151,7 @@ public class IssueController {
 
         
         try {
-			Key<IssueModel> issueKeyObtained = getIssueDAOService().createIssue(newissue);
+			Key<IssueModel> issueKeyObtained = issueDAOService.createIssue(newissue);
             response.put("ok",true);
             response.put("status","entity save success");
             response.put("code",issueKeyObtained.toWebSafeString());
@@ -151,7 +179,7 @@ public class IssueController {
 										@RequestParam(value = "order", defaultValue = "ascending", required = false) String sortOrder){
 
 
-		QueryResultIterator<IssueModel> resultSet = getIssueDAOService().getAllIssues(cursorStr,Integer.parseInt(limit), sortProperty, sortOrder);
+		QueryResultIterator<IssueModel> resultSet = issueDAOService.getAllIssues(cursorStr,Integer.parseInt(limit), sortProperty, sortOrder);
 		String cursorNext = "";
 		boolean continu = false;
 		List<IssueModel> issues = new ArrayList<IssueModel>();
@@ -191,7 +219,7 @@ public class IssueController {
 	@RequestMapping("/issue/readbybatch")
 	protected List<IssueModel> readAllService(@RequestParam(value = "cursor", defaultValue = "") String cursorStr) {
 
-		Query<IssueModel> query = ObjectifyWorker.getofy().load().type(IssueModel.class).limit(10);
+		Query<IssueModel> query = ObjectifyService.ofy().load().type(IssueModel.class).limit(10);
 		
 		if(!cursorStr.isEmpty()) {
 			query = query.startAt(Cursor.fromWebSafeString(cursorStr));
@@ -225,7 +253,7 @@ public class IssueController {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String,Object> downvotePayload = mapper.readValue(downvoteObj, new TypeReference<Map<String, Object>>() {});
 
-		String numberOfDownvotes = getIssueDAOService().DodownVote(downvotePayload.get("issue").toString(),
+		String numberOfDownvotes = issueDAOService.DodownVote(downvotePayload.get("issue").toString(),
 				downvotePayload.get("name").toString());
 
 		Map<String,Object> response = new HashMap<>();
@@ -249,7 +277,7 @@ public class IssueController {
 	@RequestMapping("/getdownvoters")
 	public @ResponseBody String getDownvoters(@RequestParam(value = "issueid") String issueID){
 
-		List<String> downvoters = getIssueDAOService().getDownvoters(issueID);
+		List<String> downvoters = issueDAOService.getDownvoters(issueID);
 
 		Map<String,Object> response = new HashMap<>();
 		response.put("ok", true);
@@ -272,7 +300,7 @@ public class IssueController {
 	@RequestMapping("/getdownvotescount")
 	public @ResponseBody String downvoteCount(@RequestParam(value = "issueid") String issueID){
 
-		int downvoteCount = getIssueDAOService().getDownvoters(issueID).size();
+		int downvoteCount = issueDAOService.getDownvoters(issueID).size();
 
 		Map<String,Object> response = new HashMap<>();
 		response.put("ok", true);
@@ -299,7 +327,7 @@ public class IssueController {
 		ObjectMapper mapperIn = new ObjectMapper();
 		Map<String, Object> issue = mapperIn.readValue(issueId, new TypeReference<Map<String, Object>>() {});
 
-		IssueModel responseIssue = getIssueDAOService().closeIssue(issue.get("id").toString());
+		IssueModel responseIssue = issueDAOService.closeIssue(issue.get("id").toString());
 
 		String jsonResponse = "";
 		ObjectMapper mapperOut = new ObjectMapper();
@@ -324,7 +352,7 @@ public class IssueController {
 		ObjectMapper mapperIn = new ObjectMapper();
 		Map<String, Object> issue = mapperIn.readValue(issueId, new TypeReference<Map<String, Object>>() {});
 
-		IssueModel responseIssue = getIssueDAOService().openIssue(issue.get("id").toString());
+		IssueModel responseIssue = issueDAOService.openIssue(issue.get("id").toString());
 
 		String jsonResponse = "";
 		ObjectMapper mapper = new ObjectMapper();

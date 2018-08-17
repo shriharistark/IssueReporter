@@ -18,12 +18,13 @@ import java.io.IOException;
 
 @Component
 @WebFilter(urlPatterns = {"/*","/"})
+
 public class ObjectifyWebFilter extends ObjectifyFilter {
 
     public ObjectifyWebFilter() {
-        ObjectifyService.register(IssueModel.class);
-        ObjectifyService.register(TagsModel.class);
-        ObjectifyService.register(CommentModel.class);
+//        ObjectifyService.register(IssueModel.class);
+//        ObjectifyService.register(TagsModel.class);
+//        ObjectifyService.register(CommentModel.class);
     }
 
     @Override

@@ -3,26 +3,22 @@ package com.example.Springgaejdohello.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.Springgaejdohello.ObjectifyWorker;
 import com.example.Springgaejdohello.daoInterface.IssueDAO;
 import com.example.Springgaejdohello.model.IssueModel;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class IssueDAOService implements IssueDAO{
-	
-	static Objectify objectifyInstance;
-	Query<IssueModel> result;
-	
-	public IssueDAOService() {
-		//singleton
-		if(objectifyInstance == null) {
-			objectifyInstance = ObjectifyWorker.getofy();
-		}
-	}
+
+	@Autowired
+	private static ObjectifyService Objectify;
+
 
 	@Override
 	public QueryResultIterator<IssueModel> getAllIssues(String cursorStr,int limit,String orderByProperty, String order) {
@@ -52,7 +48,7 @@ public class IssueDAOService implements IssueDAO{
 			sortProp = "";
 		}
 
-		Query<IssueModel> query = ObjectifyWorker.getofy().load().type(IssueModel.class).order(sortProp).limit(limit);
+		Query<IssueModel> query = Objectify.ofy().load().type(IssueModel.class).order(sortProp).limit(limit);
 		
 		if(!cursorStr.isEmpty()) {
 			query = query.startAt(Cursor.fromWebSafeString(cursorStr));
@@ -104,7 +100,7 @@ public class IssueDAOService implements IssueDAO{
 
 	@Override
 	public IssueModel getIssueById(String id) {
-		IssueModel issuemodel = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
+		IssueModel issuemodel = Objectify.ofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
 
 		return issuemodel;
 	}
@@ -112,14 +108,14 @@ public class IssueDAOService implements IssueDAO{
 	@Override
 	public String DodownVote(String issueID, String downvoter) {
 
-		IssueModel issueObject = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(issueID)).now();
+		IssueModel issueObject = Objectify.ofy().load().type(IssueModel.class).id(Long.parseLong(issueID)).now();
 		System.out.print(issueObject.getWebSafeKey());
 		Integer downVotesPrev = issueObject.getDownvotes();
 		issueObject.setDownvotes(++downVotesPrev);
 		issueObject.setDownvoters(downvoter);
 		IssueDAO.updateTimeModified(issueID);
 
-		ObjectifyWorker.getofy().save().entity(issueObject).now();
+		Objectify.ofy().save().entity(issueObject).now();
 		return downVotesPrev.toString();
 
 	}
@@ -127,7 +123,7 @@ public class IssueDAOService implements IssueDAO{
 	@Override
 	public List<String> getDownvoters(String issueID) {
 
-		IssueModel issueObject = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(issueID)).now();
+		IssueModel issueObject = Objectify.ofy().load().type(IssueModel.class).id(Long.parseLong(issueID)).now();
 		List<String> downvoters = issueObject.getDownvoters();
 
 		return downvoters;
@@ -135,20 +131,20 @@ public class IssueDAOService implements IssueDAO{
 
 	@Override
 	public IssueModel closeIssue(String id) {
-		IssueModel issueToClose = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
+		IssueModel issueToClose = Objectify.ofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
 		IssueDAO.updateTimeModified(id);
 		issueToClose.setStatus("close");
 
-		ObjectifyWorker.getofy().save().entity(issueToClose);
+		Objectify.ofy().save().entity(issueToClose);
 		return issueToClose;
 	}
 
 	@Override
 	public IssueModel openIssue(String id) {
-		IssueModel issueToOpen = ObjectifyWorker.getofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
+		IssueModel issueToOpen = Objectify.ofy().load().type(IssueModel.class).id(Long.parseLong(id)).now();
 		issueToOpen.setStatus("open");
 		IssueDAO.updateTimeModified(id);
-		ObjectifyWorker.getofy().save().entity(issueToOpen);
+		Objectify.ofy().save().entity(issueToOpen);
 		return issueToOpen;
 	}
 
@@ -156,7 +152,7 @@ public class IssueDAOService implements IssueDAO{
 	public Key<IssueModel> createIssue(IssueModel issue) {
 		Key<IssueModel> issuekey = null;
 		try {
-			issuekey = ObjectifyWorker.getofy().save().entity(issue).now();
+			issuekey = Objectify.ofy().save().entity(issue).now();
 		}catch(Exception e) {
 			System.out.print(e.getCause());
 		}

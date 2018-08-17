@@ -1,12 +1,12 @@
 package com.example.Springgaejdohello.dao;
 
-import com.example.Springgaejdohello.ObjectifyWorker;
 import com.example.Springgaejdohello.daoInterface.TagsDAO;
 import com.example.Springgaejdohello.model.TagsModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class TagsDAOService implements TagsDAO {
 
     public TagsDAOService(){
         if(objectifyInstance == null) {
-            objectifyInstance = ObjectifyWorker.getofy();
+            objectifyInstance = ObjectifyService.ofy();
         }
 
     }
