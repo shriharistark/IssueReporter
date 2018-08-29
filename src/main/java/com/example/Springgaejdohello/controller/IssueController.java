@@ -25,7 +25,7 @@ import com.googlecode.objectify.cmd.Query;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping(value = {"/", "/issue"})
 public class IssueController {
 
 	//singleton - so the wiring is done only at the run time
@@ -35,12 +35,6 @@ public class IssueController {
 	@Autowired
 	BatchWrite batchWrite;
 
-//	IssueDAOService issueDAOService{
-//		if(issueDAOService == null){
-//			return new IssueDAOService();
-//		}
-//		return issueDAOService;
-//	}
 
 	BatchWrite getBatchWrite(){
 		if(batchWrite == null){
@@ -55,31 +49,9 @@ public class IssueController {
 		return "home.html";
 	}
 
-	@RequestMapping(value = "/newissue/{issueid}")
-	public ModelAndView showIssue(@PathVariable("issueid") String issueId,
-								  ModelMap model){
-
-		model.addAttribute("issueid",issueId);
-		return new ModelAndView("redirect:/issuedetail.html",model);
-	}
-	
-	/*
-	@RequestMapping("/testjdo")
-	public @ResponseBody String testJDO(@RequestParam("name")String name,
-						 @RequestParam("age")String age) {
-		
-        try {
-    			ObjectifyService.ofy().save().entity(new IssueModel(name,age)).now();
-        }catch(Exception e) {
-        		return e.getMessage();
-        }
-        
-        return "worked!";
-	}*/
-
 
 	//read issue by id
-	@RequestMapping(value = "/issue/readbyid", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/readbyid", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody String getIssueById(@RequestParam("id")String id) throws JsonProcessingException {
 
 		IssueModel issue = issueDAOService.getIssueById(id);
@@ -103,7 +75,7 @@ public class IssueController {
 	}
 	
 	//create issue
-	@RequestMapping(value = "/issue/create", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody String setIssue(@RequestBody String body) throws JsonParseException, JsonMappingException, IOException {
 
         //List<String> tagslist = Arrays.asList(tags);
@@ -185,7 +157,7 @@ public class IssueController {
         return jsonResponse;
     }
 	
-	@RequestMapping(value = "/issue/readall", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/readall", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody String readAll(@RequestParam(value = "cursor", defaultValue = "") String cursorStr,
 										@RequestParam(value = "limit", defaultValue = "5") String limit,
 										@RequestParam(value = "sortby", defaultValue = "lastDateModified", required = false) String sortProperty,
@@ -229,7 +201,7 @@ public class IssueController {
 		return jsonResponse;
 	}
 	
-	@RequestMapping("/issue/readbybatch")
+	@RequestMapping("/readbybatch")
 	protected List<IssueModel> readAllService(@RequestParam(value = "cursor", defaultValue = "") String cursorStr) {
 
 		Query<IssueModel> query = ObjectifyService.ofy().load().type(IssueModel.class).limit(10);
@@ -258,7 +230,7 @@ public class IssueController {
 		return resultSet;
 	}
 
-	@RequestMapping(value = "/downvote", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/issue/downvote", method = RequestMethod.POST, consumes = "application/json")
 	public @ResponseBody String downvote(@RequestBody String downvoteObj) throws IOException {
 
 		//to do - add additional parameter notes(may be required for later)
@@ -383,103 +355,5 @@ public class IssueController {
 
 		return jsonResponse;
 	}
-
-	//helper code
-//	private IssueModel generateIssue(Map<String,Object> issuePayload){
-//
-//		System.out.println(issuePayload.get("tags").toString());
-//
-//		String tagsStr[]= issuePayload.get("tags").toString()
-//				.substring(1,issuePayload.get("tags").toString().length()-1)
-//				.split(",");
-//
-//		IssueModel newissue = new IssueModel();
-//		newissue.setCode();
-//		newissue.setTags(Arrays.asList(tagsStr));
-//		newissue.setAssignedto(issuePayload.get("assignedTo").toString());
-//		newissue.setAssignee(issuePayload.get("assignee").toString());
-//		System.out.println("issue status from frontend: "+issuePayload.get("status").toString());
-//		newissue.setStatus(issuePayload.get("status") == null?"open":issuePayload.get("status").toString().toLowerCase());
-//		newissue.setDescription(issuePayload.get("description").toString());
-//		newissue.setSubject(issuePayload.get("subject").toString());
-//		newissue.setDownvotes(1);
-//		newissue.setDownvoters(issuePayload.get("assignee").toString());
-//		newissue.setLastDateModified(new Date().getTime());
-//		newissue.setNumberOfComments(0);
-//		return newissue;
-//	}
-
-	/* junk code
-
-	@RequestMapping(value = {"/gcs/{bucket}/{fileName}"},method = RequestMethod.POST)
-	public @ResponseBody String uploadFile(@PathVariable("bucket") String bucket,
-			@PathVariable("fileName") String nameFile,
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-
-		System.out.print("I am here inside sampleuplaod");
-		final GcsService gcsService = GcsServiceFactory.createGcsService(new RetryParams.Builder()
-				.initialRetryDelayMillis(10)
-				.retryMaxAttempts(10)
-				.totalRetryPeriodMillis(15000)
-				.build());
-
-
-		GcsFileOptions instance = GcsFileOptions.getDefaultInstance();
-		GcsFilename fileName = new GcsFilename(bucket,nameFile);
-		GcsOutputChannel outputChannel;
-		outputChannel = gcsService.createOrReplace(fileName, instance);
-
-		return "{'name':'hari'}";
-	}
-
-	@RequestMapping(value = {"/gcs/{bucket}/{fileName}"},method = RequestMethod.GET)
-	public @ResponseBody String getFile(@PathVariable("bucket") String bucket,
-													   @PathVariable("fileName") String nameFile,
-													   HttpServletRequest request,
-													   HttpServletResponse response) throws IOException {
-
-		System.out.print("I am here inside sample get");
-		final GcsService gcsService = GcsServiceFactory.createGcsService(new RetryParams.Builder()
-				.initialRetryDelayMillis(10)
-				.retryMaxAttempts(10)
-				.totalRetryPeriodMillis(15000)
-				.build());
-
-		GcsFilename fileName = new GcsFilename(bucket,nameFile);
-		GcsInputChannel readChannel = gcsService.openPrefetchingReadChannel(fileName, 0, 2 * 1024 * 1024);
-
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-		int nRead;
-		byte[] data = new byte[16384];
-
-		StringBuilder encodedImage = new StringBuilder();
-
-		while ((nRead = Channels.newInputStream(readChannel).read(data, 0, data.length)) != -1) {
-			buffer.write(data, 0, nRead);
-			encodedImage.append(Base64.encode(data));
-		}
-
-
-		Map<String,Object> responseMap = new HashMap<>();
-		responseMap.put("ok", true);
-
-		String jsonResponse = "";
-		ObjectMapper mapper = new ObjectMapper();
-
-		responseMap.put("image",encodedImage);
-		System.out.println("Image: "+encodedImage);
-
-		try {
-			jsonResponse = mapper.writeValueAsString(responseMap);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return jsonResponse;
-
-	}*/
 
 }

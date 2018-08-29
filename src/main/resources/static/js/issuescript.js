@@ -88,7 +88,7 @@ var events = {
                     }
                 };
 
-                let url = "/downvote";
+                let url = "/issue/downvote";
 
                 if(downvoterName){
 
@@ -759,7 +759,7 @@ var issue = {};
             }
         };
 
-        let url = "/closeissue";
+        let url = "/issue/closeissue";
 
         return fetch(url,init).then(function (value) {
             return value.json();
@@ -790,7 +790,7 @@ issue.openIssue = function(issueId){
         }
     };
 
-    let url = "/openissue";
+    let url = "/issue/openissue";
 
     return fetch(url,init).then(function (value) {
         return value.json();

@@ -218,6 +218,13 @@ body{
     height: 6em;
 }
 
+#header #google-sign-in{
+    width: 36%;
+    height: 60%;
+    cursor: pointer;
+    alignment: center;
+}
+
 #sidebar{
     display: flex;
     min-width: 15em;

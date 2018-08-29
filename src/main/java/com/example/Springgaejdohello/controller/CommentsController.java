@@ -104,8 +104,11 @@ public class CommentsController {
             e.printStackTrace();
         }
 
+        // to get issue key
         //making internal call - hackjob code
         String webSafeIssueKey = commentBuilder.getIssueWebSafeKey();
+
+        //Internal server call - works only in local for now
         final String uriToRead =  "http://localhost:8080/issue/readbyid?id="+commentIn.get("issueid");
 //        String reqJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString();
         RestTemplate restTemplate = new RestTemplate();
