@@ -1,6 +1,8 @@
 package com.example.Springgaejdohello.controller;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.*;
 
 import com.example.Springgaejdohello.Service.BatchWrite;
@@ -24,6 +26,11 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping(value = {"/", "/issue"})
 public class IssueController {
@@ -35,6 +42,9 @@ public class IssueController {
 	@Autowired
 	BatchWrite batchWrite;
 
+	@Autowired
+	HttpSession httpSession;
+
 
 	BatchWrite getBatchWrite(){
 		if(batchWrite == null){
@@ -45,8 +55,31 @@ public class IssueController {
 	}
 
 	@RequestMapping("/")
-	public String home() {
+	public String home(HttpServletResponse res, HttpServletRequest request) {
+		//new request? set session : query db for the user data
+		System.out.println("\n---Hit home!---\n");
+		System.out.println("State: "+httpSession.getAttribute("state"));
+
+		if(httpSession.getAttribute("state") == null){
+
+			String state = new BigInteger(130, new SecureRandom()).toString(32);
+			httpSession.setAttribute("state",state);
+
+		}
+
+		else {
+			//query the db for user data
+		}
+
 		return "home.html";
+	}
+
+	@RequestMapping(value = "/viewissue/{issueid}")
+	public ModelAndView showIssue(@PathVariable("issueid") String issueId,
+								  ModelMap model){
+
+		model.addAttribute("issueid",issueId);
+		return new ModelAndView("redirect:/issuedetail.html",model);
 	}
 
 
@@ -230,7 +263,7 @@ public class IssueController {
 		return resultSet;
 	}
 
-	@RequestMapping(value = "/issue/downvote", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/downvote", method = RequestMethod.POST, consumes = "application/json")
 	public @ResponseBody String downvote(@RequestBody String downvoteObj) throws IOException {
 
 		//to do - add additional parameter notes(may be required for later)

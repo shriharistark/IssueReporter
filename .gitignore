@@ -23,3 +23,6 @@
 /dist/
 /nbdist/
 /.nb-gradle/
+
+#credentials
+/src/main/java/com/example/Springgaejdohello/Service/Utils/client_secret.json

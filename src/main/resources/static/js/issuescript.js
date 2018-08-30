@@ -271,7 +271,7 @@ var events = {
                     let issueContent = "none";
                     evt.stopPropagation();
 
-                    document.location.href = "newissue/"+issueID;
+                    document.location.href = "/viewissue/"+issueID;
                     issueContent = getIssue(issueID).then((res) => {
                         return res;
                     });

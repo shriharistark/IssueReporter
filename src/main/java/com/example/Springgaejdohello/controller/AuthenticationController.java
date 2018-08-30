@@ -4,11 +4,16 @@ import com.example.Springgaejdohello.Service.Auth.Google.AuthObject;
 import com.example.Springgaejdohello.Service.Auth.Google.AuthObjectBuilder;
 import com.example.Springgaejdohello.Service.Utils.AuthResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -22,16 +27,16 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthenticationController {
-
-    @Autowired
-    HttpSession httpSession;
 
     @Autowired
     private static final String CLIENT_SECRET = "fwMZPTYbTp-9hDjuaBrETEdO";
@@ -39,40 +44,63 @@ public class AuthenticationController {
     @Autowired
     private static final String CLIENT_ID = "126208571601-fitl8ba1afjkb8on2v64fg8gfdf6efc5.apps.googleusercontent.com";
 
-    @RequestMapping(value = "/state", method = RequestMethod.GET)
-    public @ResponseBody String setCSRF_state(HttpSession session, HttpServletResponse response, HttpServletRequest request){
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public @ResponseBody String setCSRF_state(){
 
         //new request? set session : query db for the user data
-        if(session.getAttribute("state") == null){
-
-            String state = new BigInteger(130, new SecureRandom()).toString(32);
-            session.setAttribute("state",state);
-            Cookie cookie = new Cookie("state",state);
-            response.addCookie(cookie);
-
-            RestTemplate restTemplate = new RestTemplate();
-            AuthObject authObject = restTemplate.getForObject("https://accounts.google.com/o/oauth2/v2/auth?" +
-                    "client_id="+CLIENT_ID+
-                    "&response_type="+"code"+
-                    "&scope="+"openid email"+
-                    "&redirect_uri="+getBase_url(request)+"/auth/google/"+
-                    "&state="+state,AuthObject.class);
-
-
-            return state;
-
-        }
-
-        else {
-            //query the db for user data
-            return "";
-        }
+//        if(httpSession.getAttribute("state") == null){
+//
+//            String state = new BigInteger(130, new SecureRandom()).toString(32);
+//            httpSession.setAttribute("state",state);
+////            Cookie cookie = new Cookie("state",state);
+////            response.addCookie(cookie);
+//
+////            RestTemplate restTemplate = new RestTemplate();
+////            AuthObject authObject = restTemplate.getForObject("https://accounts.google.com/o/oauth2/v2/auth?" +
+////                    "client_id="+CLIENT_ID+
+////                    "&response_type="+"code"+
+////                    "&scope="+"openid email"+
+////                    "&redirect_uri="+getBase_url(request)+"/auth/google/"+
+////                    "&state="+state,AuthObject.class);
+//
+//
+//            return state;
+//
+//        }
+//
+//        else {
+//            //query the db for user data
+//            return "";
+//        }
+        return "authentication";
     }
+
+//    @RequestMapping(value = "/do", method = RequestMethod.GET)
+//    public void getAuthorizationCode(HttpServletRequest request, HttpSession session){
+//
+//        String uri = request.getRequestURI();
+//        String base_url = request.getRequestURL().toString();
+//        base_url = base_url.replaceFirst(uri, "");
+//
+//        RestTemplate template = new RestTemplate();
+//        String AuthorisatonCodeResponse = template.getForObject(
+//                "https://accounts.google.com/o/oauth2/v2/auth?" +
+//                "client_id="+CLIENT_ID+"&" +
+//                "response_type=code&" +
+//                "scope="+"openid email profile"+"&" +
+//                "redirect_uri="+base_url+"/auth/google"+"&" +
+//                "state="+session.getAttribute("state").toString(),
+//                String.class);
+//
+//        System.out.println("Authorisation code servlet get from browser?: "+AuthorisatonCodeResponse);
+//
+//    }
 
     //redirect_uri
     @RequestMapping(value = "/google", method = RequestMethod.GET)
     public @ResponseBody String
     authenticateWithGoogle(@RequestParam("code") String authCode,
+                           @RequestParam("prompt")String prompt,
                            @RequestParam(value = "state", required = false) String stateToken,
                            HttpServletRequest request) {
 
@@ -81,10 +109,16 @@ public class AuthenticationController {
         HashMap<String, String> responseMap = new HashMap<>();
         String response = "";
 
+        String state = "";
+        Cookie[] ck = request.getCookies();
+        for(Cookie cookie : ck){
+            if(cookie.getName().equals("state")){
+                state = cookie.getValue();
+            }
+        }
 
         if (stateToken == null ||
-                stateToken.equals(request.getSession(false)
-                        .getAttribute("state").toString())) {
+                stateToken.equals(state)) {
 
             RestTemplate restTemplate = new RestTemplate();
 
@@ -98,35 +132,54 @@ public class AuthenticationController {
             params.add("grant_type", "authorization_code");
 
             //hack code to find the host
-            String uri = request.getRequestURI();
-            String base_url = request.getRequestURL().toString();
-            base_url = base_url.replaceFirst(uri, "");
+//            String uri = request.getRequestURI();
+//            String base_url = request.getRequestURL().toString();
+//            base_url = base_url.replaceFirst(uri, "");
             //
 
-            params.add("redirect_uri", base_url+"/auth/google");
+            params.add("redirect_uri", "https://localhost:8080"+"/auth/google");
 
             HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<MultiValueMap<String, String>>(params, headers);
             System.out.print("\nAuthcode: " + authCode + "\n");
 
-            AuthObject responseBody = restTemplate
+            String authResponseJson = restTemplate
                     .postForObject(
                             "https://www.googleapis.com/oauth2/v4/token"
                             , requestHeader
-                            , AuthObject.class);
+                            , String.class);
 
-            System.out.print("\nResponse: " + responseBody.toString() + "\n");
+            System.out.print("\nResponse: " + authResponseJson + "\n");
 
+            ObjectMapper authResponseMapper = new ObjectMapper();
             try {
-                if (responseBody != null) {
-                    responseMap.put("ok","success");
-                    responseMap.put("refreshToken", responseBody.getRefresh_token());
-                    responseMap.put("accessToken", responseBody.getAccess_token());
-                    responseMap.put("expires in", responseBody.getExpires_in());
-                    responseMap.put("id_token", responseBody.getId_token());
+                Map<String,Object> authResponse = authResponseMapper.readValue(String.valueOf(authResponseJson), new TypeReference<Map<String, Object>>() {});
+                AuthObject authObject = new AuthObjectBuilder(CLIENT_ID,base_url+"/auth/google","openid email")
+                        .setAccess_token(authResponse.get("access_token").toString())
+                        .setExpires_in(authResponse.get("expires_in").toString())
+                        .setToken_type(authResponse.get("token_type").toString()).build();
+
+                if(authResponse.get("refresh_token") != null){
+                    authObject.setRefresh_token(authResponse.get("refresh_token").toString());
                 }
-            } catch (NullPointerException n) {
-                response = "Some error occured NPE";
-                n.printStackTrace();
+
+                String user_details_jwt = authResponse.get("id_token").toString();
+                String payload = user_details_jwt.split("\\.")[1];
+                String user_details_json = new String (Base64.getDecoder().decode(payload));
+                HashMap<String, Object> user_details = authResponseMapper.readValue
+                        (user_details_json,new TypeReference<Map<String, Object>>() {});
+
+                if (!authResponse.isEmpty()) {
+                    responseMap.put("ok","success");
+                    responseMap.put("refreshToken", authObject.getRefresh_token());
+                    responseMap.put("accessToken", authObject.getAccess_token());
+                    responseMap.put("expires in", authObject.getExpires_in());
+                    responseMap.put("id_token", authObject.getId_token());
+                    responseMap.put("user_email",user_details.get("email").toString());
+                    responseMap.put("email_verified",user_details.get("email_verified").toString());
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
         }else {

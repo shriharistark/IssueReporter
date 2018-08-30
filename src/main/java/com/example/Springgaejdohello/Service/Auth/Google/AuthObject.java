@@ -1,8 +1,10 @@
 package com.example.Springgaejdohello.Service.Auth.Google;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true )
 public class AuthObject {
 
     String client_id;
@@ -48,6 +50,25 @@ public class AuthObject {
         this.refresh_token = refresh_token;
         this.token_type = token_type;
         this.expires_in = expires_in;
+    }
+
+    public AuthObject() {
+    }
+
+    /* Auth response Mapper */
+    @JsonCreator
+    public AuthObject(
+            @JsonProperty("access_token") String access_token,
+            @JsonProperty(value = "refresh_token", required = false) String refresh_token,
+            @JsonProperty("id_token") String id_token,
+            @JsonProperty("expires_in") String expires_in,
+            @JsonProperty("token_type") String token_type
+    ){
+        this.access_token = access_token;
+        this.expires_in = expires_in;
+        this.id_token = id_token;
+        this.token_type = token_type;
+        this.refresh_token = refresh_token;
     }
 
     public String getClient_id() {
