@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -31,23 +33,39 @@ public class AuthenticationController {
     @Autowired
     HttpSession httpSession;
 
+    @Autowired
     private static final String CLIENT_SECRET = "fwMZPTYbTp-9hDjuaBrETEdO";
+
+    @Autowired
     private static final String CLIENT_ID = "126208571601-fitl8ba1afjkb8on2v64fg8gfdf6efc5.apps.googleusercontent.com";
 
-    @RequestMapping("/*")
-    public void setCSRF_state(HttpServletRequest request){
+    @RequestMapping(value = "/state", method = RequestMethod.GET)
+    public @ResponseBody String setCSRF_state(HttpSession session, HttpServletResponse response, HttpServletRequest request){
 
         //new request? set session : query db for the user data
-        if(request.getSession(false) == null){
+        if(session.getAttribute("state") == null){
 
             String state = new BigInteger(130, new SecureRandom()).toString(32);
-            httpSession.setAttribute("state",state);
+            session.setAttribute("state",state);
+            Cookie cookie = new Cookie("state",state);
+            response.addCookie(cookie);
+
+            RestTemplate restTemplate = new RestTemplate();
+            AuthObject authObject = restTemplate.getForObject("https://accounts.google.com/o/oauth2/v2/auth?" +
+                    "client_id="+CLIENT_ID+
+                    "&response_type="+"code"+
+                    "&scope="+"openid email"+
+                    "&redirect_uri="+getBase_url(request)+"/auth/google/"+
+                    "&state="+state,AuthObject.class);
+
+
+            return state;
 
         }
 
         else {
             //query the db for user data
-
+            return "";
         }
     }
 

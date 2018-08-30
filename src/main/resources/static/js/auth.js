@@ -5,11 +5,25 @@
 const host = window.location.host;
 const protocol = window.location.protocol;
 
+
+
 function authoriseWithGoogle(){
     // const port = window.location.port; //since host is the combination of hostName and port
 
+    function getCook(cookiename)
+    {
+        // Get name followed by anything except a semicolon
+        var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
+        // Return everything after the equal sign, or an empty string if the cookie name not found
+        return decodeURIComponent(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
+    }
+
     //state will be set here
-    fetch("/auth").then((response) => {
+    let uri = protocol+"//"+host+"/auth/state";
+    let init = {
+        method:'GET'
+    };
+    fetch(uri, init).then((response) => {
         console.log("state set");
     }, (fail) => {
         console.log("error with setting the state");
@@ -19,17 +33,22 @@ function authoriseWithGoogle(){
         const client_id = "126208571601-fitl8ba1afjkb8on2v64fg8gfdf6efc5.apps.googleusercontent.com";
         const redirect_uri = protocol+"//"+host+"/auth/google";
         const scope = "openid email";
-        let state = '<%=session.getAttribute("state")%>';
+        const state = getCook('state');
+        console.log(state);
 
-        const uri = "https://accounts.google.com/o/oauth2/v2/auth?" +
+        uri = "https://accounts.google.com/o/oauth2/v2/auth?" +
             " client_id="+client_id+"&" +
             " response_type=code&" +
             " scope="+scope+"&" +
             " redirect_uri="+redirect_uri+"&" +
             " state="+state;
 
-        let init = {
+        init = {
             method: "GET",
+            headers : {
+                'Access-Control-Allow-Credentials': 'true',
+            },
+            credentials : 'include'
         };
 
         //this fetch will have google redirect the request for auth to the redirect_uri specified.

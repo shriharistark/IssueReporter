@@ -45,6 +45,19 @@
 		    <scope>provided</scope>
    		</dependency>
 
+		<!-- Google client library for authorization/authentication -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.23.0</version>
+		</dependency>
+
+		<!--&lt;!&ndash; jackson client &ndash;&gt;-->
+		<!--<dependency>-->
+			<!--<groupId>com.google.http-client</groupId>-->
+			<!--<artifactId>google-http-client-jackson2</artifactId>-->
+		<!--</dependency>-->
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -74,11 +87,11 @@
 	
 		<!-- jdo dependencies with data nucleus added manually -->
 		<!-- https://mvnrepository.com/artifact/com.google.appengine.orm/datanucleus-appengine -->
-		<dependency>
-            <groupId>javax.jdo</groupId>
-            <artifactId>jdo-api</artifactId>
-            <version>3.0</version>
-        </dependency>
+		<!--<dependency>-->
+            <!--<groupId>javax.jdo</groupId>-->
+            <!--<artifactId>jdo-api</artifactId>-->
+            <!--<version>3.0</version>-->
+        <!--</dependency>-->
 
         <!-- https://mvnrepository.com/artifact/com.google.appengine/appengine-api-1.0-sdk -->
         <!-- added newly -->
