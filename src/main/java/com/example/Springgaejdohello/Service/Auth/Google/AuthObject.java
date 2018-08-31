@@ -1,8 +1,6 @@
 package com.example.Springgaejdohello.Service.Auth.Google;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true )
 public class AuthObject {
@@ -62,19 +60,21 @@ public class AuthObject {
             @JsonProperty(value = "refresh_token", required = false) String refresh_token,
             @JsonProperty("id_token") String id_token,
             @JsonProperty("expires_in") String expires_in,
-            @JsonProperty("token_type") String token_type
+            @JsonProperty("token_type") String token_type,
+            @JsonProperty("scope") String scope
     ){
         this.access_token = access_token;
         this.expires_in = expires_in;
         this.id_token = id_token;
         this.token_type = token_type;
         this.refresh_token = refresh_token;
+        this.scope = scope;
     }
 
     public String getClient_id() {
         return client_id;
     }
-
+    @JsonSetter
     public void setClient_id(String client_id) {
         this.client_id = client_id;
     }
@@ -82,7 +82,7 @@ public class AuthObject {
     public String getApplication_name() {
         return application_name;
     }
-
+    @JsonSetter
     public void setApplication_name(String application_name) {
         this.application_name = application_name;
     }
@@ -90,7 +90,7 @@ public class AuthObject {
     public String getClient_secret() {
         return client_secret;
     }
-
+    @JsonSetter
     public void setClient_secret(String client_secret) {
         this.client_secret = client_secret;
     }
@@ -98,7 +98,7 @@ public class AuthObject {
     public String getRedirect_uri() {
         return redirect_uri;
     }
-
+    @JsonSetter
     public void setRedirect_uri(String redirect_uri) {
         this.redirect_uri = redirect_uri;
     }
@@ -106,7 +106,7 @@ public class AuthObject {
     public String getScope() {
         return scope;
     }
-
+    @JsonSetter
     public void setScope(String scope) {
         this.scope = scope;
     }
@@ -114,7 +114,7 @@ public class AuthObject {
     public String getState() {
         return state;
     }
-
+    @JsonSetter
     public void setState(String state) {
         this.state = state;
     }
@@ -122,7 +122,7 @@ public class AuthObject {
     public String getResponse_type() {
         return response_type;
     }
-
+    @JsonSetter
     public void setResponse_type(String response_type) {
         this.response_type = response_type;
     }
@@ -130,7 +130,7 @@ public class AuthObject {
     public String getLogin_hint() {
         return login_hint;
     }
-
+    @JsonSetter
     public void setLogin_hint(String login_hint) {
         this.login_hint = login_hint;
     }
@@ -139,6 +139,7 @@ public class AuthObject {
         return code;
     }
 
+    @JsonSetter
     public void setCode(String code) {
         this.code = code;
     }
@@ -146,7 +147,7 @@ public class AuthObject {
     public String getGrant_type() {
         return grant_type;
     }
-
+    @JsonSetter
     public void setGrant_type(String grant_type) {
         this.grant_type = grant_type;
     }
@@ -154,7 +155,7 @@ public class AuthObject {
     public String getAccess_token() {
         return access_token;
     }
-
+    @JsonSetter
     public void setAccess_token(String access_token) {
         this.access_token = access_token;
     }
@@ -162,7 +163,7 @@ public class AuthObject {
     public String getId_token() {
         return id_token;
     }
-
+    @JsonSetter
     public void setId_token(String id_token) {
         this.id_token = id_token;
     }
@@ -170,7 +171,7 @@ public class AuthObject {
     public String getRefresh_token() {
         return refresh_token;
     }
-
+    @JsonSetter
     public void setRefresh_token(String refresh_token) {
         this.refresh_token = refresh_token;
     }
@@ -178,7 +179,7 @@ public class AuthObject {
     public String getToken_type() {
         return token_type;
     }
-
+    @JsonSetter
     public void setToken_type(String token_type) {
         this.token_type = token_type;
     }
@@ -186,8 +187,9 @@ public class AuthObject {
     public String getExpires_in() {
         return expires_in;
     }
-
+    @JsonSetter
     public void setExpires_in(String expires_in) {
         this.expires_in = expires_in;
     }
+
 }

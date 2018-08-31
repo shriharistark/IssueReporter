@@ -31,9 +31,11 @@ function authoriseWithGoogle(){
     //state will be set here
 
         //once the state is set. Start the Oauth
-        const client_id = "126208571601-fitl8ba1afjkb8on2v64fg8gfdf6efc5.apps.googleusercontent.com";
+        const client_id = "126208571601-ge5rng2g2bui5o46pjr73chaska7bdtf.apps.googleusercontent.com";
         const redirect_uri = protocol+"//"+host+"/auth/google";
-        const scope = "openid email";
+        const scope = "" +
+            " https://www.googleapis.com/auth/userinfo.email " +
+            "https://www.googleapis.com/auth/userinfo.profile";
         const state = (function(cookiename){
             var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
             // Return everything after the equal sign, or an empty string if the cookie name not found
@@ -41,12 +43,21 @@ function authoriseWithGoogle(){
         })('state');
         console.log(state);
 
-        uri = "https://accounts.google.com/o/oauth2/v2/auth?" +
-            "client_id="+client_id+"&" +
-            "response_type=code&" +
-            "scope="+scope+"&" +
-            "redirect_uri="+redirect_uri+"&" +
-            "state="+state;
+        // uri = "https://accounts.google.com/o/oauth2/v2/auth?" +
+        //     "client_id="+client_id+"&" +
+        //     "response_type=code&" +
+        //     "scope="+scope+"&" +
+        //     "redirect_uri="+redirect_uri+"&" +
+        //     "state="+state;
+
+        uri = "https://accounts.google.com/o/oauth2/v2/auth?redirect_uri="+redirect_uri
+            +"&prompt=consent&response_type=code&client_id="+client_id
+            +"&scope="+scope+
+            "&access_type=offline";
+
+        /*
+        uri =
+         */
 
         // init = {
         //     method: "GET",

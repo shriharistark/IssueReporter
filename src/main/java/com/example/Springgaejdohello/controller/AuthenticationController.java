@@ -10,10 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.Cookie;
@@ -29,20 +28,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthenticationController {
 
     @Autowired
-    private static final String CLIENT_SECRET = "fwMZPTYbTp-9hDjuaBrETEdO";
+    private static final String CLIENT_SECRET = "zDDkWbaF6VTu261G__rl-uEk";
 
     @Autowired
-    private static final String CLIENT_ID = "126208571601-fitl8ba1afjkb8on2v64fg8gfdf6efc5.apps.googleusercontent.com";
+    private static final String CLIENT_ID = "126208571601-ge5rng2g2bui5o46pjr73chaska7bdtf.apps.googleusercontent.com";
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody String setCSRF_state(){
@@ -100,7 +98,7 @@ public class AuthenticationController {
     @RequestMapping(value = "/google", method = RequestMethod.GET)
     public @ResponseBody String
     authenticateWithGoogle(@RequestParam("code") String authCode,
-                           @RequestParam("prompt")String prompt,
+                           @RequestParam(value = "prompt", required = false)String prompt,
                            @RequestParam(value = "state", required = false) String stateToken,
                            HttpServletRequest request) {
 
@@ -121,52 +119,89 @@ public class AuthenticationController {
                 stateToken.equals(state)) {
 
             RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            /*hack code to find the host
+            String uri = request.getRequestURI();
+            String base_url = request.getRequestURL().toString();
+            base_url = base_url.replaceFirst(uri, "");
+            */
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("code", authCode);
             params.add("client_id", CLIENT_ID);
             params.add("client_secret", CLIENT_SECRET);
             params.add("grant_type", "authorization_code");
+            params.add("redirect_uri", "http://localhost:8080"+"/auth/google");
 
-            //hack code to find the host
-//            String uri = request.getRequestURI();
-//            String base_url = request.getRequestURL().toString();
-//            base_url = base_url.replaceFirst(uri, "");
-            //
+            /* test nude
+            Map<String, String> body_request = new HashMap<String, String>();
+            for(Map.Entry<String, String> elem: params.toSingleValueMap().entrySet()){
+                body_request.put(elem.getKey(),elem.getValue());
+            }
 
-            params.add("redirect_uri", "https://localhost:8080"+"/auth/google");
+            Map<String, String> headers_request = new HashMap<>();
+            headers_request.put("Content-type","application/x-www-form-urlencoded");
+            */
 
-            HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<MultiValueMap<String, String>>(params, headers);
+            //This is how the request is suppsed to look like
+            /*
+            code=4%2FTACcyCPkqiHv8RjfuM3w2jEXr68lL-U4dESYEAlNzyiZdltYzhkPsa2kdNs2uUrlbY0rjLS71FIAV_lBOejoC9s
+            &redirect_uri=https%3A%2F%2Fdevelopers.google.com%2Foauthplayground
+            &client_id=407408718192.apps.googleusercontent.com
+            &client_secret=************
+            &scope=
+            &grant_type=authorization_code
+
+             */
+
+//            System.out.println("\n---Request: "+constructRequest(body_request,headers_request)+"----\n");
             System.out.print("\nAuthcode: " + authCode + "\n");
 
-            String authResponseJson = restTemplate
-                    .postForObject(
-                            "https://www.googleapis.com/oauth2/v4/token"
-                            , requestHeader
-                            , String.class);
+            HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<MultiValueMap<String, String>>(params, headers);
+
+            String authResponseJson = "sample error";
+            try{
+                ResponseEntity<String> authResponse_entity= restTemplate
+                        .exchange(
+                                "https://www.googleapis.com/oauth2/v4/token",
+                                HttpMethod.POST
+                                , requestHeader
+                                , String.class);
+
+                if(authResponse_entity.getStatusCode().is2xxSuccessful()){
+                    authResponseJson = authResponse_entity.getBody();
+                }
+
+                else {
+                    authResponseJson = authResponse_entity.getBody();
+                }
+            }catch (HttpClientErrorException e){
+                System.out.println("Client Exception 400");
+            }
+
 
             System.out.print("\nResponse: " + authResponseJson + "\n");
 
             ObjectMapper authResponseMapper = new ObjectMapper();
             try {
-                Map<String,Object> authResponse = authResponseMapper.readValue(String.valueOf(authResponseJson), new TypeReference<Map<String, Object>>() {});
-                AuthObject authObject = new AuthObjectBuilder(CLIENT_ID,base_url+"/auth/google","openid email")
+                Map<String,Object> authResponse = authResponseMapper.readValue(authResponseJson, new TypeReference<Map<String, Object>>() {});
+
+                System.out.println("----\nResponse we got from google Oauth = "+authResponse+"\n------");
+
+                AuthObject authObject = new AuthObjectBuilder(CLIENT_ID,"http://localhost:8080"+"/auth/google","openid email")
                         .setAccess_token(authResponse.get("access_token").toString())
                         .setExpires_in(authResponse.get("expires_in").toString())
-                        .setToken_type(authResponse.get("token_type").toString()).build();
-
+                        .setToken_type(authResponse.get("token_type").toString())
+                        .build();
                 if(authResponse.get("refresh_token") != null){
                     authObject.setRefresh_token(authResponse.get("refresh_token").toString());
                 }
 
-                String user_details_jwt = authResponse.get("id_token").toString();
-                String payload = user_details_jwt.split("\\.")[1];
-                String user_details_json = new String (Base64.getDecoder().decode(payload));
-                HashMap<String, Object> user_details = authResponseMapper.readValue
-                        (user_details_json,new TypeReference<Map<String, Object>>() {});
+                Map<String, Object> user_details = getUserDetails_jwt(authResponse.get("id_token").toString());
 
                 if (!authResponse.isEmpty()) {
                     responseMap.put("ok","success");
@@ -204,5 +239,15 @@ public class AuthenticationController {
         url = url.replaceFirst(uri,"");
 
         return url;
+    }
+
+    private Map<String, Object> getUserDetails_jwt(String jsonWebToken) throws IOException {
+
+        String payload = jsonWebToken.split("\\.")[1];
+        String user_details_json = new String (Base64.getDecoder().decode(payload));
+        Map<String, Object> user_details = new ObjectMapper().readValue
+                (user_details_json,new TypeReference<Map<String, Object>>() {});
+
+        return user_details;
     }
 }
