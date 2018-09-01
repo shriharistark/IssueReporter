@@ -2,6 +2,7 @@ package com.example.Springgaejdohello.controller;
 
 import com.example.Springgaejdohello.Service.Auth.Google.AuthObject;
 import com.example.Springgaejdohello.Service.Auth.Google.AuthObjectBuilder;
+import com.example.Springgaejdohello.Service.Auth.Google.Credentials;
 import com.example.Springgaejdohello.Service.Utils.AuthResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -26,6 +27,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -36,11 +40,6 @@ import java.util.*;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    @Autowired
-    private static final String CLIENT_SECRET = "zDDkWbaF6VTu261G__rl-uEk";
-
-    @Autowired
-    private static final String CLIENT_ID = "126208571601-ge5rng2g2bui5o46pjr73chaska7bdtf.apps.googleusercontent.com";
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody String setCSRF_state(){
@@ -73,39 +72,21 @@ public class AuthenticationController {
         return "authentication";
     }
 
-//    @RequestMapping(value = "/do", method = RequestMethod.GET)
-//    public void getAuthorizationCode(HttpServletRequest request, HttpSession session){
-//
-//        String uri = request.getRequestURI();
-//        String base_url = request.getRequestURL().toString();
-//        base_url = base_url.replaceFirst(uri, "");
-//
-//        RestTemplate template = new RestTemplate();
-//        String AuthorisatonCodeResponse = template.getForObject(
-//                "https://accounts.google.com/o/oauth2/v2/auth?" +
-//                "client_id="+CLIENT_ID+"&" +
-//                "response_type=code&" +
-//                "scope="+"openid email profile"+"&" +
-//                "redirect_uri="+base_url+"/auth/google"+"&" +
-//                "state="+session.getAttribute("state").toString(),
-//                String.class);
-//
-//        System.out.println("Authorisation code servlet get from browser?: "+AuthorisatonCodeResponse);
-//
-//    }
-
     //redirect_uri
     @RequestMapping(value = "/google", method = RequestMethod.GET)
     public @ResponseBody String
     authenticateWithGoogle(@RequestParam("code") String authCode,
                            @RequestParam(value = "prompt", required = false)String prompt,
                            @RequestParam(value = "state", required = false) String stateToken,
-                           HttpServletRequest request) {
+                           HttpServletRequest request,
+                           HttpServletResponse servletResponse) {
 
         //for writing response
         ObjectMapper resp = new ObjectMapper();
         HashMap<String, String> responseMap = new HashMap<>();
         String response = "";
+
+        System.out.println("\nState: "+Credentials.CLIENT_ID+"--"+Credentials.CLIENT_SECRET+"\n");
 
         String state = "";
         Cookie[] ck = request.getCookies();
@@ -124,18 +105,18 @@ public class AuthenticationController {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            /*hack code to find the host
+            //hack code to find the host
             String uri = request.getRequestURI();
             String base_url = request.getRequestURL().toString();
             base_url = base_url.replaceFirst(uri, "");
-            */
+
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("code", authCode);
-            params.add("client_id", CLIENT_ID);
-            params.add("client_secret", CLIENT_SECRET);
+            params.add("client_id", Credentials.CLIENT_ID);
+            params.add("client_secret", Credentials.CLIENT_SECRET);
             params.add("grant_type", "authorization_code");
-            params.add("redirect_uri", "http://localhost:8080"+"/auth/google");
+            params.add("redirect_uri", base_url+"/auth/google");
 
             /* test nude
             Map<String, String> body_request = new HashMap<String, String>();
@@ -165,6 +146,7 @@ public class AuthenticationController {
 
             String authResponseJson = "sample error";
             try{
+
                 ResponseEntity<String> authResponse_entity= restTemplate
                         .exchange(
                                 "https://www.googleapis.com/oauth2/v4/token",
@@ -192,7 +174,7 @@ public class AuthenticationController {
 
                 System.out.println("----\nResponse we got from google Oauth = "+authResponse+"\n------");
 
-                AuthObject authObject = new AuthObjectBuilder(CLIENT_ID,"http://localhost:8080"+"/auth/google","openid email")
+                AuthObject authObject = new AuthObjectBuilder(Credentials.CLIENT_ID,"http://localhost:8080"+"/auth/google","openid email")
                         .setAccess_token(authResponse.get("access_token").toString())
                         .setExpires_in(authResponse.get("expires_in").toString())
                         .setToken_type(authResponse.get("token_type").toString())
@@ -208,9 +190,11 @@ public class AuthenticationController {
                     responseMap.put("refreshToken", authObject.getRefresh_token());
                     responseMap.put("accessToken", authObject.getAccess_token());
                     responseMap.put("expires in", authObject.getExpires_in());
-                    responseMap.put("id_token", authObject.getId_token());
+                    responseMap.put("id_token", authResponse.get("id_token").toString());
                     responseMap.put("user_email",user_details.get("email").toString());
                     responseMap.put("email_verified",user_details.get("email_verified").toString());
+                    servletResponse.addCookie(new Cookie("user_jwt",responseMap.get("id_token")));
+//                    servletResponse.sendRedirect("/");
                 }
 
             } catch (IOException e) {
@@ -231,15 +215,6 @@ public class AuthenticationController {
         return response;
     }
 
-    private String getBase_url(HttpServletRequest request){
-
-        String url = request.getRequestURL().toString();
-        String uri = request.getRequestURI();
-
-        url = url.replaceFirst(uri,"");
-
-        return url;
-    }
 
     private Map<String, Object> getUserDetails_jwt(String jsonWebToken) throws IOException {
 
@@ -250,4 +225,6 @@ public class AuthenticationController {
 
         return user_details;
     }
+
+
 }

@@ -26,3 +26,5 @@
 
 #credentials
 /src/main/java/com/example/Springgaejdohello/Service/Utils/client_secret.json
+/src/main/resources/api_credentials.json
+/src/main/java/com/example/Springgaejdohello/Service/Auth/Google/Credentials.java
