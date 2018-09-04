@@ -46,9 +46,11 @@ var events = {
 
         console.log("downvote is called");
 
+        let issueCode = "";
 
         $(".issue-main-container").on("click",".button-downvote .btn", function(evt){
 
+            evt.stopImmediatePropagation();
             let downvotes = +($(this).find(".downvote-numbers").first().html());
 
             // $(this).find(".downvote-numbers").first().html(downvotes+1);
@@ -64,20 +66,24 @@ var events = {
             downvoteForm.css({top:downvoteButtonTop+120, left:downvoteButtonLeft+200, position:'absolute'});
             /* downvoteForm.find(".inset").first().html("#"+$(this).closest(".issue").first().attr("issue-id"));*/
 
-            $("#sumbit-downvote").click(function (ev) {
+            issueCode = $(evt.target).closest(".issue").first().attr("issue-id");
+            console.log(issueCode);
+
+            return $("#sumbit-downvote").click(function (ev) {
                 ev.preventDefault();
                 ev.stopImmediatePropagation();
 
                 let downvoteFormIn = $("#downvote-form input");
                 let downvoterName = downvoteFormIn.eq(0).val();
                 let additionalNotes = downvoteFormIn.eq(1).val();
-                let issueCode = $(evt.target).closest(".issue").first().attr("issue-id");
 
                 let downvoteObj = {
                     name: downvoterName,
                     notes: additionalNotes,
-                    issue: issueCode
+                    issue: issueCode,
                 };
+
+                console.log(downvoteObj);
 
                 let init = {
                     method: "POST",
@@ -120,6 +126,7 @@ var events = {
                                     }
                                 }
                             });
+                            issueCode = "";
                             $(evt.target).closest(".downvote-numbers").first().html((+(downvoteResponse.downvotes)));
                             issue.hideBox("downvote-form");
                         }

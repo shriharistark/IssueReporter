@@ -33,9 +33,7 @@ function authoriseWithGoogle(){
         //once the state is set. Start the Oauth
         const client_id = "126208571601-ge5rng2g2bui5o46pjr73chaska7bdtf.apps.googleusercontent.com";
         const redirect_uri = protocol+"//"+host+"/auth/google";
-        const scope = "" +
-            " https://www.googleapis.com/auth/userinfo.email " +
-            "https://www.googleapis.com/auth/userinfo.profile";
+        const scope = "profile email openid";
         const state = (function(cookiename){
             var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
             // Return everything after the equal sign, or an empty string if the cookie name not found

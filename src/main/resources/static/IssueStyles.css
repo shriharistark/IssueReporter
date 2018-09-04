@@ -11,6 +11,38 @@ body{
     /*left: 50%;*/
 }
 
+.default-text{
+    font-family: Helvetica;
+    font-size: 10px;
+    font-weight: 700;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: 1.2px;
+    text-align: left;
+    color: #ababab;
+    padding-bottom: 0.5%;
+    text-transform: uppercase;
+}
+
+#login\/signup {
+
+    width: fit-content;
+    height: fit-content;
+    align-self: flex-start;
+    /* justify-content: flex-end; */
+    margin: 10px 19% 0px 0;
+}
+
+#login\/signup:hover {
+    color: #828282;
+    cursor: pointer;
+}
+
+#issue-container{
+    margin-right: 20%;
+}
+
 .issue-container{
     display: flex;
     flex-direction: column;
@@ -19,6 +51,7 @@ body{
 .issue-main-container{
     /*background: url("img/tic-tac-toe.png") repeat;*/
     /*max-width: 55%;*/
+    /*margin-right: 25%;*/
     min-width: 50%;
     /*height: 600px;*/
     /*background-repeat: repeat;*/
@@ -27,7 +60,8 @@ body{
 
 .issue{
     overflow: hidden;
-    padding: 0.5% 2% 0% 2%;
+    margin: 5px 0 0 0;
+    /* padding: 0.5% 2% 0% 2%; */
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -102,10 +136,11 @@ body{
 }
 
 .issue .downvote-button{
+    margin: 0 0 10px 10px;
     float: left;
     padding: 1% 0% 1% 1%;
     cursor: pointer;
-    min-width:7%;
+    min-width: 7%;
 }
 
 .issue .downvote-button:hover{
@@ -114,11 +149,15 @@ body{
 
 .issue .issue-body{
     overflow: hidden;
-    padding: 1.5% 2% 2% 1%;
-    max-width:75%;
+    padding: 1% 0% 0% 0%;
+    /* margin: 0 0 10px 10px; */
+    max-width: 75%;
     min-width: 75%;
-    cursor:pointer;
+    cursor: pointer;
+}
 
+.issue .issue-body div{
+    padding-bottom: 5px;
 }
 
 .issue .downvotebutton .downvote-numbers{
@@ -214,15 +253,25 @@ body{
 }
 
 #header{
+    min-width: 70%;
     border-bottom: solid #ababab 1px;
     height: 6em;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    /* padding: 10px 22% 0px 0; */
+    margin: 0 10% 0 0;
 }
 
-#header #google-sign-in{
-    width: 36%;
-    height: 60%;
+#header #google-sign-in, .gsign-in{
+    min-width: 103px;
+    max-width: 205px;
     cursor: pointer;
-    alignment: center;
+}
+
+.gsign-in{
+    background:url("img/GsignIn.png") no-repeat;
+
 }
 
 #sidebar{
@@ -231,6 +280,7 @@ body{
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    margin-right: 2%;
 }
 
 #body-after-header{
@@ -577,7 +627,7 @@ body{
 
 .issue-action{
     position: relative;
-    background-color: black;
+    /*background-color: black;*/
     opacity: 1 !important;
     display: flex;
     flex-direction: column;
