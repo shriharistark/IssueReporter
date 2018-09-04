@@ -205,13 +205,12 @@ public class AuthenticationController {
                 if(!userDAOService.isExistingUser(user_details.get("email").toString().toLowerCase())){
 
                     //if user fails to signup in 10 mins, the cookie will expire
-                    System.out.println("\n"+user_details.get("email").toString()+" is an existin user!"+"\n");
+                    System.out.println("\n"+user_details.get("email").toString()+" is a new user!"+"\n");
 
                     Cookie user_cookie_temporary = new Cookie("user_details",authResponse.get("id_token").toString());
+                    user_cookie_temporary.setMaxAge(600);
                     user_cookie_temporary.setDomain("localhost");
                     user_cookie_temporary.setPath("/");
-                    user_cookie_temporary.setSecure(true);
-                    user_cookie_temporary.setMaxAge(600);
                     servletResponse.addCookie(user_cookie_temporary);
                     servletResponse.sendRedirect("/");
                     return "new user";

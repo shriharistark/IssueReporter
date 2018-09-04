@@ -64,7 +64,6 @@ public class IssueController {
 			Cookie CSRF_cookie = new Cookie("auth_state",CSRF_token);
 			CSRF_cookie.setDomain("localhost");
 			CSRF_cookie.setPath("/");
-			CSRF_cookie.setSecure(true);
 			servletResponse.addCookie(CSRF_cookie);
 		}
 
