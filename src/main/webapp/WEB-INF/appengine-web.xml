@@ -4,4 +4,10 @@
   <threadsafe>true</threadsafe>
   <runtime>java8</runtime>
   <sessions-enabled>true</sessions-enabled>
+
+  <static-error-handlers>
+    <handler file="404.html" />
+    <handler file="404.html" error-code="404" />
+  </static-error-handlers>
+
 </appengine-web-app>

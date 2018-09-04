@@ -19,7 +19,6 @@ public class IssueDAOService implements IssueDAO{
 	@Autowired
 	private static ObjectifyService Objectify;
 
-
 	@Override
 	public QueryResultIterator<IssueModel> getAllIssues(String cursorStr,int limit,String orderByProperty, String order) {
 

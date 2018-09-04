@@ -4,6 +4,8 @@ import com.example.Springgaejdohello.Service.Auth.Google.AuthObject;
 import com.example.Springgaejdohello.Service.Auth.Google.AuthObjectBuilder;
 import com.example.Springgaejdohello.Service.Auth.Google.Credentials;
 import com.example.Springgaejdohello.Service.Utils.AuthResponse;
+import com.example.Springgaejdohello.dao.UserDAOService;
+import com.example.Springgaejdohello.daoInterface.UserDAO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +44,9 @@ import java.util.*;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
+
+    @Autowired
+    UserDAOService userDAOService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody String setCSRF_state(){
@@ -78,26 +85,53 @@ public class AuthenticationController {
     authenticateWithGoogle(@RequestParam("code") String authCode,
                            @RequestParam(value = "prompt", required = false)String prompt,
                            @RequestParam(value = "state", required = false) String stateToken,
-                           HttpServletRequest request,
+                           HttpServletRequest servletRequest,
                            HttpServletResponse servletResponse) {
+
+        if(servletRequest.getSession() != null &&
+                servletRequest.getSession().getAttribute("user") != null){
+
+            try {
+                System.out.println("\nAlready has details in the session..\n");
+                servletResponse.sendRedirect("/");
+                return "session already available";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         //for writing response
         ObjectMapper resp = new ObjectMapper();
         HashMap<String, String> responseMap = new HashMap<>();
         String response = "";
 
-        System.out.println("\nState: "+Credentials.CLIENT_ID+"--"+Credentials.CLIENT_SECRET+"\n");
+        System.out.println("\nState returned from google: "+stateToken+"\n");
 
         String state = "";
-        Cookie[] ck = request.getCookies();
+
+        //nothing actually happens here in localhost. This piece of code does nothing.
+        //JsessionID is not flagged as secure whatsoever.
+        Cookie[] ck = servletRequest.getCookies();
         for(Cookie cookie : ck){
-            if(cookie.getName().equals("state")){
+            if(cookie.getName().equals("auth_state")){
                 state = cookie.getValue();
+            }
+
+            else if(cookie.getName().equals("JSESSIONID")){
+                System.out.println("\nJsession_id: "+cookie.getValue());
+                cookie.setDomain("localhost");
+                cookie.setPath("/");
+                cookie.setHttpOnly(true);
+                cookie.setSecure(true);
+                servletResponse.addCookie(cookie);
             }
         }
 
+        System.out.println("\nState applied from our issue reporter: "+servletRequest.getSession().getAttribute("state")+"\n");
+
+        //even if the state is null, this will get executed
         if (stateToken == null ||
-                stateToken.equals(state)) {
+                stateToken.equals(servletRequest.getSession().getAttribute("state"))) {
 
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
@@ -106,8 +140,8 @@ public class AuthenticationController {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
             //hack code to find the host
-            String uri = request.getRequestURI();
-            String base_url = request.getRequestURL().toString();
+            String uri = servletRequest.getRequestURI();
+            String base_url = servletRequest.getRequestURL().toString();
             base_url = base_url.replaceFirst(uri, "");
 
 
@@ -118,28 +152,7 @@ public class AuthenticationController {
             params.add("grant_type", "authorization_code");
             params.add("redirect_uri", base_url+"/auth/google");
 
-            /* test nude
-            Map<String, String> body_request = new HashMap<String, String>();
-            for(Map.Entry<String, String> elem: params.toSingleValueMap().entrySet()){
-                body_request.put(elem.getKey(),elem.getValue());
-            }
 
-            Map<String, String> headers_request = new HashMap<>();
-            headers_request.put("Content-type","application/x-www-form-urlencoded");
-            */
-
-            //This is how the request is suppsed to look like
-            /*
-            code=4%2FTACcyCPkqiHv8RjfuM3w2jEXr68lL-U4dESYEAlNzyiZdltYzhkPsa2kdNs2uUrlbY0rjLS71FIAV_lBOejoC9s
-            &redirect_uri=https%3A%2F%2Fdevelopers.google.com%2Foauthplayground
-            &client_id=407408718192.apps.googleusercontent.com
-            &client_secret=************
-            &scope=
-            &grant_type=authorization_code
-
-             */
-
-//            System.out.println("\n---Request: "+constructRequest(body_request,headers_request)+"----\n");
             System.out.print("\nAuthcode: " + authCode + "\n");
 
             HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<MultiValueMap<String, String>>(params, headers);
@@ -163,6 +176,8 @@ public class AuthenticationController {
                 }
             }catch (HttpClientErrorException e){
                 System.out.println("Client Exception 400");
+                e.getMessage();
+                e.getStackTrace();
             }
 
 
@@ -185,6 +200,24 @@ public class AuthenticationController {
 
                 Map<String, Object> user_details = getUserDetails_jwt(authResponse.get("id_token").toString());
 
+                //if not an existing user(a new user) ->
+                // redirect to sign up page with pre-filled data from google such as user's name, email etc.
+                if(!userDAOService.isExistingUser(user_details.get("email").toString().toLowerCase())){
+
+                    //if user fails to signup in 10 mins, the cookie will expire
+                    System.out.println("\n"+user_details.get("email").toString()+" is an existin user!"+"\n");
+
+                    Cookie user_cookie_temporary = new Cookie("user_details",authResponse.get("id_token").toString());
+                    user_cookie_temporary.setDomain("localhost");
+                    user_cookie_temporary.setPath("/");
+                    user_cookie_temporary.setSecure(true);
+                    user_cookie_temporary.setMaxAge(600);
+                    servletResponse.addCookie(user_cookie_temporary);
+                    servletResponse.sendRedirect("/");
+                    return "new user";
+
+                }
+
                 if (!authResponse.isEmpty()) {
                     responseMap.put("ok","success");
                     responseMap.put("refreshToken", authObject.getRefresh_token());
@@ -193,8 +226,25 @@ public class AuthenticationController {
                     responseMap.put("id_token", authResponse.get("id_token").toString());
                     responseMap.put("user_email",user_details.get("email").toString());
                     responseMap.put("email_verified",user_details.get("email_verified").toString());
-                    servletResponse.addCookie(new Cookie("user_jwt",responseMap.get("id_token")));
-//                    servletResponse.sendRedirect("/");
+
+                    //once state validation is done, remove the state token
+                    if(getCookie(servletRequest,"auth_state") != null) {
+                        Cookie auth_cookie = getCookie(servletRequest,"auth_state");
+                        auth_cookie.setPath("/");
+                        auth_cookie.setDomain("localhost");
+                        auth_cookie.setMaxAge(0);
+                        servletResponse.addCookie(auth_cookie);
+                    }
+
+                    servletRequest.getSession().setAttribute("user",user_details);
+
+                    //set user details in a cookie
+                    Cookie user_details_cookie = new Cookie("user_jwt", responseMap.get("id_token"));
+                    user_details_cookie.setDomain("localhost");
+                    user_details_cookie.setPath("/");
+                    servletResponse.addCookie(user_details_cookie);
+
+                    servletResponse.sendRedirect("/");
                 }
 
             } catch (IOException e) {
@@ -226,5 +276,57 @@ public class AuthenticationController {
         return user_details;
     }
 
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    public @ResponseBody String logoutUser(HttpServletRequest servletRequest,
+                                           HttpServletResponse servletResponse){
+
+        if(servletRequest.getSession(false) == null){
+            return "login First";
+        }
+
+        //invalidate state cookie, if present
+        System.out.println(getCookie(servletRequest,"auth_state"));
+        if(getCookie(servletRequest,"auth_state") != null) {
+            Cookie auth_cookie = getCookie(servletRequest,"auth_state");
+            auth_cookie.setMaxAge(0);
+            auth_cookie.setDomain("localhost");
+            auth_cookie.setPath("/");
+            servletResponse.addCookie(auth_cookie);
+        }
+
+        //invalidate the user_jwt cookie
+        if(getCookie(servletRequest,"user_jwt") != null){
+            Cookie user_jwtCookie = getCookie(servletRequest,"user_jwt");
+            user_jwtCookie.setMaxAge(0);
+            user_jwtCookie.setPath("/");
+            user_jwtCookie.setDomain("localhost");
+            servletResponse.addCookie(user_jwtCookie);
+        }
+
+        servletRequest.getSession(false).setAttribute("state",null);
+        servletRequest.getSession(false).setAttribute("user",null);
+        servletRequest.getSession(false).invalidate();
+        try {
+            servletRequest.logout();
+        } catch (ServletException e) {
+            e.printStackTrace();
+        }
+
+
+        return "Good bye! :))";
+
+    }
+
+    private Cookie getCookie(HttpServletRequest request, String name){
+
+        Cookie[] cookies = request.getCookies();
+        for(Cookie cookie : cookies){
+            if(cookie.getName().equals(name)){
+                return cookie;
+            }
+        }
+
+        return null;
+    }
 
 }

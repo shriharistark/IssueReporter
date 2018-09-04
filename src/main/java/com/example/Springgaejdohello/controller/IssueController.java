@@ -42,9 +42,6 @@ public class IssueController {
 	@Autowired
 	BatchWrite batchWrite;
 
-	@Autowired
-	HttpSession httpSession;
-
 
 	BatchWrite getBatchWrite(){
 		if(batchWrite == null){
@@ -55,21 +52,23 @@ public class IssueController {
 	}
 
 	@RequestMapping("/")
-	public String home(HttpServletResponse res, HttpServletRequest request) {
+	public String home(HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
 		//new request? set session : query db for the user data
 		System.out.println("\n---Hit home!---\n");
-		System.out.println("State: "+httpSession.getAttribute("state"));
+//		System.out.println("State id: "+servletRequest.getSession(false) == null);
 
-		if(httpSession.getAttribute("state") == null){
+		if(servletRequest.getSession() != null && servletRequest.getSession().getAttribute("state") == null){
+			String CSRF_token = new BigInteger(130, new SecureRandom()).toString(32);
+			servletRequest.getSession().setAttribute("state",CSRF_token);
 
-			String state = new BigInteger(130, new SecureRandom()).toString(32);
-			httpSession.setAttribute("state",state);
-
+			Cookie CSRF_cookie = new Cookie("auth_state",CSRF_token);
+			CSRF_cookie.setDomain("localhost");
+			CSRF_cookie.setPath("/");
+			CSRF_cookie.setSecure(true);
+			servletResponse.addCookie(CSRF_cookie);
 		}
 
-		else {
-			//query the db for user data
-		}
+		//cookie validations
 
 		return "home.html";
 	}
