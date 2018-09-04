@@ -3,6 +3,7 @@ package com.example.Springgaejdohello;
 import com.example.Springgaejdohello.model.CommentModel;
 import com.example.Springgaejdohello.model.IssueModel;
 import com.example.Springgaejdohello.model.TagsModel;
+import com.example.Springgaejdohello.model.UserModel;
 import com.googlecode.objectify.ObjectifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -23,6 +24,7 @@ public class SpringgaejdohelloApplication extends SpringBootServletInitializer {
 		ObjectifyService.register(IssueModel.class);
 		ObjectifyService.register(TagsModel.class);
 		ObjectifyService.register(CommentModel.class);
+		ObjectifyService.register(UserModel.class);
 	}
 
 //	@Bean

@@ -5,17 +5,17 @@
 const host = window.location.host;
 const protocol = window.location.protocol;
 
-(function(){
-    let uri = protocol+"//"+host+"/auth/";
-    let init = {
-        method:'GET'
-    };
-    fetch(uri, init).then((response) => {
-        console.log("state set");
-    }, (fail) => {
-        console.log("error with setting the state");
-    })
-})();
+// (function(){
+//     let uri = protocol+"//"+host+"/auth/";
+//     let init = {
+//         method:'GET'
+//     };
+//     fetch(uri, init).then((response) => {
+//         console.log("state set");
+//     }, (fail) => {
+//         console.log("error with setting the state");
+//     })
+// })();
 
 function authoriseWithGoogle(){
     // const port = window.location.port; //since host is the combination of hostName and port
@@ -38,8 +38,8 @@ function authoriseWithGoogle(){
             var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
             // Return everything after the equal sign, or an empty string if the cookie name not found
             return decodeURIComponent(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
-        })('state');
-        console.log(state);
+        })('auth_state');
+        console.log(`state in frontend: ${state}`);
 
         // uri = "https://accounts.google.com/o/oauth2/v2/auth?" +
         //     "client_id="+client_id+"&" +
@@ -51,7 +51,8 @@ function authoriseWithGoogle(){
         uri = "https://accounts.google.com/o/oauth2/v2/auth?redirect_uri="+redirect_uri
             +"&prompt=consent&response_type=code&client_id="+client_id
             +"&scope="+scope+
-            "&access_type=offline";
+            "&access_type=offline"+
+            "&state="+state;
 
         /*
         uri =
