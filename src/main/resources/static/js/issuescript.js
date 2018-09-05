@@ -7,6 +7,7 @@
   addIssue("open","123","Appointments disappearing all of a sudden","009","Prince","Jingle bells jingle bells jingle all the way. Twinkle twinkle little star how I wonder what I want, Up above the world so hight like a diamond in the sky","Avengers/Thulsi","390");
 * */
 
+
 document.getElementById("create-post").addEventListener("click",function (ev) {
     var createPostDiv = document.createElement("div");
     createPostDiv.classList.add("create-post-popup-div");

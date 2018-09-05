@@ -17,6 +17,19 @@ const protocol = window.location.protocol;
 //     })
 // })();
 
+$(document).ready(()=>{
+    if(!getCookie("user_presence")){
+        console.log("user not logged in");
+        $("#login-signup").trigger("click");
+    }
+});
+
+function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
 function authoriseWithGoogle(){
     // const port = window.location.port; //since host is the combination of hostName and port
 

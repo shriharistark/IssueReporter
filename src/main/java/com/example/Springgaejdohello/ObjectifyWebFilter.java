@@ -10,6 +10,8 @@ import com.example.Springgaejdohello.model.CommentModel;
 import com.example.Springgaejdohello.model.IssueModel;
 import com.example.Springgaejdohello.model.TagsModel;
 import com.googlecode.objectify.ObjectifyService;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.googlecode.objectify.ObjectifyFilter;
@@ -17,6 +19,7 @@ import com.googlecode.objectify.ObjectifyFilter;
 import java.io.IOException;
 
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @WebFilter(urlPatterns = {"/*","/"})
 
 public class ObjectifyWebFilter extends ObjectifyFilter {
