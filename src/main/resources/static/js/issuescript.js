@@ -15,6 +15,15 @@ document.getElementById("create-post").addEventListener("click",function (ev) {
 
 var events = {
 
+    downvoteButtonHover : function(){
+        $(".issue-main-container").on("mouseover",".downvote-button .btn",function(evt){
+            // alert("mouse overed!");
+            $(evt.target).find(".arrow-down").first().css("filter","contrast(20%)");
+        }).on("mouseleave",".btn",function (evt) {
+            $(evt.target).find(".arrow-down").first().css("filter","");
+        })
+    },
+
     sortBox : function(){
         $(".header-box").on("click",function(ev){
             $(".sort-box").first().slideDown(200);

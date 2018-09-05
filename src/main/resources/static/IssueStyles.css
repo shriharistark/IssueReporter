@@ -26,12 +26,11 @@ body{
 }
 
 #login-signup {
-
     width: fit-content;
     height: fit-content;
     align-self: flex-start;
     /* justify-content: flex-end; */
-    margin: 10px 19% 0px 0;
+    margin: 10px 5% 0px 0;
 }
 
 #login-signup:hover {
@@ -40,7 +39,8 @@ body{
 }
 
 #issue-container{
-    margin-right: 20%;
+    min-width: 70%;
+    /* margin-right: 10%; */
 }
 
 .issue-container{
@@ -185,6 +185,10 @@ body{
     padding-bottom: 50%;
 }
 
+.arrow-down:hover{
+    filter:contrast(20%);
+}
+
 
 .issue .btn {
     outline:none;
@@ -253,14 +257,15 @@ body{
 }
 
 #header{
-    min-width: 70%;
+    max-width: 75%;
     border-bottom: solid #ababab 1px;
     height: 6em;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     /* padding: 10px 22% 0px 0; */
-    margin: 0 10% 0 0;
+    /* margin: 0 15% 0 0; */
+    padding: 0px 10% 0px 0px;
 }
 
 #social-login{
@@ -312,7 +317,7 @@ body{
     padding : 8% 5%;
 }
 
-.existing-user{
+.existing-user , .new-user{
     text-align: -webkit-center;
     font-family: sans-serif;
     margin-top: 10px;
@@ -325,7 +330,12 @@ body{
 
 .existing-user:hover{
     cursor: pointer;
-    color: #ff6f56;
+    color: #e22100;
+}
+
+.new-user:hover{
+    cursor: pointer;
+    color: #007d25;
 }
 
 #sidebar{
@@ -335,13 +345,15 @@ body{
     justify-content: flex-start;
     align-items: center;
     margin-right: 2%;
+    margin-left : 3%;
 }
 
 #body-after-header{
+    max-width: 75%;
     padding: 12px;
     display: flex;
     flex-direction: row;
-    /*min-width: 90%;*/
+    /* min-width: 90%; */
 }
 
 .issue-popup{
