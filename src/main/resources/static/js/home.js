@@ -114,7 +114,7 @@ function(){
                 }
             },
 
-            submit : function (formParams,otherparams) {
+            submit : function (formParams,otherparams,actionsuponinvalidparams) {
 
                 if(!formParams){
                     return false;
@@ -130,15 +130,17 @@ function(){
                         let message = validatorResult[0];
                         let problematic_params = validatorResult.splice(1,validatorResult.length);
                         console.log(message,problematic_params);
+                        actionsuponinvalidparams(message,problematic_params);
                     }
                 }else {
+                    //will never happen unless the source is manually tampered
                     console.log("validator response isn't an array");
                 }
 
             }
         };
 
-        //magic code
+        //magic code that does lot of magic
         $("body").on("click",function(evt){
             evt.stopImmediatePropagation();
             /*console.log($(evt.target));
@@ -206,7 +208,36 @@ function(){
                     name : $("#name").val(),
                     team : $("#team").val(),
                 }
-                formEvents.submit(formParams,'');
+                formEvents.submit(formParams,'',function(message,invalidParams){
+                    let cssInvalid = {
+                        "border-bottom" : "2px solid #ff0006",
+                        "box-shadow" : "0px 8px 10px -3px #ffbebe",
+                    };
+
+                    let cssValid = {
+                        "border-bottom": "2px solid #66bd00",
+                        "box-shadow": "0px 5px 8px -3px #58d246",
+                    };
+                    //assign invalid css to invalid parameters
+                    invalidParams.forEach(param => {
+                        $("#"+param).closest(".signup-field").css(cssInvalid);
+                        $("#"+param).closest(".signup-field").css('border-color',"#ff0000");
+                    });
+
+                    //assigns css green for valid params - not required
+                    /*for(let key of Object.keys(formParams)){
+                        if(!invalidParams.includes(key)){
+                            $("#"+key).closest(".signup-field").css(cssValid);
+                        }
+                    }*/
+
+                    setTimeout(()=>{
+                        $(".signup-field").css({
+                            "border-bottom" : "",
+                            "box-shadow" : "",
+                        })
+                    }, 3500);
+                });
                 //submit the form
             }
         });
