@@ -25,24 +25,7 @@ public class AuthorisationFilter implements Filter {
         HttpServletRequest servletRequest = (HttpServletRequest) request;
         HttpServletResponse servletResponse = (HttpServletResponse) response;
 
-        if(servletRequest.getSession(false) != null){
-            if(servletRequest.getSession().getAttribute("user") != null){
-                chain.doFilter(servletRequest,servletResponse);
-            }
-
-            else{
-                Cookie user_presence = new Cookie("user_presence","false");
-                user_presence.setMaxAge(300);
-                servletResponse.addCookie(user_presence);
-                chain.doFilter(servletRequest,servletResponse);
-            }
-        }
-
-        else {
-            servletRequest.getSession(true);
-            System.out.println("no session!");
-            chain.doFilter(servletRequest,servletResponse);
-        }
+        chain.doFilter(servletRequest,servletResponse);
     }
 
     @Override

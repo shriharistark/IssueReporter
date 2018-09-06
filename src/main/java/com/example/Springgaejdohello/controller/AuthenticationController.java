@@ -112,18 +112,18 @@ public class AuthenticationController {
         //nothing actually happens here in localhost. This piece of code does nothing.
         //JsessionID is not flagged as secure whatsoever.
         Cookie[] ck = servletRequest.getCookies();
-        for(Cookie cookie : ck){
-            if(cookie.getName().equals("auth_state")){
-                state = cookie.getValue();
-            }
-
-            else if(cookie.getName().equals("JSESSIONID")){
-                System.out.println("\nJsession_id: "+cookie.getValue());
-                cookie.setDomain("localhost");
-                cookie.setPath("/");
-                cookie.setHttpOnly(true);
-                cookie.setSecure(true);
-                servletResponse.addCookie(cookie);
+        if(ck != null) {
+            for (Cookie cookie : ck) {
+                if (cookie.getName().equals("auth_state")) {
+                    state = cookie.getValue();
+                } else if (cookie.getName().equals("JSESSIONID")) {
+                    System.out.println("\nJsession_id: " + cookie.getValue());
+                    cookie.setDomain("localhost");
+                    cookie.setPath("/");
+                    cookie.setHttpOnly(true);
+                    cookie.setSecure(true);
+                    servletResponse.addCookie(cookie);
+                }
             }
         }
 
@@ -212,8 +212,8 @@ public class AuthenticationController {
                     user_cookie_temporary.setDomain("localhost");
                     user_cookie_temporary.setPath("/");
                     servletResponse.addCookie(user_cookie_temporary);
-                    servletResponse.sendRedirect("/");
-                    return "new user";
+//                    servletResponse.sendRedirect("/");
+//                    return "new user";
 
                 }
 
@@ -243,7 +243,7 @@ public class AuthenticationController {
                     user_details_cookie.setPath("/");
                     servletResponse.addCookie(user_details_cookie);
 
-                    servletResponse.sendRedirect("/");
+                    servletResponse.sendRedirect("/issue/home");
                 }
 
             } catch (IOException e) {
@@ -319,9 +319,11 @@ public class AuthenticationController {
     private Cookie getCookie(HttpServletRequest request, String name){
 
         Cookie[] cookies = request.getCookies();
-        for(Cookie cookie : cookies){
-            if(cookie.getName().equals(name)){
-                return cookie;
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(name)) {
+                    return cookie;
+                }
             }
         }
 

@@ -69,6 +69,11 @@ $(document).ready(
                     backgroundDismiss : true,
 
                 });
+            },
+
+            showSignupForm : function (partialObject) {
+                let user_object = partialObject;
+
             }
         }
 

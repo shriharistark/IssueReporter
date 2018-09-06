@@ -25,6 +25,7 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.cmd.Query;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping(value = {"/", "/issue"})
+@RequestMapping(value = { "/issue"})
 public class IssueController {
 
 	//singleton - so the wiring is done only at the run time
@@ -51,15 +52,16 @@ public class IssueController {
 		return batchWrite;
 	}
 
-	@RequestMapping("/")
-	public String home(HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
+	@RequestMapping("/home")
+	public ModelAndView home(HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
 		//new request? set session : query db for the user data
 		System.out.println("\n---Hit home!---\n");
 //		System.out.println("State id: "+servletRequest.getSession(false) == null);
 
-		if(servletRequest.getSession() != null && servletRequest.getSession().getAttribute("state") == null){
+		HttpSession session = servletRequest.getSession(false);
+		if(session != null && session.getAttribute("state") == null){
 			String CSRF_token = new BigInteger(130, new SecureRandom()).toString(32);
-			servletRequest.getSession().setAttribute("state",CSRF_token);
+			session.setAttribute("state",CSRF_token);
 
 			Cookie CSRF_cookie = new Cookie("auth_state",CSRF_token);
 			CSRF_cookie.setDomain("localhost");
@@ -68,8 +70,7 @@ public class IssueController {
 		}
 
 		//cookie validations
-
-		return "home.html";
+		return new ModelAndView("redirect:/home.html");
 	}
 
 	@RequestMapping(value = "/viewissue/{issueid}")

@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bugdog</title>
+    <!--<link rel="stylesheet" href="IssuedetailedStyles.css">-->
+    <script src="js/jquery.js"></script>
+</head>
+<body>
+<div id = "loading-icon" hidden>
+    <img src="img/infinity.gif">
+</div>
+
+<div id="header">
+    <div id = "login-signup" class="default-text">
+        Log in/Sign up
+    </div>
+</div>
+<div id = "body-after-header">
+
+    <!--sidebar elements -->
+    <div id = "sidebar">
+        <button id = "create-post" class="create-post-btn" onclick="issue.showBox('create-issue-popup')">CREATE POST</button>
+        <button id="search-post" class="create-post-btn">SEARCH POST</button>
+
+    </div>
+
+    <!--Signup form-->
+    <div id = "signup-form">
+        <form id = "create-issue-popup-form" autocomplete="off">
+
+            <!-- subject -->
+            <div class = "create-issue-popup-subject">
+                <div class="textInput">
+                    <div class="inset">
+                        Name
+                    </div>
+                    <div class="inputContainer">
+                        <input type="text" placeholder="**your name goes here" value="type in your name here" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+            <!-- description -->
+            <div class="create-issue-popup-description">
+                <div class="textInput">
+                    <div class="inset">
+                        Email
+                    </div>
+                    <div class="inputContainer">
+                        <input type="text" placeholder="**your email goes here" value="">
+                    </div>
+                </div>
+            </div>
+            <!-- assignee -->
+            <div class="create-issue-popup-assignee">
+                <div class="textInput">
+                    <div class="inset">
+                        Team
+                    </div>
+                    <div class="inputContainer">
+                        <input type="text" placeholder="not mandatory" value="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="create-issue-popup-done">
+                <button class="create-post-btn">Signup</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<!--alert box plugins-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
+
+<!--<script src="js/issuescript.js"></script>-->
+<script src="js/home.js"></script>
+<script src="js/auth.js"></script>
+
+<link rel="stylesheet" href="IssueStyles.css">
+
+<!-- refactor later -->
+<script type="text/javascript">
+    function validateForm() {
+        if (isEmpty(document.getElementById('data_6').value.trim())) {
+            alert('Name is required!');
+            return false;
+        }
+        if (isEmpty(document.getElementById('data_4').value.trim())) {
+            alert('Email is required!');
+            return false;
+        }
+        return true;
+    }
+    function isEmpty(str) { return (str.length === 0 || !str.trim()); }
+    function validateEmail(email) {
+        var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,15}(?:\.[a-z]{2})?)$/i;
+        return isEmpty(email) || re.test(email);
+    }
+</script>
+
+</body>
+</html>
