@@ -28,44 +28,45 @@
 
     <!--Signup form-->
     <div id = "signup-form">
-        <form id = "create-issue-popup-form" autocomplete="off">
+        <h2 class="title">Sign up</h2>
+        <form id = "create-issue-popup-form" autocomplete="off" action="#">
 
-            <!-- subject -->
-            <div class = "create-issue-popup-subject">
+            <!-- name -->
+            <div class = "signup-field">
                 <div class="textInput">
                     <div class="inset">
                         Name
                     </div>
                     <div class="inputContainer">
-                        <input type="text" placeholder="**your name goes here" value="type in your name here" autocomplete="off">
+                        <input id="name" type="text" placeholder="required" value="type in your name here" autocomplete="off">
                     </div>
                 </div>
             </div>
-            <!-- description -->
-            <div class="create-issue-popup-description">
+            <!-- email -->
+            <div class="signup-field">
                 <div class="textInput">
                     <div class="inset">
                         Email
                     </div>
                     <div class="inputContainer">
-                        <input type="text" placeholder="**your email goes here" value="">
+                        <input id="email"  type="text" placeholder="required" value="Your email id here">
                     </div>
                 </div>
             </div>
-            <!-- assignee -->
-            <div class="create-issue-popup-assignee">
+            <!-- Team -->
+            <div class="signup-field">
                 <div class="textInput">
                     <div class="inset">
                         Team
                     </div>
                     <div class="inputContainer">
-                        <input type="text" placeholder="not mandatory" value="">
+                        <input id="team" type="text" placeholder="optional" value="team's name">
                     </div>
                 </div>
             </div>
 
             <div class="create-issue-popup-done">
-                <button class="create-post-btn">Signup</button>
+                <button id ="submit-signup-form" class="create-post-btn">Signup</button>
             </div>
         </form>
     </div>
@@ -80,7 +81,7 @@
 <script src="js/home.js"></script>
 <script src="js/auth.js"></script>
 
-<link rel="stylesheet" href="IssueStyles.css">
+<link rel="stylesheet" href="landingpage.css">
 
 <!-- refactor later -->
 <script type="text/javascript">
