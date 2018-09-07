@@ -88,8 +88,8 @@ public class AuthenticationController {
                            HttpServletRequest servletRequest,
                            HttpServletResponse servletResponse) {
 
-        if(servletRequest.getSession() != null &&
-                servletRequest.getSession().getAttribute("user") != null){
+        if(servletRequest.getSession(false) != null &&
+                servletRequest.getSession(false).getAttribute("user") != null){
 
             try {
                 System.out.println("\nAlready has details in the session..\n");
@@ -207,13 +207,14 @@ public class AuthenticationController {
                     //if user fails to signup in 10 mins, the cookie will expire
                     System.out.println("\n"+user_details.get("email").toString()+" is a new user!"+"\n");
 
+                    //set the user details as jwt
                     Cookie user_cookie_temporary = new Cookie("user_details",authResponse.get("id_token").toString());
                     user_cookie_temporary.setMaxAge(600);
                     user_cookie_temporary.setDomain("localhost");
                     user_cookie_temporary.setPath("/");
                     servletResponse.addCookie(user_cookie_temporary);
-//                    servletResponse.sendRedirect("/");
-//                    return "new user";
+                    servletResponse.sendRedirect("/");
+                    return "new user";
 
                 }
 

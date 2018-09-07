@@ -18,7 +18,7 @@ const protocol = window.location.protocol;
 // })();
 
 $(document).ready(()=>{
-    if(!getCookie("user_presence")){
+    if(!getCookie("user_presence") && !getCookie("user_details")){
         console.log("user not logged in");
         $("#login-signup").trigger("click");
     }

@@ -4,6 +4,14 @@ function(){
 
     // no libraries used for the signup form! :D ;)
 
+    let user;
+
+    function parseJwt (token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(window.atob(base64));
+    };
+
     //default values for forms
         let default_values = {
             name : $("#name").val(),
@@ -167,6 +175,7 @@ function(){
                         _formEvents.source = $(event.target).attr("id");
                         $(event.target).val("");
                     }*/
+                    console.log("refactor check: ",_formEvents,"**",_defaultObj);
 
                     if(event.type === "click" &&
                         _formEvents.clicks < 2 && _formEvents.clicks > 0 &&
@@ -210,44 +219,63 @@ function(){
                     team : $("#team").val(),
                 }
                 formEvents.submit(formParams,'',function(message,invalidParams){
-                    let cssInvalid = {
-                        "border-bottom" : "2px solid #ff0006",
-                        "box-shadow" : "0px 8px 10px -3px #ffbebe",
-                    };
+                    // let cssInvalid = {
+                    //     "border-bottom" : "2px solid #ff0006",
+                    //     "box-shadow" : "0px 8px 10px -3px #ffbebe",
+                    // };
 
                     //assign invalid css to invalid parameters
                     invalidParams.forEach(param => {
-                        $("#"+param).closest(".signup-field").css(cssInvalid);
-                        $("#"+param).closest(".signup-field").css('border-color',"#ff0000");
+                        $("#"+param).closest(".signup-field").addClass('highlight-field-error');
+                        let invalidParamEl =  $("#"+param).closest(".signup-field");
+                        setTimeout(()=>{
+                            invalidParamEl.removeClass('highlight-field-error');
+                        },500);
+                        // $("#"+param).closest(".signup-field").css('border-color',"#ff0000");
+                    });
+
+                    $.alert({
+                        title : false,
+                        escapeKey : true,
+                        boxWidth : '50%',
+                        theme : 'dark',
+                        useBootstrap: false,
+                        content : message,
+                        autoClose : 'close|3000',
+                        buttons : {
+                            close : {
+                                isHidden : true,
+                            }
+                        }
                     });
 
                     //resets red css for valid params on successive attempts - not required
-                    if(invalidParams.length <= 0){
+                    // if(invalidParams.length <= 0){
+                    //
+                    //     $(".signup-field").css({
+                    //         "border-bottom" : "",
+                    //         "box-shadow" : "",
+                    //     });
+                    //     $(".signup-field").css("border-color","#efefef");
+                    // }
+                    // for(let key of Object.keys(formParams)){
+                    //     console.log(key,"|");
+                    //     if(!invalidParams.includes(key)){
+                    //         console.log(key," is a valid parameter");
+                    //         $("#"+key).closest(".signup-field").css({
+                    //             "border-bottom" : "",
+                    //             "box-shadow" : "",
+                    //         });
+                    //         $("#"+key).closest(".signup-field").css("border-color","#efefef");
+                    //     }
+                    // }
 
-                        $(".signup-field").css({
-                            "border-bottom" : "",
-                            "box-shadow" : "",
-                        });
-                        $(".signup-field").css("border-color","#efefef");
-                    }
-                    for(let key of Object.keys(formParams)){
-                        console.log(key,"|");
-                        if(!invalidParams.includes(key)){
-                            console.log(key," is a valid parameter");
-                            $("#"+key).closest(".signup-field").css({
-                                "border-bottom" : "",
-                                "box-shadow" : "",
-                            });
-                            $("#"+key).closest(".signup-field").css("border-color","#efefef");
-                        }
-                    }
-
-                    setTimeout(()=>{
-                        $(".signup-field").css({
-                            "border-bottom" : "",
-                            "box-shadow" : "",
-                        })
-                    }, 3500);
+                    // setTimeout(()=>{
+                    //     $(".signup-field").css({
+                    //         "border-bottom" : "",
+                    //         "box-shadow" : "",
+                    //     })
+                    // }, 3500);
                 });
                 //submit the form
             }
@@ -327,11 +355,132 @@ function(){
             },
 
             showSignupForm : function (partialObject) {
+
                 let user_object = partialObject;
+                $(".jconfirm").remove();
+                $("#signup-form").remove();
+
+                if(user_object.name && user_object.email) {
+
+                    let form = '    <div id = "signup-form">\n' +
+                        '        <h2 class="title">Sign up</h2>\n' +
+                        '        <form id = "create-issue-popup-form" autocomplete="off" action="#">\n' +
+                        '\n' +
+                        '            <!-- name -->\n' +
+                        '            <div class = "signup-field">\n' +
+                        '                <div class="textInput">\n' +
+                        '                    <div class="inset">\n' +
+                        '                        Name\n' +
+                        '                    </div>\n' +
+                        '                    <div class="inputContainer">\n' +
+                        `                        <input id="name" type="text" placeholder="required" value=${user_object.name} autocomplete="off">` +
+                        '                    </div>\n' +
+                        '                </div>\n' +
+                        '            </div>\n' +
+                        '            <!-- email -->\n' +
+                        '            <div class="signup-field">\n' +
+                        '                <div class="textInput">\n' +
+                        '                    <div class="inset">\n' +
+                        '                        Email\n' +
+                        '                    </div>\n' +
+                        '                    <div class="inputContainer">\n' +
+                        `                        <input id="email"  type="text" placeholder="required" value=${user_object.email}>\n` +
+                        '                    </div>\n' +
+                        '                </div>\n' +
+                        '            </div>\n' +
+                        '            <!-- Team -->\n' +
+                        '            <div class="signup-field">\n' +
+                        '                <div class="textInput">\n' +
+                        '                    <div class="inset">\n' +
+                        '                        Team\n' +
+                        '                    </div>\n' +
+                        '                    <div class="inputContainer">\n' +
+                        '                        <input id="team" type="text" placeholder="optional" value="team\'s name">\n' +
+                        '                    </div>\n' +
+                        '                </div>\n' +
+                        '            </div>\n' +
+                        '\n' +
+                        '            <div class="create-issue-popup-done">\n' +
+                        '                <button id ="submit-signup-form" class="create-post-btn">Signup</button>\n' +
+                        '            </div>\n' +
+                        '        </form>\n' +
+                        '    </div>';
 
 
+                    /*
+                    $("#name").val(partialObject.name);
+                    $("#email").val(partialObject.email);*/
+
+                    $.confirm({
+                        title : false,
+                        escapeKey: false,
+                        theme: 'material',
+                        animationSpeed: 400,
+                        boxWidth: '70%',
+                        useBootstrap: false,
+                        content: form,
+                        buttons: {
+                            close: {
+                                isHidden: true
+                            }
+                        },
+                        backgroundDismiss: false,
+
+                    });
+
+                    setTimeout(()=>{
+                        let fieldsPresent = [];
+                        //pushing all the fields in the form to check against the received ones from
+                        //google signup flow
+                        $("#signup-form input").each(function(index){
+                            fieldsPresent.push($(this).attr("ID"));
+                        });
+
+                        let prompt_field = '';
+                        for(const defaultParams of fieldsPresent){
+                            console.log((fieldsPresent));
+                            if(user_object[defaultParams]){
+                                $("#"+defaultParams).closest(".signup-field").addClass('highlight-field-ok');
+                                $("#"+defaultParams).closest(".signup-field").addClass('set-focus-die');
+                                $("#"+defaultParams).attr("readonly",true);
+                                // $("#"+defaultParams).off("click focus");
+                            }
+                            else {
+                                $("#"+defaultParams).closest(".signup-field").addClass('highlight-field-error');
+                                prompt_field = $("#"+defaultParams);
+                            }
+                        }
+
+                        setTimeout(()=>{
+                            if(prompt_field){
+                                prompt_field.click();
+                                prompt_field.focus();
+                                prompt_field.closest(".signup-field").removeClass('highlight-field-error');
+                            }
+                        },500);
+
+                    },150);
+
+                    // setTimeout(()=>{
+                    //     $("#"+'name').closest(".signup-field").removeClass('highlight-field');
+                    //     $("#"+'email').closest(".signup-field").removeClass('highlight-field');
+                    // },4000);
+
+                }
             }
         }
 
+        // boxes.showSignupForm({});
+        if(getCookie("user_details") && !user){
+            let user_jwt_for_signup = getCookie("user_details");
+            user = parseJwt(user_jwt_for_signup);
+
+            // if(user.name && user.email){
+            //     $("#name").val(user["name"]);
+            //     $("#email").val(user["email"]);
+            // }
+            boxes.showSignupForm(user);
+
+        }
     }
 )
