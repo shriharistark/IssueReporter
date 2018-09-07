@@ -64,7 +64,7 @@ function(){
 
                     //passed integrity check
                     if(formTests.email && formTests.name && formTests.team){
-                        return ["ok"];
+                        return ["ok",""];
                     }
 
                     //fail : contains default value || user has not entered any values on his own
@@ -122,12 +122,13 @@ function(){
 
                 let validatorResult = this._isValidForm(formParams);
                 if(Array.isArray(validatorResult)){
-                    if(validatorResult[0] === "ok"){
+                    let message = validatorResult[0];
+                    if(message === "ok"){
+                        actionsuponinvalidparams(message,[]);
                         //do the fetch post request bla bla
                     }
 
                     else{
-                        let message = validatorResult[0];
                         let problematic_params = validatorResult.splice(1,validatorResult.length);
                         console.log(message,problematic_params);
                         actionsuponinvalidparams(message,problematic_params);
@@ -214,22 +215,32 @@ function(){
                         "box-shadow" : "0px 8px 10px -3px #ffbebe",
                     };
 
-                    let cssValid = {
-                        "border-bottom": "2px solid #66bd00",
-                        "box-shadow": "0px 5px 8px -3px #58d246",
-                    };
                     //assign invalid css to invalid parameters
                     invalidParams.forEach(param => {
                         $("#"+param).closest(".signup-field").css(cssInvalid);
                         $("#"+param).closest(".signup-field").css('border-color',"#ff0000");
                     });
 
-                    //assigns css green for valid params - not required
-                    /*for(let key of Object.keys(formParams)){
+                    //resets red css for valid params on successive attempts - not required
+                    if(invalidParams.length <= 0){
+
+                        $(".signup-field").css({
+                            "border-bottom" : "",
+                            "box-shadow" : "",
+                        });
+                        $(".signup-field").css("border-color","#efefef");
+                    }
+                    for(let key of Object.keys(formParams)){
+                        console.log(key,"|");
                         if(!invalidParams.includes(key)){
-                            $("#"+key).closest(".signup-field").css(cssValid);
+                            console.log(key," is a valid parameter");
+                            $("#"+key).closest(".signup-field").css({
+                                "border-bottom" : "",
+                                "box-shadow" : "",
+                            });
+                            $("#"+key).closest(".signup-field").css("border-color","#efefef");
                         }
-                    }*/
+                    }
 
                     setTimeout(()=>{
                         $(".signup-field").css({
@@ -317,6 +328,7 @@ function(){
 
             showSignupForm : function (partialObject) {
                 let user_object = partialObject;
+
 
             }
         }

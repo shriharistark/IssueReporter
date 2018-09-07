@@ -63,11 +63,11 @@
 
 .signup-field:focus-within {
     /*Blue*/
-    /*border-bottom: 2px solid #00ddff;*/
-    /*box-shadow: 0px 8px 10px -3px #bef3ff;*/
+    border-bottom: 2px solid #00ddff;
+    box-shadow: 0px 8px 10px -3px #bef3ff;
 
-    border-bottom: 2px solid #ff0006;
-    box-shadow: 0px 8px 10px -3px #ffbebe;
+    /*border-bottom: 2px solid #ff0006;*/
+    /*box-shadow: 0px 8px 10px -3px #ffbebe;*/
 
     /* green*/
     /*border-bottom: 2px solid #66bd00;*/
