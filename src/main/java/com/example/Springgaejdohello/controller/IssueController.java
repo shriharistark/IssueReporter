@@ -58,17 +58,6 @@ public class IssueController {
 		System.out.println("\n---Hit home!---\n");
 //		System.out.println("State id: "+servletRequest.getSession(false) == null);
 
-		HttpSession session = servletRequest.getSession(false);
-		if(session != null && session.getAttribute("state") == null){
-			String CSRF_token = new BigInteger(130, new SecureRandom()).toString(32);
-			session.setAttribute("state",CSRF_token);
-
-			Cookie CSRF_cookie = new Cookie("auth_state",CSRF_token);
-			CSRF_cookie.setDomain("localhost");
-			CSRF_cookie.setPath("/");
-			servletResponse.addCookie(CSRF_cookie);
-		}
-
 		//cookie validations
 		return new ModelAndView("redirect:/home.html");
 	}

@@ -28,50 +28,73 @@ function(){
 
                 let rules = {
                     name : function(funcContainingRulesFornaming,params){
-                      // if(name.length > 3 && !name.includes(default_values["name"])){
-                      //     console.log("name validator passed!");
-                      //     return true;
-                      // }
-                      // return false;
                         return funcContainingRulesFornaming.call(rules,params);
                     },
 
-                    team : function(team){
-                        if(team.length > 3 && !team.includes(default_values["team"])){
-                            console.log("team validator passed!");
-                            return true;
-                        }
-                        return false;
+                    team :  function(funcContainingRulesForTeamName,teamObjectParam){
+                        return funcContainingRulesForTeamName.call(rules,teamObjectParam);
                     },
 
                     email : function(email){
                         let email_regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
                         if(email_regex.test(email)){
                             console.log("email validator passed");
-                            return true;
+                            return [true];
                         }
 
-                        return false;
+                        return [false];
                     }
                 }
 
+                //write rules here
                 let formTests = {
+                    rules : {
+                        email : 'Email needs to be a valid one',
+                        name : 'Name must be greater than 3 letters\nName cannot contain default values',
+                        team : '1. Team name must be greater than 3 letters\n2. Should be one of these : Bling, Fasttrack, Avengers, Claws',
+                    },
+                    getRules(param){
+                      return this.rules[param];
+                    },
+                    getTestParams(){
+                        //hardcoded for now -
+                        return Object.keys(this).filter(key => {
+                            return (key !== 'rules' && !key.startsWith("get"));
+                        })
+                    },
                     email : rules.email(formParams["email"]),
                     //define your custom rules here - implement the same for email as well as team fields
                     name  : rules.name(function(name){
                         if(name.length > 3 && !name.includes(default_values["name"])){
                             console.log("name validator passed!");
-                            return true;
+                            return [true];
                         }
-                        return false;
+                        return [false];
                     },formParams["name"]),
-                    team  : rules.team(formParams["team"]),
+                    team  : rules.team(function(teamobject){
+                        let teamname = teamobject.name;
+                        let teams = teamobject.teams;
+                        if(teamname.length < 3){
+                            return [false, "Team name must be greater than 3 letters"];
+                        }
+                        if(teamname.includes(default_values["team"])){
+                            return [false,"Contains default values on teams"];
+                        }
+
+                        if(!Array.isArray(teams) || !teams.includes(teamname)){
+                            return [false, "Team names must be Bling Claws Avengers Fasttrack"];
+                        }
+
+                        console.log("team validator passed!");
+                        return [true];
+
+                    },{name : formParams["team"], teams : ["bling","claws","avengers","fasttrack"]}),
                 };
 
                 if(formParams["email"] && formParams["name"] && formParams["team"]){
 
                     //passed integrity check
-                    if(formTests.email && formTests.name && formTests.team){
+                    if(formTests.email && formTests.name && formTests.team[0]){
                         return ["ok",""];
                     }
 
@@ -97,13 +120,19 @@ function(){
                     else{
                         //invalid message
                         let invalidParams = [];
-                        invalidParams.push("Rules not satisfied");
-                        for(const test of Object.keys(formTests)){
+                        let messageString = "";
+
+                        for(const test of formTests.getTestParams()){
                             // console.log(formTests[test]);
-                            if(!formTests[test]){
+                            let testResult = formTests[test];
+                            console.log(`${test} is ${testResult[0]} and results : ${testResult[1]}`);
+                            if(!testResult[0]){
                                 invalidParams.push(test);
+                                messageString += "\n"+testResult[1];
                             }
                         }
+                        console.log("true check for validation",invalidParams);
+                        invalidParams.unshift("Rules not satisfied: \n"+messageString);
                         return invalidParams;
                     }
                 }
@@ -241,12 +270,13 @@ function(){
                         theme : 'dark',
                         useBootstrap: false,
                         content : message,
-                        autoClose : 'close|3000',
+                        autoClose : 'close|5000',
                         buttons : {
                             close : {
                                 isHidden : true,
                             }
-                        }
+                        },
+                        backgroundDismiss : true,
                     });
 
                     //resets red css for valid params on successive attempts - not required

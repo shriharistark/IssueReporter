@@ -31,6 +31,7 @@ function getCookie(name) {
 }
 
 function authoriseWithGoogle(){
+
     // const port = window.location.port; //since host is the combination of hostName and port
 
     // function getCook(cookiename)
@@ -47,12 +48,30 @@ function authoriseWithGoogle(){
         const client_id = "126208571601-ge5rng2g2bui5o46pjr73chaska7bdtf.apps.googleusercontent.com";
         const redirect_uri = protocol+"//"+host+"/auth/google";
         const scope = "profile email openid";
-        const state = (function(cookiename){
-            var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
-            // Return everything after the equal sign, or an empty string if the cookie name not found
-            return decodeURIComponent(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
-        })('auth_state');
-        console.log(`state in frontend: ${state}`);
+        // const state = (function(cookiename){
+        //     var cookiestring=RegExp(""+cookiename+"[^;]+").exec(document.cookie);
+        //     // Return everything after the equal sign, or an empty string if the cookie name not found
+        //     return decodeURIComponent(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
+        // })('auth_state');
+        let state;
+        let uri;
+        fetch('/statetoken',{}).then(function (response) {
+            return response.json();
+        }).then(responseValue => {
+            if(responseValue.ok){
+                state = responseValue.state;
+            }
+            console.log(`state in frontend: ${state}`);
+            return state;
+        }).then(stateVal => {
+            uri = "https://accounts.google.com/o/oauth2/v2/auth?redirect_uri="+redirect_uri
+                +"&prompt=consent&response_type=code&client_id="+client_id
+                +"&scope="+scope+
+                "&access_type=offline"+
+                "&state="+state;
+
+            window.location.href = uri;
+        })
 
         // uri = "https://accounts.google.com/o/oauth2/v2/auth?" +
         //     "client_id="+client_id+"&" +
@@ -60,12 +79,6 @@ function authoriseWithGoogle(){
         //     "scope="+scope+"&" +
         //     "redirect_uri="+redirect_uri+"&" +
         //     "state="+state;
-
-        uri = "https://accounts.google.com/o/oauth2/v2/auth?redirect_uri="+redirect_uri
-            +"&prompt=consent&response_type=code&client_id="+client_id
-            +"&scope="+scope+
-            "&access_type=offline"+
-            "&state="+state;
 
         /*
         uri =
@@ -86,8 +99,8 @@ function authoriseWithGoogle(){
         // fetch(uri, init).then((tokens) => {
         //
         // });
-
-        window.location.href = uri;
+        //
+        // window.location.href = uri;
 
 };
 

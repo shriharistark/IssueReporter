@@ -127,11 +127,11 @@ public class AuthenticationController {
             }
         }
 
-        System.out.println("\nState applied from our issue reporter: "+servletRequest.getSession().getAttribute("state")+"\n");
+        System.out.println("\nState applied from our issue reporter: "+servletRequest.getSession(false).getAttribute("state")+"\n");
 
         //even if the state is null, this will get executed
         if (stateToken == null ||
-                stateToken.equals(servletRequest.getSession().getAttribute("state"))) {
+                stateToken.equals(servletRequest.getSession(false).getAttribute("google_state"))) {
 
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
