@@ -238,7 +238,7 @@ function(){
         $("body").on("keydown",function(evt){
 
             // console.log(evt.metaKey);
-            if(evt.metaKey && evt.keyCode === 13){
+            if(evt.metaKey && evt.keyCode === 13 || evt.ctrlKey){
                 console.log('command and enter is pressed');
                 console.log("sign up from submitted using cmd+enter");
 
@@ -278,41 +278,123 @@ function(){
                         },
                         backgroundDismiss : true,
                     });
-
-                    //resets red css for valid params on successive attempts - not required
-                    // if(invalidParams.length <= 0){
-                    //
-                    //     $(".signup-field").css({
-                    //         "border-bottom" : "",
-                    //         "box-shadow" : "",
-                    //     });
-                    //     $(".signup-field").css("border-color","#efefef");
-                    // }
-                    // for(let key of Object.keys(formParams)){
-                    //     console.log(key,"|");
-                    //     if(!invalidParams.includes(key)){
-                    //         console.log(key," is a valid parameter");
-                    //         $("#"+key).closest(".signup-field").css({
-                    //             "border-bottom" : "",
-                    //             "box-shadow" : "",
-                    //         });
-                    //         $("#"+key).closest(".signup-field").css("border-color","#efefef");
-                    //     }
-                    // }
-
-                    // setTimeout(()=>{
-                    //     $(".signup-field").css({
-                    //         "border-bottom" : "",
-                    //         "box-shadow" : "",
-                    //     })
-                    // }, 3500);
                 });
                 //submit the form
             }
         });
 
-        $("#submit-signup-form").on("click",function (evt) {
-            console.log("sign up from submitted using click");
+        $("body").on("click","#submit-signup-form",function(evt){
+
+            console.log("submit attempted using click");
+
+                let formParams = {
+                    email : $("#email").val(),
+                    name : $("#name").val(),
+                    team : $("#team").val(),
+                }
+                formEvents.submit(formParams,'',function(message,invalidParams){
+
+                    //assign invalid css to invalid parameters
+                    invalidParams.forEach(param => {
+                        $("#"+param).closest(".signup-field").addClass('highlight-field-error');
+                        let invalidParamEl =  $("#"+param).closest(".signup-field");
+                        setTimeout(()=>{
+                            invalidParamEl.removeClass('highlight-field-error');
+                        },500);
+                        // $("#"+param).closest(".signup-field").css('border-color',"#ff0000");
+                    });
+
+                    $.alert({
+                        title : false,
+                        escapeKey : true,
+                        boxWidth : '50%',
+                        theme : 'dark',
+                        useBootstrap: false,
+                        content : message,
+                        // autoClose : 'close|5000',
+                        buttons : {
+                            close : {
+                                isHidden : true,
+                            }
+                        },
+                        backgroundDismiss : true,
+                    });
+
+                    let failed_signup = $.alert({
+                        lazyOpen : true,
+                        title : false,
+                        escapeKey : false,
+                        boxWidth : '50%',
+                        theme : 'dark',
+                        useBootstrap: false,
+                        content : "Signup failed",
+                        autoClose : 'close|2500',
+                        buttons : {
+                            close : {
+                                isHidden : true,
+                            }
+                        },
+                        backgroundDismiss : true,
+                    });
+
+                    let successful_signup = $.alert({
+                        lazyOpen : true,
+                        title : false,
+                        escapeKey : false,
+                        boxWidth : '50%',
+                        theme : 'dark',
+                        useBootstrap: false,
+                        content : "Signup success. Logging you in ... ",
+                        autoClose : 'close|2500',
+                        buttons : {
+                            close : {
+                                isHidden : true,
+                            }
+                        },
+                        backgroundDismiss : true,
+                    });
+
+                    if(message === 'ok'){
+                        let signUpUrl = "/auth/signup/google";
+
+                        let signupParams = {
+                            name : $("#name").val(),
+                            email : $("#email").val(),
+                            team : $("#team").val(),
+                        };
+
+                        let init = {
+                            method : 'POST',
+                            headers : {
+                                'Content-Type' : 'application/json',
+                            },
+                            body : JSON.stringify(signupParams),
+                        };
+
+                        fetch(signUpUrl,init).then(signupResponse => {
+                            return signupResponse.json();
+                        }).then(token => {
+                            if(token.ok){
+                                let userTokenJson = token.message.googleToken;
+                                let userToken = JSON.parse(userTokenJson);
+                                window.localStorage.setItem('user',userTokenJson);
+                                successful_signup.open();
+                                return userToken;
+                            }
+                            else{
+                                failed_signup.open();
+                                return token.message.reason;
+                            }
+                        }).then(finalres => {
+                            setTimeout(()=>{
+                                window.location = "/";
+                            },4000);
+                        })
+                    }
+
+                });
+                //submit the form
+
         });
 
         $("#login-signup").click(()=>{
@@ -339,13 +421,12 @@ function(){
                     boxWidth : '30%',
                     useBootstrap : false,
                     content : '<div class = "login-signup-box">\n' +
-                    '        <div class="title">Sign up with </div>\n' +
+                    '        <div class="title">Continue with </div>\n' +
                     '        <div id="social-login">\n' +
                     '            <img src="img/googe-icon.png" id="google-sign-in" class="social-signin gsign-in" onclick="authoriseWithGoogle()">\n' +
                     '            <img src="img/fbsign-in.png" id = "facebook-sign-in" class="social-signin facebooksign-in">\n' +
                     '            <img src = "img/github-signin.png" id ="github-sign-in" class="social-signin githubsign-in">\n' +
                     '        </div>\n' +
-                    '        <div id ="login" class="existing-user" >Already have a account? Log in</div>\n' +
                     '    </div>',
                     buttons : {
                         close : {
@@ -392,7 +473,7 @@ function(){
 
                 if(user_object.name && user_object.email) {
 
-                    let form = '    <div id = "signup-form">\n' +
+                    let form = '    <div id = "signup-form" onsubmit="return false;">\n' +
                         '        <h2 class="title">Sign up</h2>\n' +
                         '        <form id = "create-issue-popup-form" autocomplete="off" action="#">\n' +
                         '\n' +

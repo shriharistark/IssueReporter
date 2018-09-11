@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-@WebFilter(urlPatterns = "/*")
+@WebFilter(urlPatterns = "/xkjljjf")
 @Order(2)
 public class AuthorisationFilter implements Filter {
 

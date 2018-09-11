@@ -18,7 +18,7 @@ const protocol = window.location.protocol;
 // })();
 
 $(document).ready(()=>{
-    if(!getCookie("user_presence") && !getCookie("user_details")){
+    if(!getCookie("user_presence") && !getCookie("user_jwt")){
         console.log("user not logged in");
         $("#login-signup").trigger("click");
     }
@@ -68,7 +68,8 @@ function authoriseWithGoogle(){
                 +"&prompt=consent&response_type=code&client_id="+client_id
                 +"&scope="+scope+
                 "&access_type=offline"+
-                "&state="+state;
+                "&state="+state+
+                "&type="+"signup";
 
             window.location.href = uri;
         })

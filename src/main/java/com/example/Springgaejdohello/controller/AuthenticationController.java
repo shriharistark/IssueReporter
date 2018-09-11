@@ -1,11 +1,13 @@
 package com.example.Springgaejdohello.controller;
 
+import com.example.Springgaejdohello.Builders.UserBuilder;
 import com.example.Springgaejdohello.Service.Auth.Google.AuthObject;
 import com.example.Springgaejdohello.Service.Auth.Google.AuthObjectBuilder;
 import com.example.Springgaejdohello.Service.Auth.Google.Credentials;
 import com.example.Springgaejdohello.Service.Utils.AuthResponse;
 import com.example.Springgaejdohello.dao.UserDAOService;
 import com.example.Springgaejdohello.daoInterface.UserDAO;
+import com.example.Springgaejdohello.model.UserModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,15 +20,13 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,30 +52,6 @@ public class AuthenticationController {
     public @ResponseBody String setCSRF_state(){
 
         //new request? set session : query db for the user data
-//        if(httpSession.getAttribute("state") == null){
-//
-//            String state = new BigInteger(130, new SecureRandom()).toString(32);
-//            httpSession.setAttribute("state",state);
-////            Cookie cookie = new Cookie("state",state);
-////            response.addCookie(cookie);
-//
-////            RestTemplate restTemplate = new RestTemplate();
-////            AuthObject authObject = restTemplate.getForObject("https://accounts.google.com/o/oauth2/v2/auth?" +
-////                    "client_id="+CLIENT_ID+
-////                    "&response_type="+"code"+
-////                    "&scope="+"openid email"+
-////                    "&redirect_uri="+getBase_url(request)+"/auth/google/"+
-////                    "&state="+state,AuthObject.class);
-//
-//
-//            return state;
-//
-//        }
-//
-//        else {
-//            //query the db for user data
-//            return "";
-//        }
         return "authentication";
     }
 
@@ -84,12 +60,15 @@ public class AuthenticationController {
     public @ResponseBody String
     authenticateWithGoogle(@RequestParam("code") String authCode,
                            @RequestParam(value = "prompt", required = false)String prompt,
-                           @RequestParam(value = "state", required = false) String stateToken,
+                           @RequestParam(value = "state", required = false) String stateTokenFromGoogle,
                            HttpServletRequest servletRequest,
                            HttpServletResponse servletResponse) {
 
-        if(servletRequest.getSession(false) != null &&
-                servletRequest.getSession(false).getAttribute("user") != null){
+        HttpSession session = servletRequest.getSession(false);
+
+        //user is already logged in
+        if(session != null &&
+                session.getAttribute("user") != null){
 
             try {
                 System.out.println("\nAlready has details in the session..\n");
@@ -105,153 +84,90 @@ public class AuthenticationController {
         HashMap<String, String> responseMap = new HashMap<>();
         String response = "";
 
-        System.out.println("\nState returned from google: "+stateToken+"\n");
+        //state that we applied on our client side which was
+        // generated from the server side - verify it on the server side as well
+        System.out.println("\nState returned from google: "+stateTokenFromGoogle+"\n");
 
-        String state = "";
+        String stateSetByUs = session.getAttribute("google_state") != null ? session.getAttribute("google_state").toString() : "";
 
-        //nothing actually happens here in localhost. This piece of code does nothing.
-        //JsessionID is not flagged as secure whatsoever.
-        Cookie[] ck = servletRequest.getCookies();
-        if(ck != null) {
-            for (Cookie cookie : ck) {
-                if (cookie.getName().equals("auth_state")) {
-                    state = cookie.getValue();
-                } else if (cookie.getName().equals("JSESSIONID")) {
-                    System.out.println("\nJsession_id: " + cookie.getValue());
-                    cookie.setDomain("localhost");
-                    cookie.setPath("/");
-                    cookie.setHttpOnly(true);
-                    cookie.setSecure(true);
-                    servletResponse.addCookie(cookie);
-                }
-            }
-        }
+        System.out.println("\nState applied from our issue reporter: "+stateSetByUs+"\n");
 
-        System.out.println("\nState applied from our issue reporter: "+servletRequest.getSession(false).getAttribute("state")+"\n");
+        Map<String,Object> googleResponseAsMap = new HashMap<>();
 
-        //even if the state is null, this will get executed
-        if (stateToken == null ||
-                stateToken.equals(servletRequest.getSession(false).getAttribute("google_state"))) {
+        //validating the state tokens here
+        if (stateTokenFromGoogle.equals(stateSetByUs)) {
 
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
+            //clear the session attribute
+            session.removeAttribute("google_state");
             //hack code to find the host
             String uri = servletRequest.getRequestURI();
             String base_url = servletRequest.getRequestURL().toString();
             base_url = base_url.replaceFirst(uri, "");
 
+            googleResponseAsMap = exchangeAuthCodeForAccessTokenWithGoogle(authCode,base_url+"/auth/google");
+            Map<String, Object> user_details = getUserDetails_jwt(googleResponseAsMap.get("id_token").toString());
 
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("code", authCode);
-            params.add("client_id", Credentials.CLIENT_ID);
-            params.add("client_secret", Credentials.CLIENT_SECRET);
-            params.add("grant_type", "authorization_code");
-            params.add("redirect_uri", base_url+"/auth/google");
+            //if not an existing user(a new user) ->
+            // redirect to sign up page with pre-filled data from google such as user's name, email etc.
+            //setting google's id token to the session
 
+            if(userDAOService.readUser(user_details.get("email").toString().toLowerCase()) == null){
 
-            System.out.print("\nAuthcode: " + authCode + "\n");
+                //if user fails to signup in 10 mins, the cookie will expire
+                System.out.println("\n"+user_details.get("email").toString()+" is a new user!"+"\n");
 
-            HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<MultiValueMap<String, String>>(params, headers);
+                //set the user details as jwt
+                //this user jwt will expire in 10 minutes regardless of whether the user signed in or not
+                Cookie user_cookie_temporary = new Cookie("user_details",googleResponseAsMap.get("id_token").toString());
+                user_cookie_temporary.setMaxAge(300);
+                user_cookie_temporary.setDomain("localhost");
+                user_cookie_temporary.setPath("/");
+                servletResponse.addCookie(user_cookie_temporary);
 
-            String authResponseJson = "sample error";
-            try{
+                session.setAttribute("google_signup_token",user_details);
 
-                ResponseEntity<String> authResponse_entity= restTemplate
-                        .exchange(
-                                "https://www.googleapis.com/oauth2/v4/token",
-                                HttpMethod.POST
-                                , requestHeader
-                                , String.class);
-
-                if(authResponse_entity.getStatusCode().is2xxSuccessful()){
-                    authResponseJson = authResponse_entity.getBody();
-                }
-
-                else {
-                    authResponseJson = authResponse_entity.getBody();
-                }
-            }catch (HttpClientErrorException e){
-                System.out.println("Client Exception 400");
-                e.getMessage();
-                e.getStackTrace();
-            }
-
-
-            System.out.print("\nResponse: " + authResponseJson + "\n");
-
-            ObjectMapper authResponseMapper = new ObjectMapper();
-            try {
-                Map<String,Object> authResponse = authResponseMapper.readValue(authResponseJson, new TypeReference<Map<String, Object>>() {});
-
-                System.out.println("----\nResponse we got from google Oauth = "+authResponse+"\n------");
-
-                AuthObject authObject = new AuthObjectBuilder(Credentials.CLIENT_ID,"http://localhost:8080"+"/auth/google","openid email")
-                        .setAccess_token(authResponse.get("access_token").toString())
-                        .setExpires_in(authResponse.get("expires_in").toString())
-                        .setToken_type(authResponse.get("token_type").toString())
-                        .build();
-                if(authResponse.get("refresh_token") != null){
-                    authObject.setRefresh_token(authResponse.get("refresh_token").toString());
-                }
-
-                Map<String, Object> user_details = getUserDetails_jwt(authResponse.get("id_token").toString());
-
-                //if not an existing user(a new user) ->
-                // redirect to sign up page with pre-filled data from google such as user's name, email etc.
-                if(!userDAOService.isExistingUser(user_details.get("email").toString().toLowerCase())){
-
-                    //if user fails to signup in 10 mins, the cookie will expire
-                    System.out.println("\n"+user_details.get("email").toString()+" is a new user!"+"\n");
-
-                    //set the user details as jwt
-                    Cookie user_cookie_temporary = new Cookie("user_details",authResponse.get("id_token").toString());
-                    user_cookie_temporary.setMaxAge(600);
-                    user_cookie_temporary.setDomain("localhost");
-                    user_cookie_temporary.setPath("/");
-                    servletResponse.addCookie(user_cookie_temporary);
+                try {
                     servletResponse.sendRedirect("/");
-                    return "new user";
-
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
-
-                if (!authResponse.isEmpty()) {
-                    responseMap.put("ok","success");
-                    responseMap.put("refreshToken", authObject.getRefresh_token());
-                    responseMap.put("accessToken", authObject.getAccess_token());
-                    responseMap.put("expires in", authObject.getExpires_in());
-                    responseMap.put("id_token", authResponse.get("id_token").toString());
-                    responseMap.put("user_email",user_details.get("email").toString());
-                    responseMap.put("email_verified",user_details.get("email_verified").toString());
-
-                    //once state validation is done, remove the state token
-                    if(getCookie(servletRequest,"auth_state") != null) {
-                        Cookie auth_cookie = getCookie(servletRequest,"auth_state");
-                        auth_cookie.setPath("/");
-                        auth_cookie.setDomain("localhost");
-                        auth_cookie.setMaxAge(0);
-                        servletResponse.addCookie(auth_cookie);
-                    }
-
-                    servletRequest.getSession().setAttribute("user",user_details);
-
-                    //set user details in a cookie
-                    Cookie user_details_cookie = new Cookie("user_jwt", responseMap.get("id_token"));
-                    user_details_cookie.setDomain("localhost");
-                    user_details_cookie.setPath("/");
-                    servletResponse.addCookie(user_details_cookie);
-
-                    servletResponse.sendRedirect("/issue/home");
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
+                return "new user";
             }
 
-        }else {
+            System.out.println("\n"+user_details.get("email").toString()+" is an existing user!"+"\n");
+
+
+            if (!googleResponseAsMap.isEmpty()) {
+                responseMap.put("ok","success");
+                responseMap.put("refreshToken", googleResponseAsMap.get("refresh_token").toString());
+                responseMap.put("accessToken", googleResponseAsMap.get("access_token").toString());
+                responseMap.put("expires in", googleResponseAsMap.get("expires_in").toString());
+                responseMap.put("id_token", googleResponseAsMap.get("id_token").toString());
+                responseMap.put("user_email",user_details.get("email").toString());
+                responseMap.put("email_verified",user_details.get("email_verified").toString());
+                responseMap.put("user_picture",user_details.get("picture").toString());
+
+                //set user details to user's session ID
+                servletRequest.getSession().setAttribute("user",user_details);
+
+                //set user details in a cookie
+                Cookie user_details_cookie = new Cookie("user_jwt", responseMap.get("id_token"));
+                user_details_cookie.setDomain("localhost");
+                user_details_cookie.setPath("/");
+                servletResponse.addCookie(user_details_cookie);
+
+                try {
+                    servletResponse.sendRedirect("/issue/home");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    System.out.println("issue/home doesn't exist");
+                }
+            }
+
+
+        }
+
+        else {
 
             responseMap.put("ok", "failed to authenticate");
             responseMap.put("reason","Invalid state Token");
@@ -265,13 +181,126 @@ public class AuthenticationController {
         return response;
     }
 
+    //for the signup with social logins
+    @RequestMapping(value = "/signup/email", method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String userSignup(@RequestBody String signupParams,
+                                           HttpServletRequest servletRequest,
+                                           HttpServletResponse servletResponse) throws IOException {
 
-    private Map<String, Object> getUserDetails_jwt(String jsonWebToken) throws IOException {
+
+        //todo
+
+        return "endpoint is not active yet";
+
+    }
+
+    //for the signup with social logins
+    @RequestMapping(value = "/signup/{type}", method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String userSignup(@RequestBody String signupParams,
+                                           @PathVariable("type") String signupType,
+                                           HttpServletRequest servletRequest,
+                                           HttpServletResponse servletResponse) throws IOException {
+
+        HttpSession session = servletRequest.getSession(false);
+        //parse protocol and base uri from the request
+        String uri = servletRequest.getRequestURI();
+        String base_url = servletRequest.getRequestURL().toString();
+        base_url = base_url.replaceFirst(uri, "");
+
+        Map<String,Object> responseMap = new HashMap<>();
+
+        //sesion not equal null is an insanity check
+        if(session != null && session.getAttribute("google_signup_token") != null &&
+                //protect this using a filter //todo
+                session.getAttribute("user") == null){
+
+            String[] paramsTobePresentIntheRequest = new String[]{"name","email","team","type"};
+            Map<String,Object> paramsReceived = new ObjectMapper().readValue
+                    (signupParams,new TypeReference<Map<String, Object>>() {});
+            paramsReceived.put("type",signupType);
+
+            //invalidate the signup Cookie
+            Cookie invalid_cookie = getCookie(servletRequest,"user_details");
+            invalid_cookie.setMaxAge(1);
+            invalid_cookie.setDomain("localhost");
+            invalid_cookie.setPath("/");
+            servletResponse.addCookie(invalid_cookie);
+
+            if(checkForMandatoryParams(paramsReceived,paramsTobePresentIntheRequest)){
+                if(userDAOService.readUser(paramsReceived.get("email").toString().toLowerCase()) == null){
+                    //if no user is accounted with this email address
+                    userDAOService.createUser(new UserBuilder(
+                            paramsReceived.get("email").toString().toLowerCase(),paramsReceived.get("name").toString())
+                            .setUser_status("active")
+                            .setUser_type(signupType)
+                            .setUser_team(paramsReceived.get("team").toString())
+                            .build());
+
+                    ObjectMapper googleTokenWriter = new ObjectMapper();
+
+                    responseMap.put("email",paramsReceived.get("email").toString());
+                    responseMap.put("googleToken",googleTokenWriter.writeValueAsString(
+                            session.getAttribute("google_signup_token")));
+                    System.out.println(session.getAttribute("google_signup_token").getClass());
+                    session.setAttribute("google_login_token",session.getAttribute("google_signup_token"));
+                    session.removeAttribute("google_signup_token");
+
+                    Cookie user_presence = new Cookie("user_presence","true");
+                    user_presence.setMaxAge(-1);
+                    user_presence.setDomain("localhost");
+                    user_presence.setPath("/");
+                    servletResponse.addCookie(user_presence);
+
+                    return writeResponseToJson(true,responseMap);
+
+                }
+                else{
+                    responseMap.put("reason","user is already present");
+                    return writeResponseToJson(false,responseMap);
+                }
+            }
+            else{
+                responseMap.put("reason","name, email and team are mandatory");
+                return writeResponseToJson(false,responseMap);
+            }
+
+        }
+
+        //write response finally
+        //todo
+        responseMap.put("reason","google token is unavailable at the session");
+        return writeResponseToJson(false,responseMap);
+
+    }
+
+    //for generic sign-ups
+
+    @RequestMapping(value = "/login/{type}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public @ResponseBody String userLogin(@RequestParam("email")String userEmail,
+                                          @RequestParam("type")String userType,
+                                          @RequestParam("password")String password){
+
+
+        return "";
+
+    }
+
+    private Map<String, Object> getUserDetails_jwt(String jsonWebToken) {
 
         String payload = jsonWebToken.split("\\.")[1];
         String user_details_json = new String (Base64.getDecoder().decode(payload));
-        Map<String, Object> user_details = new ObjectMapper().readValue
-                (user_details_json,new TypeReference<Map<String, Object>>() {});
+        Map<String, Object> user_details = null;
+        try {
+            user_details = new ObjectMapper().readValue
+                    (user_details_json,new TypeReference<Map<String, Object>>() {});
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            System.out.println("json exception");
+        }
 
         return user_details;
     }
@@ -303,8 +332,20 @@ public class AuthenticationController {
             servletResponse.addCookie(user_jwtCookie);
         }
 
-        servletRequest.getSession(false).setAttribute("state",null);
-        servletRequest.getSession(false).setAttribute("user",null);
+        //invalidate the user_presence cookie
+        if(getCookie(servletRequest,"user_presence") != null){
+            Cookie user_presence = getCookie(servletRequest,"user_presence");
+            user_presence.setMaxAge(0);
+            user_presence.setPath("/");
+            user_presence.setDomain("localhost");
+            servletResponse.addCookie(user_presence);
+        }
+
+        servletRequest.getSession(false).removeAttribute("state");
+        servletRequest.getSession(false).removeAttribute("user");
+        servletRequest.getSession(false).removeAttribute("google_signup_token");
+        servletRequest.getSession(false).removeAttribute("google_login_token");
+
         servletRequest.getSession(false).invalidate();
         try {
             servletRequest.logout();
@@ -315,6 +356,68 @@ public class AuthenticationController {
 
         return "Good bye! :))";
 
+    }
+
+    private Map<String,Object> exchangeAuthCodeForAccessTokenWithGoogle(String authorization_code,
+                                                                        String redirect_uri) {
+
+        //state must have been verified on the previous end point itself
+        //use the authorization code and the redirect uri to post request to google server
+        //get the token response and return it to the callee
+        Map<String,Object> googleResponse = new HashMap<>();
+
+        if(!authorization_code.isEmpty() && !redirect_uri.isEmpty()){
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("code", authorization_code);
+            params.add("client_id", Credentials.CLIENT_ID);
+            params.add("client_secret", Credentials.CLIENT_SECRET);
+            params.add("grant_type", "authorization_code");
+            params.add("redirect_uri", redirect_uri);
+
+
+            System.out.print("\nAuthcode: " + authorization_code + "\n");
+
+            HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<MultiValueMap<String, String>>(params, headers);
+
+            String authResponseJson = "sample error";
+
+            try {
+                ResponseEntity<String> authResponse_entity = restTemplate
+                        .exchange(
+                                "https://www.googleapis.com/oauth2/v4/token",
+                                HttpMethod.POST
+                                , requestHeader
+                                , String.class);
+
+                if (authResponse_entity.getStatusCode().is2xxSuccessful()) {
+                    authResponseJson = authResponse_entity.getBody();
+                } else {
+                    authResponseJson = authResponse_entity.getBody();
+                }
+            }catch (HttpClientErrorException e) {
+                e.printStackTrace();
+                System.out.println("Invalid post requst to google");
+                googleResponse.put("error message", "Client exception");
+            }
+            try {
+                googleResponse = new ObjectMapper().readValue(authResponseJson,new TypeReference<Map<String, Object>>() {});
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                System.out.println("Error while trying to parse Google's response as json");
+                googleResponse.put("error message","json exception");
+            }
+
+        }
+
+        return googleResponse;
     }
 
     private Cookie getCookie(HttpServletRequest request, String name){
@@ -329,6 +432,32 @@ public class AuthenticationController {
         }
 
         return null;
+    }
+
+    private boolean checkForMandatoryParams(Map<String,Object> userInput, String[] paramsToCheckAgainst){
+
+        for(String param : paramsToCheckAgainst){
+            if(!userInput.containsKey(param)){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private String writeResponseToJson(boolean ok, Map<String,Object> body){
+
+        Map<String, Object> responseMap = new HashMap<>();
+        ObjectMapper responseMapper = new ObjectMapper();
+        try {
+            responseMap.put("ok", ok);
+            responseMap.put("message", body);
+
+            return responseMapper.writeValueAsString(responseMap);
+        }catch (JsonProcessingException js){
+            System.out.println("json processing exception");
+            return "";
+        }
     }
 
 }

@@ -31,7 +31,7 @@ var downvotes = {
 
     populateDownvoters : function (issueCode) {
 
-        let url = "/getdownvoters?issueid="+issueCode;
+        let url = "issue/getdownvoters?issueid="+issueCode;
         let init = {
             method : "GET",
             headers : {

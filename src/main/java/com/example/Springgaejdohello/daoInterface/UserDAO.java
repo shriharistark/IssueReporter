@@ -10,5 +10,5 @@ public interface UserDAO {
     UserModel readUser(String user_email);
     boolean updateUser(String user_email,UserModel userModel);
     boolean deleteUser(String user_email);
-    boolean isExistingUser(String user_email);
+//    String isExistingUser(String user_email);
 }

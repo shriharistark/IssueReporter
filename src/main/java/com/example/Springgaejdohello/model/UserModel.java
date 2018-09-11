@@ -14,6 +14,7 @@ public class UserModel {
     String user_refresh_token;
     String user_picture;
     @Index String user_status;
+    String user_password; //of course it is SHA 256 encrypted with salt!
 
     public UserModel(){
 
@@ -73,5 +74,13 @@ public class UserModel {
 
     public void setUser_status(String user_status) {
         this.user_status = user_status;
+    }
+
+    public String getUser_password() {
+        return user_password;
+    }
+
+    public void setUser_password(String user_password) {
+        this.user_password = user_password;
     }
 }

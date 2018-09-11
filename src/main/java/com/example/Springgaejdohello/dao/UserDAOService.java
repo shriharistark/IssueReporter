@@ -67,12 +67,18 @@ public class UserDAOService implements UserDAO {
         return false;
 
     }
-
-    @Override
-    public boolean isExistingUser(String user_email) {
-
-        //new user => readuser returns null || null != null false => isExistinguser = false
-
-        return readUser(user_email) != null;
-    }
+//
+//    @Override
+//    public String isExistingUser(String user_email) {
+//
+//        //new user => readuser returns null || null != null false => isExistinguser = false
+//
+//        UserModel user = readUser(user_email);
+//        if(user == null){
+//            return null;
+//        }
+//        else{
+//            return user.getUser_type();
+//        }
+//    }
 }
